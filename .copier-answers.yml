@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.3.8
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: wpetit@ed.ac.uk
+author_name: William Petit
+has_binder: false
+has_settings: false
+kind: server
+labextension_name: nbexchange-jlab
+project_short_description: A JupyterLab extension for NbExchange
+python_name: nbexchange-jlab
+repository: ''
+test: true
+

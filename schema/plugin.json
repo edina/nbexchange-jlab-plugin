@@ -1,0 +1,37 @@
+{
+  "title": "NBExchange JupyterLab plugin",
+  "description": "NBExchange for Jupyterlab.",
+  "jupyter.lab.menus": {
+    "main": [
+      {
+        "id": "jp-mainmenu-nbexchange",
+        "label": "Nbexchange",
+        "rank": 80,
+        "items": [
+          {
+            "command": "nbgrader:open-assignment-list",
+            "rank": 500
+          },
+          {
+            "command": "nbgrader:open-course-list",
+            "rank": 500
+          },
+          {
+            "command": "nbgrader:open-formgrader",
+            "rank": 500
+          },
+          {
+            "command": "nbgrader:open-create-assignment",
+            "rank": 500
+          },
+          {
+            "command": "nbgrader:open-history",
+            "rank": 500
+          }
+        ]
+      }
+    ]
+  },
+  "additionalProperties": false,
+  "type": "object"
+}

@@ -1,0 +1,22 @@
+/*
+    See the JupyterLab Developer Guide for useful CSS Patterns:
+
+    https://jupyterlab.readthedocs.io/en/stable/developer/css.html
+*/
+
+.row {
+    margin: 5px 0;
+    border-top: dimgrey 1px solid;
+}
+
+.badge {
+    display: inline-block;
+    min-width: 20px;
+    padding: 2px;
+    border-radius: 50%;
+    font-size: smaller;
+    text-align: center;
+    background: #1976d2;
+    color: #fefefe;
+    margin-left: 1em;
+}
