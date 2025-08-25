@@ -33,30 +33,32 @@ export class HistoryList {
         // TODO
     }
 
-    public clear_list(loading: boolean): void {
-        // TODO
+    public clear_list(): void {
+        this.panel_group_element.innerHTML = '';
     }
 
     private load_list_success(data: any[]): void {
-        // this.clear_list(false);
+        this.clear_list();
 
         for (let i=0; i<data.length; i++) {
             const assignments: any[] = data[i]['assignments'];
+
+            console.log("Assignments count", assignments.length);
             for(let j=0; j<assignments.length; j++) {
-                const assignment = assignments[i];
+                const assignment = assignments[j];
                 const assignment_code = assignment['assignment_code'];
                 const assignment_id = assignment['assignment_id'];
+                console.log("Assignment: ",assignment_code);
                 // Create assignment panel
                 const assignment_panel_elem = document.createElement('div');
+                assignment_panel_elem.classList.add('panel', 'panel-default');
                 const panel_body_id = "assignment-panel-body-" + assignment_id;
                 assignment_panel_elem.innerHTML = ([
-                    '    <div class="panel panel-default">',
                     '      <div class="panel-heading">',
                     '        ' + assignment_code + ' <' + assignment_id + '>',
                     '      </div>',
                     '      <div class="panel-body" id="' + panel_body_id + '">',
                     '      </div>',
-                    '    </div>'
                 ].join('\n'));
                 this.panel_group_element.append(assignment_panel_elem);
 
@@ -89,10 +91,11 @@ export class HistoryList {
         if(callback) {
             this.callback = callback;
         }
-        this.clear_list(true);
+        this.clear_list();
         try {
-            // const data = await requestAPI<any>("history");
-            const data: {success: boolean,value: any[] | string} = {"success":true,"value":[{"role":"Instructor","user":{"id":2266,"name":"1-kiz"},"assignments":[{"assignment_id":818,"assignment_code":"t 271509","actions":[{"action":"AssignmentActions.released","timestamp":"2023-04-27 14:11:41.811636 UTC","user":"1-kiz"},{"action":"AssignmentActions.fetched","timestamp":"2023-04-27 14:11:48.437523 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:12:02.607811 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:12:08.194856 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:13:33.937920 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:13:42.679900 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:14:25.880876 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.648164 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.704879 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:16:53.502806 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.034791 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.042261 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:19:24.206872 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:20:12.308669 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.010973 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.014984 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.022065 UTC","user":"1-kiz"}],"action_summary":{"released":1,"fetched":1,"submitted":3,"collected":3,"feedback_released":3,"feedback_fetched":6}}],"isInstructor":true,"course_id":111,"course_code":"made up","course_title":"made up"}]}
+            const data = await requestAPI<any>("history");
+            // const data: {success: boolean,value: any[] | string} = {"success":true,"value":[{"role":"Instructor","user":{"id":2266,"name":"1-kiz"},"assignments":[{"assignment_id":818,"assignment_code":"t 271509","actions":[{"action":"AssignmentActions.released","timestamp":"2023-04-27 14:11:41.811636 UTC","user":"1-kiz"},{"action":"AssignmentActions.fetched","timestamp":"2023-04-27 14:11:48.437523 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:12:02.607811 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:12:08.194856 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:13:33.937920 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:13:42.679900 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:14:25.880876 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.648164 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.704879 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:16:53.502806 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.034791 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.042261 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:19:24.206872 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:20:12.308669 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.010973 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.014984 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.022065 UTC","user":"1-kiz"}],"action_summary":{"released":1,"fetched":1,"submitted":3,"collected":3,"feedback_released":3,"feedback_fetched":6}}],"isInstructor":true,"course_id":111,"course_code":"made up","course_title":"made up"}]}
+            console.log(data)
             if(data.success) {
                 this.load_list_success(<any[]>data.value)
             } else {
@@ -279,6 +282,7 @@ class ActionGroup {
         actions: Action[]
     ){
         let element: HTMLDivElement = document.createElement('div');
+        element.classList.add('action-group');
         this.make_row(element, title, actions);
         const div_elements = panel_elem.getElementsByTagName('div');
         const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
@@ -287,12 +291,11 @@ class ActionGroup {
 
     private make_row(element: HTMLDivElement, title: string, actions: Action[]): void {
         const row = document.createElement('details');
-        row.classList.add('row')
         const summary = document.createElement("summary");
 
         const title_span = document.createElement('span');
         const count_span = document.createElement('span');
-        count_span.classList.add('badge')
+        count_span.classList.add('action-badge')
 
         title_span.innerText = title
         count_span.innerText = String(actions.length);
@@ -316,7 +319,7 @@ class Action {
         data: any
     ){
         let element: HTMLDivElement = document.createElement('div');
-        element.classList.add('row')
+        element.classList.add('action-row')
         this.make_row(element, data);
         parent_elem.append(element)
     }
@@ -330,7 +333,8 @@ class Action {
         const user_span = document.createElement('span');
         user_span.classList.add('col-sm-4')
 
-        timestamp_span.innerText = data['timestamp']
+        const date = new Date(data['timestamp']);
+        timestamp_span.innerText = date.toLocaleDateString() + " " + date.toLocaleTimeString();
         user_span.innerText = data['user']
 
         row.append(timestamp_span)

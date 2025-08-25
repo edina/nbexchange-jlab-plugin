@@ -1,7 +1,7 @@
 {
   "ServerApp": {
     "jpserver_extensions": {
-      "nbexchange-jlab": true
+      "nbexchange_jlab": true
     }
   }
 }

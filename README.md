@@ -4,8 +4,8 @@
 
 A JupyterLab extension for NbExchange
 
-This extension is composed of a Python package named `nbexchange-jlab`
-for the server extension and a NPM package named `nbexchange-jlab`
+This extension is composed of a Python package named `nbexchange_jlab`
+for the server extension and a NPM package named `nbexchange_jlab`
 for the frontend extension.
 
 ## Requirements
@@ -17,7 +17,7 @@ for the frontend extension.
 To install the extension, execute:
 
 ```bash
-pip install nbexchange-jlab
+pip install nbexchange_jlab
 ```
 
 ## Uninstall
@@ -25,7 +25,7 @@ pip install nbexchange-jlab
 To remove the extension, execute:
 
 ```bash
-pip uninstall nbexchange-jlab
+pip uninstall nbexchange_jlab
 ```
 
 ## Troubleshoot
@@ -62,7 +62,7 @@ pip install -e ".[test]"
 # Link your development version of the extension with JupyterLab
 jupyter labextension develop . --overwrite
 # Server extension must be manually installed in develop mode
-jupyter server extension enable nbexchange-jlab
+jupyter server extension enable nbexchange_jlab
 # Rebuild extension Typescript source after making changes
 jlpm build
 ```
@@ -88,8 +88,8 @@ jupyter lab build --minimize=False
 
 ```bash
 # Server extension must be manually disabled in develop mode
-jupyter server extension disable nbexchange-jlab
-pip uninstall nbexchange-jlab
+jupyter server extension disable nbexchange_jlab
+pip uninstall nbexchange_jlab
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`

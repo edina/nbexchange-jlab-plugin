@@ -1,6 +1,6 @@
 {
-    "name": "nbexchange-jlab",
-    "version": "0.1.0",
+    "name": "nbexchange_jlab",
+    "version": "0.2.0",
     "description": "A JupyterLab extension to add Noteable Look and Feel",
     "keywords": [
         "jupyter",
@@ -39,7 +39,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-        "clean:labextension": "rimraf nbexchange-jlab/labextension nbexchange-jlab/_version.py",
+        "clean:labextension": "rimraf nbexchange_jlab/labextension nbexchange_jlab/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -113,7 +113,7 @@
             }
         },
         "extension": true,
-        "outputDir": "nbexchange-jlab/labextension",
+        "outputDir": "nbexchange_jlab/labextension",
         "schemaDir": "schema"
     },
     "eslintIgnore": [

@@ -8,6 +8,7 @@ import {
     HistoryList,
     CourseList,
 } from './history';
+import {requestAPI} from "../handler";
 
 export class HistoryWidget extends Widget {
 
@@ -18,7 +19,7 @@ export class HistoryWidget extends Widget {
         this.app = app;
 
         this.node.innerHTML = ([
-            '<div id="history" class="tab-pane">',
+            '<div id="nbexchange-history-list" class="tab-pane">',
             '  <div id="history_toolbar" class="row list_toolbar">',
             '    <div class="col-sm-8 no-padding">',
             '      <span id="history_list_info" class="toolbar_info">History for course:</span>',
@@ -61,24 +62,28 @@ export class HistoryWidget extends Widget {
             history_l,
             options
         );
+
+        this.checkNbGraderVersion();
     }
 
-    // TODO: We probably want to make sure we use the right version of Nbgrader
-    // checkNbGraderVersion() {
-    //     var warning = this.node.getElementsByClassName('version_error')[0] as HTMLDivElement;
-    //     warning.hidden=false;
-    //     requestAPI<any>('nbgrader_version?version='+"0.9.5")
-    //         .then(response => {
-    //             if (!response['success']) {
-    //                 warning.innerText = response['message'];
-    //                 warning.style.display = 'block'
-    //             }
-    //         })
-    //         .catch(reason => {
-    //             console.error(
-    //                 `Error on GET /assignment_list/nbgrader_version.\n${reason}`
-    //             );
-    //         });
-    // }
+    checkNbGraderVersion() {
+        const warning = this.node.getElementsByClassName('version_error')[0] as HTMLDivElement;
+        requestAPI<any>('nbgrader_version?version='+"0.9.5", '')
+            .then(response => {
+                if (!response['success']) {
+                    warning.hidden=false;
+                    warning.innerText = response['message'];
+                    warning.style.display = 'block'
+                }
+                else {
+                    warning.hidden=true;
+                }
+            })
+            .catch(reason => {
+                console.error(
+                    `Error on GET /assignment_list/nbgrader_version.\n${reason}`
+                );
+            });
+    }
 
 }

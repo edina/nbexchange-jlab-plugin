@@ -7788,9 +7788,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nbexchange-jlab@workspace:.":
+"nbexchange_jlab@workspace:.":
   version: 0.0.0-use.local
-  resolution: "nbexchange-jlab@workspace:."
+  resolution: "nbexchange_jlab@workspace:."
   dependencies:
     "@jupyter-notebook/tree": ^7.4.4
     "@jupyterlab/application": ^4.4.5

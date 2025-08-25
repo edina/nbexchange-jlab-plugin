@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0
 build-backend = "hatchling.build"
 
 [project]
-name = "nbexchange-jlab"
+name = "nbexchange_jlab"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
@@ -44,26 +44,26 @@ source = "nodejs"
 fields = ["description", "authors", "urls", "keywords"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["nbexchange-jlab/labextension"]
+artifacts = ["nbexchange_jlab/labextension"]
 exclude = [".github", "binder"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"nbexchange-jlab/labextension" = "share/jupyter/labextensions/nbexchange-jlab"
-"install.json" = "share/jupyter/labextensions/nbexchange-jlab/install.json"
+"nbexchange_jlab/labextension" = "share/jupyter/labextensions/nbexchange_jlab"
+"install.json" = "share/jupyter/labextensions/nbexchange_jlab/install.json"
 "jupyter-config/server-config" = "etc/jupyter/jupyter_server_config.d"
 "jupyter-config/labconfig" = "etc/jupyter/labconfig"
 
 [tool.hatch.build.hooks.version]
-path = "nbexchange-jlab/_version.py"
+path = "nbexchange_jlab/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "nbexchange-jlab/labextension/static/style.js",
-    "nbexchange-jlab/labextension/package.json",
+    "nbexchange_jlab/labextension/static/style.js",
+    "nbexchange_jlab/labextension/package.json",
 ]
-skip-if-exists = ["nbexchange-jlab/labextension/static/style.js"]
+skip-if-exists = ["nbexchange_jlab/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -73,7 +73,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "nbexchange-jlab/labextension"
+build_dir = "nbexchange_jlab/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"

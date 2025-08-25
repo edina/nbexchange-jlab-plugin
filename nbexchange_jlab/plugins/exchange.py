@@ -45,8 +45,7 @@ class Exchange(ABCExchange):
         ),
     ).tag(config=True)
 
-    # base_service_url = Unicode(os.environ.get("NAAS_EXBASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(config=True)
-    base_service_url = Unicode(os.environ.get("NAAS_EXBASE_URL", "http://localhost:9000")).tag(config=True)
+    base_service_url = Unicode(os.environ.get("NAAS_EXBASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(config=True)
 
     def service_url(self):
         this_url = urljoin(self.base_service_url, "/services/nbexchange/")
@@ -75,6 +74,8 @@ class Exchange(ABCExchange):
         raise ExchangeError(msg)
 
     def api_request(self, path, method="GET", *args, **kwargs):
+        self.log.info(f"api_request: {path}")
+
         jwt_token = os.environ.get("NAAS_JWT")
         cookies = dict()
         headers = dict()
@@ -84,7 +85,7 @@ class Exchange(ABCExchange):
 
         url = self.service_url() + path
 
-        self.log.debug(f"Exchange.api_request calling exchange with url {url}")
+        self.log.info(f"Exchange.api_request calling exchange with url {url}")
 
         if method == "GET":
             get_req = partial(requests.get, url, headers=headers, cookies=cookies, timeout=self.api_timeout)

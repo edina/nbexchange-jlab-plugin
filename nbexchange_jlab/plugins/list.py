@@ -37,7 +37,7 @@ class ExchangeList(abc.ExchangeList, Exchange):
 
     def query_exchange(self):
         """
-        This queries the database for all the actions for a course
+        This queries the database for all the assignments for a course
 
         if self.inbound or self.cached are true, it returns all the 'submitted'
         items, else it returns all the 'released' ones.
@@ -46,72 +46,72 @@ class ExchangeList(abc.ExchangeList, Exchange):
         """
         try:
             if self.coursedir.course_id:
-                """List history for specific course"""
-                r = self.api_request(f"history?course_id={quote_plus(self.coursedir.course_id)}")
+                """List assignments for specific course"""
+                r = self.api_request(f"assignments?course_id={quote_plus(self.coursedir.course_id)}")
             else:
-                """List history for all courses"""
-                r = self.api_request("history")
+                """List assignments for all courses"""
+                r = self.api_request("assignments")
         except requests.exceptions.Timeout:
-            self.fail("Timed out trying to reach the exchange service to list available history.")
+            self.fail("Timed out trying to reach the exchange service to list available assignments.")
 
-        self.log.debug(f"Got back {r} when listing history")
+        self.log.debug(f"Got back {r} when listing assignments")
 
         try:
-            history = r.json()
+            assignments = r.json()
         except json.decoder.JSONDecodeError as err:
             self.log.error(
-                "Got back an invalid response when listing history\n"
+                "Got back an invalid response when listing assignments\n"
                 f"response text: {r.text}\n"
                 f"JSONDecodeError: {err}"
             )
             return []
 
-        return history["value"]
+        return assignments["value"]
 
     def init_src(self):
         pass
 
-    # sets self.history to be the list of assignment records that match the
+    # sets self.assignments to be the list of assignment records that match the
     #  released/submitted/cached criteria configured
     def init_dest(self):
-        self.history = []
+        self.assignments = []
 
-        exchange_listed_history = self.query_exchange()
-        self.log.debug(f"ExternalExchange.list.init_dest collected {exchange_listed_history}")
+        exchange_listed_assignments = self.query_exchange()
+        self.log.debug(f"ExternalExchange.list.init_dest collected {exchange_listed_assignments}")
 
         # if "inbound", looking for inbound (submitted) records
         # elif 'cached', looking for already downloaded files
         # else, looking for outbound (released) files
         if self.inbound or self.cached:
-            for assignment in exchange_listed_history:
+            for assignment in exchange_listed_assignments:
                 if assignment.get("status") == "submitted":
-                    self.history.append(assignment)
+                    self.assignments.append(assignment)
         else:
-            self.history = filter(lambda x: x.get["status"] == "released", exchange_listed_history)
+            self.assignments = filter(lambda x: x.get["status"] == "released", exchange_listed_assignments)
 
     def copy_files(self):
         pass
 
     # Add the path for notebooks on disk, and add the blank parameters
     # Feedback details is listed in "submitted" records
-    def parse_action(self, action):
+    def parse_assignment(self, assignment):  # , on_disk_assignments=None):
         # If the assignment was found on disk, we need to expand the metadata
-        if action.get("status") == "fetched":
+        if assignment.get("status") == "fetched":
             # get the individual notebook details
-            action_dir = os.path.join(self.action_dir, action.get("assignment_id"))
+            assignment_dir = os.path.join(self.assignment_dir, assignment.get("assignment_id"))
 
             if self.path_includes_course:
-                action_dir = os.path.join(
-                    self.action_dir,
+                assignment_dir = os.path.join(
+                    self.assignment_dir,
                     self.coursedir.course_id,
-                    action.get("assignment_id"),
+                    assignment.get("assignment_id"),
                 )
 
-            action["notebooks"] = []
+            assignment["notebooks"] = []
             # Find the ipynb files
-            for notebook in sorted(glob.glob(os.path.join(action_dir, "*.ipynb"))):
+            for notebook in sorted(glob.glob(os.path.join(assignment_dir, "*.ipynb"))):
                 notebook_id = os.path.splitext(os.path.split(notebook)[1])[0]
-                action["notebooks"].append(
+                assignment["notebooks"].append(
                     {
                         "path": notebook,
                         "notebook_id": notebook_id,
@@ -122,107 +122,107 @@ class ExchangeList(abc.ExchangeList, Exchange):
                     }
                 )
 
-        return action
+        return assignment
 
-    def parse_history(self):
+    def parse_assignments(self):
 
         # Set up some general variables
-        self.history = []
-        held_history = {"fetched": {}, "released": {}}
+        self.assignments = []
+        held_assignments = {"fetched": {}, "released": {}}
 
         # Get a list of everything from the exchange
-        exchange_listed_history = self.query_exchange()
+        exchange_listed_assignments = self.query_exchange()
 
         # if "inbound" or "cached" are true, we're looking for inbound
         #  (submitted) records else we're looking for outbound (released)
         #  records
-        # (everything else is irrelevant for this method - self.history will
+        # (everything else is irrelevant for this method - self.assignments will
         #   contain either a list of `released` items or a list of `submitted items`
         #   ..... and nothing else!)
         if self.inbound or self.cached:
-            for action in exchange_listed_history:
-                if action.get("status") == "submitted":
-                    self.history.append(action)
+            for assignment in exchange_listed_assignments:
+                if assignment.get("status") == "submitted":
+                    self.assignments.append(assignment)
         else:
-            for action in exchange_listed_history:
-                if action.get("status") == "released":
-                    self.history.append(action)
+            for assignment in exchange_listed_assignments:
+                if assignment.get("status") == "released":
+                    self.assignments.append(assignment)
 
         # We want to check the local disk for "fetched" items, not what the external server
         #   says we should have.
         # **NOTE** the way this works is that the status of a `released` record gets changed to
         #  `fetched` if the item is on disk
-        interim_history = []
+        interim_assignments = []
         found_fetched = set([])
-        for action in self.history:
+        for assignment in self.assignments:
             if self.path_includes_course:
-                action_directory = os.path.join(
-                    self.action_dir, action["course_id"], action["assignment_id"]
+                assignment_directory = os.path.join(
+                    self.assignment_dir, assignment["course_id"], assignment["assignment_id"]
                 )
             else:
-                action_directory = os.path.join(self.action_dir, action["assignment_id"])
+                assignment_directory = os.path.join(self.assignment_dir, assignment["assignment_id"])
 
-            if action["status"] == "released":
+            if assignment["status"] == "released":
                 # Has this release already been found on disk?
-                if action["assignment_id"] in found_fetched:
+                if assignment["assignment_id"] in found_fetched:
                     continue
-                # Check to see if the 'released' action is on disk
-                if os.path.isdir(action_directory):
-                    action["status"] = "fetched"
-                    # lets just take a note of having found this action
-                    found_fetched.add(action["action"])
+                # Check to see if the 'released' assignment is on disk
+                if os.path.isdir(assignment_directory):
+                    assignment["status"] = "fetched"
+                    # lets just take a note of having found this assignment
+                    found_fetched.add(assignment["assignment_id"])
 
-            interim_history.append(self.parse_assignment(action))
-            self.log.debug(f"parse_assignment singular action returned: {action}")
+            interim_assignments.append(self.parse_assignment(assignment))
+            self.log.debug(f"parse_assignment singular assignment returned: {assignment}")
 
         # now we build two sub-lists:
         # - the last "released" per assignment_id - but only if they've not been "fetched"
         #
-        my_history = []
+        my_assignments = []
 
-        for action in interim_history:
+        for assignment in interim_assignments:
             # Skip those not being seen
-            if action is None:
+            if assignment is None:
                 continue
 
-            # Hang onto the fetched action, if there is one
+            # Hang onto the fetched assignment, if there is one
             # Note, we'll only have a note of the _first_ one - but that's fine
             #  as the timestamp is irrelevant... we just need to know if we
             #  need to look to the local disk
-            if action.get("status") == "fetched":
-                held_history["fetched"][action.get("assignment_id")] = action
+            if assignment.get("status") == "fetched":
+                held_assignments["fetched"][assignment.get("assignment_id")] = assignment
                 continue
 
             # filter out all the released items:
-            if action.get("status") == "released":
+            if assignment.get("status") == "released":
                 # This is complicated:
-                #  - If the user has "fetched" the action, we ignore any released records
+                #  - If the user has "fetched" the assignment, we ignore any released records
                 #    ... whatever age they are
                 #  - otherwise keep the latest one
-                if action.get("assignment_id") in held_history["fetched"]:
+                if assignment.get("assignment_id") in held_assignments["fetched"]:
                     continue
                 else:
-                    latest = held_history["released"].get(
-                        action.get("assignment_id"),
+                    latest = held_assignments["released"].get(
+                        assignment.get("assignment_id"),
                         {"timestamp": "1990-01-01 00:00:00 UTC"},
                     )
-                    if action.get("timestamp") >= latest.get("timestamp"):
-                        held_history["released"][action.get("assignment_id")] = action
+                    if assignment.get("timestamp") >= latest.get("timestamp"):
+                        held_assignments["released"][assignment.get("assignment_id")] = assignment
                     continue
 
             # "Submitted" assignments [may] have feedback
             # If they do, we need to promote details of local [on disk] feedback
-            # to the "action" level. It would have been nice to match
+            # to the "assignment" level. It would have been nice to match
             # sumbission times to feedback directories.
             # Note that the UI displays the "submitted" time in the table, but
             # will provide a link to a folder that is the "feedback" time
             # ("feedback-time" for all notebooks in one 'release' is the same)
-            if action.get("status") == "submitted":
-                feedback_dir = os.path.join(action.get("assignment_id"), "feedback")
+            if assignment.get("status") == "submitted":
+                feedback_dir = os.path.join(assignment.get("assignment_id"), "feedback")
                 if self.path_includes_course:
                     feedback_dir = os.path.join(
                         self.coursedir.course_id,
-                        action.get("assignment_id"),
+                        assignment.get("assignment_id"),
                         "feedback",
                     )
 
@@ -233,10 +233,10 @@ class ExchangeList(abc.ExchangeList, Exchange):
                 #  .ipynb file, then 'release_feedback' does not push a .html file to the exchange, which
                 # therefore has no record in it's database. This means the the assignments lister in the
                 # exchange doesn't add a feedback_timestamp to _that_ notebook. Therefore we need to note
-                # if _any_ notebooks in the action [for that student] has a timestamp, and use that
+                # if _any_ notebooks in the assignment [for that student] has a timestamp, and use that
                 # rather than rely on the last notebook having a timestamp
                 group_nb_timestamp = None
-                for notebook in action["notebooks"]:
+                for notebook in assignment["notebooks"]:
                     local_feedback_path = None
                     has_local_feedback = False
                     nb_timestamp = notebook["feedback_timestamp"]
@@ -265,36 +265,36 @@ class ExchangeList(abc.ExchangeList, Exchange):
                     notebook["has_local_feedback"] = has_local_feedback
                     notebook["local_feedback_path"] = local_feedback_path
 
-                # Set action-level variables is any not the individual notebooks
+                # Set assignment-level variables is any not the individual notebooks
                 # have them
-                if action["notebooks"]:
-                    has_local_feedback = any([nb["has_local_feedback"] for nb in action["notebooks"]])
-                    has_exchange_feedback = any([nb["has_exchange_feedback"] for nb in action["notebooks"]])
-                    feedback_updated = any([nb["feedback_updated"] for nb in action["notebooks"]])
+                if assignment["notebooks"]:
+                    has_local_feedback = any([nb["has_local_feedback"] for nb in assignment["notebooks"]])
+                    has_exchange_feedback = any([nb["has_exchange_feedback"] for nb in assignment["notebooks"]])
+                    feedback_updated = any([nb["feedback_updated"] for nb in assignment["notebooks"]])
                 else:
                     has_local_feedback = False
                     has_exchange_feedback = False
                     feedback_updated = False
 
-                action["has_local_feedback"] = has_local_feedback
-                action["has_exchange_feedback"] = has_exchange_feedback
-                action["feedback_updated"] = feedback_updated
+                assignment["has_local_feedback"] = has_local_feedback
+                assignment["has_exchange_feedback"] = has_exchange_feedback
+                assignment["feedback_updated"] = feedback_updated
                 if has_local_feedback:
-                    action["local_feedback_path"] = os.path.join(
+                    assignment["local_feedback_path"] = os.path.join(
                         feedback_dir,
                         group_nb_timestamp,
                     )
                 else:
-                    action["local_feedback_path"] = None
+                    assignment["local_feedback_path"] = None
 
             # We keep everything we've not filtered out
-            my_history.append(action)
+            my_assignments.append(assignment)
 
-        # concatinate the "released" and "fetched" sublists to my_history
+        # concatinate the "released" and "fetched" sublists to my_assignments
         for assignment_type in ("released", "fetched"):
-            if held_history[assignment_type].items():
-                for assignment_id in held_history[assignment_type]:
-                    my_history.append(held_history[assignment_type][assignment_id])
+            if held_assignments[assignment_type].items():
+                for assignment_id in held_assignments[assignment_type]:
+                    my_assignments.append(held_assignments[assignment_type][assignment_id])
 
         if self.inbound or self.cached:
             _get_key = lambda info: (  # noqa: E731 'do not assign a lambda expression, use a def'
@@ -305,10 +305,10 @@ class ExchangeList(abc.ExchangeList, Exchange):
             _match_key = lambda info, key: (  # noqa: E731 'do not assign a lambda expression, use a def'
                 info["course_id"] == key[0] and info["student_id"] == key[1] and info["assignment_id"] == key[2]
             )
-            assignment_keys = sorted(list(set([_get_key(info) for info in my_history])))
+            assignment_keys = sorted(list(set([_get_key(info) for info in my_assignments])))
             assignment_submissions = []
             for key in assignment_keys:
-                submissions = [x for x in my_history if _match_key(x, key)]
+                submissions = [x for x in my_assignments if _match_key(x, key)]
                 submissions = sorted(submissions, key=lambda x: x["timestamp"])
                 info = {
                     "course_id": key[0],
@@ -318,11 +318,11 @@ class ExchangeList(abc.ExchangeList, Exchange):
                     "submissions": submissions,
                 }
                 assignment_submissions.append(info)
-            my_history = assignment_submissions
+            my_assignments = assignment_submissions
         else:
-            my_history = [x for x in my_history if x.get("status") != "submitted"]
+            my_assignments = [x for x in my_assignments if x.get("status") != "submitted"]
 
-        return my_history
+        return my_assignments
 
     def list_files(self):
         """List files"""
