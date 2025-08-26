@@ -61,7 +61,7 @@ def setup_handlers(web_app):
     route_pattern = url_path_join(base_url, "nbexchange-jlab", "get-example")
     route_pattern_history = url_path_join(base_url, "nbexchange-jlab", "history")
     handlers = [
-        (route_pattern, HistoryRouteHandler),
+        (route_pattern, RouteHandler),
         (route_pattern_history, HistoryRouteHandler)
     ]
     web_app.add_handlers(host_pattern, handlers)
