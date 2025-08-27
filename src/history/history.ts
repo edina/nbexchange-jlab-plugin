@@ -50,13 +50,13 @@ export class HistoryList {
                 const assignment_id = assignment['assignment_id'];
                 console.log("Assignment: ",assignment_code);
                 // Create assignment panel
-                const assignment_panel_elem = document.createElement('div');
+                const assignment_panel_elem = document.createElement('details');
                 assignment_panel_elem.classList.add('panel', 'panel-default');
                 const panel_body_id = "assignment-panel-body-" + assignment_id;
                 assignment_panel_elem.innerHTML = ([
-                    '      <div class="panel-heading">',
+                    '      <summary class="panel-heading">',
                     '        ' + assignment_code + ' <' + assignment_id + '>',
-                    '      </div>',
+                    '      </summary>',
                     '      <div class="panel-body" id="' + panel_body_id + '">',
                     '      </div>',
                 ].join('\n'));
@@ -275,7 +275,7 @@ export class CourseList{
 
 class ActionGroup {
     constructor(
-        panel_elem: HTMLDivElement,
+        panel_elem: HTMLElement,
         parent: string,
         title: string,
         actions: Action[]
