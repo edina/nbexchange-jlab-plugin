@@ -93,9 +93,8 @@ export class HistoryList {
         }
         this.clear_list();
         try {
-            const data = await requestAPI<any>("history");
-            // const data: {success: boolean,value: any[] | string} = {"success":true,"value":[{"role":"Instructor","user":{"id":2266,"name":"1-kiz"},"assignments":[{"assignment_id":818,"assignment_code":"t 271509","actions":[{"action":"AssignmentActions.released","timestamp":"2023-04-27 14:11:41.811636 UTC","user":"1-kiz"},{"action":"AssignmentActions.fetched","timestamp":"2023-04-27 14:11:48.437523 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:12:02.607811 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:12:08.194856 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:13:33.937920 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:13:42.679900 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:14:25.880876 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.648164 UTC","user":"1-kiz"},{"action":"AssignmentActions.collected","timestamp":"2023-04-27 14:15:45.704879 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:16:53.502806 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.034791 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:17:01.042261 UTC","user":"1-kiz"},{"action":"AssignmentActions.submitted","timestamp":"2023-04-27 14:19:24.206872 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_released","timestamp":"2023-04-27 14:20:12.308669 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.010973 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.014984 UTC","user":"1-kiz"},{"action":"AssignmentActions.feedback_fetched","timestamp":"2023-04-27 14:20:26.022065 UTC","user":"1-kiz"}],"action_summary":{"released":1,"fetched":1,"submitted":3,"collected":3,"feedback_released":3,"feedback_fetched":6}}],"isInstructor":true,"course_id":111,"course_code":"made up","course_title":"made up"}]}
-            console.log(data)
+            const data = await requestAPI<any>('history?course_id=' + course);
+            // console.log(data)
             if(data.success) {
                 this.load_list_success(<any[]>data.value)
             } else {
@@ -219,7 +218,7 @@ export class CourseList{
 
         if (this.data.length === 0) {
             this.default_course_element!.innerText = "No courses found.";
-            //this.history.clear_list(false);
+            this.history.clear_list();
             this.enable_list()
             return;
         }
