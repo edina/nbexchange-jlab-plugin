@@ -45,7 +45,8 @@ class Exchange(ABCExchange):
         ),
     ).tag(config=True)
 
-    base_service_url = Unicode(os.environ.get("NAAS_EXBASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(config=True)
+    base_url = Unicode(os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(config=True)
+    base_service_url = Unicode(os.environ.get("NAAS_EXBASE_URL", base_url)).tag(config=True)
 
     def service_url(self):
         this_url = urljoin(self.base_service_url, "/services/nbexchange/")
