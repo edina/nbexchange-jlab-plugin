@@ -3,5 +3,5 @@ node = "18"
 python = "3.12"
 
 [env]
-NAAS_EXBASE_URL = "http://localhost:9000/"
+NAAS_BASE_URL = "http://localhost:9000/"
 NAAS_COURSE_ID = "Made up"

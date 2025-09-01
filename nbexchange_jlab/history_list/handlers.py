@@ -13,8 +13,7 @@ import logging
 
 class HistoryListHandler(JupyterHandler):
 
-    base_url = os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")
-    base_service_url = os.environ.get("NAAS_EXBASE_URL", base_url)
+    base_service_url = os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")
 
     @web.authenticated
     def get(self):
