@@ -4,6 +4,7 @@ import os
 import json
 
 import requests
+import tornado
 from tornado import web
 
 from urllib.parse import urljoin
@@ -32,11 +33,26 @@ class HistoryListHandler(JupyterHandler):
         if jwt_token:
             cookies["noteable_auth"] = jwt_token
 
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=self.api_timeout)
-        response_content = response.content.decode("utf-8")
-
         try:
+            r = requests.get(url, headers=headers, cookies=cookies, timeout=self.api_timeout)
+            r.raise_for_status()
+            response_content = r.content.decode("utf-8")
             d = json.loads(response_content)
             self.finish(d)
+        except requests.exceptions.ConnectionError:
+            self.finish({
+                "success": False,
+                "value": f"Could not connect to NbExchange service.",
+            })
+        except requests.exceptions.RequestException as e:
+            logging.error("Http Error:",e)
+            self.finish({
+                "success": False,
+                "value": f"Could not fetch history data from NbExchange service.",
+            })
         except json.JSONDecodeError:
             logging.error("Could not decode response content")
+            self.finish({
+                "success": False,
+                "value": "Could not decode response content from NbExchange service."
+            })

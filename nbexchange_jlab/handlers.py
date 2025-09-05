@@ -5,7 +5,7 @@ import sys
 
 from nbexchange_jlab.history_list.handlers import HistoryListHandler
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def setup_handlers(web_app):
     host_pattern = ".*$"

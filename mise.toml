@@ -4,4 +4,4 @@ python = "3.12"
 
 [env]
 NAAS_BASE_URL = "http://localhost:9000/"
-NAAS_COURSE_ID = "Made up"
+NAAS_COURSE_ID = "no_course"

@@ -1,20 +1,29 @@
-# nbexchange-jlab
+# NbExchange JupyterLab Plugin
 
 [![Github Actions Status](/workflows/Build/badge.svg)](/actions/workflows/build.yml)
 
-A JupyterLab extension for NbExchange
+A JupyterLab extension for [NbExchange](https://github.com/edina/nbexchange).
+This extension is providing [nbgrader](https://github.com/jupyter/nbgrader) plugins design to use the NbExchange service.
 
-This extension is composed of a Python package named `nbexchange_jlab`
-for the server extension and a NPM package named `nbexchange_jlab`
-for the frontend extension.
+It is composed of a Python package named `nbexchange_jlab` for the server extension 
+and a NPM package named `nbexchange_jlab` for the frontend extension.
 
 ## Requirements
 
 - JupyterLab >= 4.0.0
 
-## Install
+## Installation
 
-To install the extension, execute:
+Installing this plugin in a jupyter notebook will automatically install nbgrader.
+This version installs `nbgrader`  0.9.5 (which makes it compatible with JupyterLab & Notebook 7)
+
+This extension can be directly install from github:
+
+```bash
+pip install https://github.com/edina/nbexchange_jlab_plugin/archive/refs/tags/v0.2.2-beta.tar.gz
+```
+
+or from this cloned repository:
 
 ```bash
 pip install nbexchange_jlab
@@ -44,96 +53,47 @@ the frontend extension, check the frontend extension is installed:
 jupyter labextension list
 ```
 
+## Configuration
+
+### Environment
+
+NbExchange is using a couple of environment variable to know how to connect with the [NbExchange service](https://github.com/edina/nbexchange)
+
+```bash
+export NAAS_BASE_URL="http://localhost:9000/"
+export NAAS_COURSE_ID="My Course"
+```
+
+If you are using [mise](https://mise.jdx.dev/) make sure the right values are in the `mise.toml` file.
+
+### Nbgrader configuration
+
+Configuring `nbgrader` to use the alternative exchange in Jupyterlab/Jupyter-Notebook
+
+The primary reference for this should be the [nbgrader documentation](https://nbgrader.readthedocs.io/en/stable/configuration/nbgrader_config.html)
+This repository contain a config file example: `nbgrader_config.py`.
+It basically needs to include the following line:
+
+```python
+c.ExchangeFactory.exchange = 'nbexchange_jlab.plugins.Exchange'
+c.ExchangeFactory.list = 'nbexchange_jlab.plugins.ExchangeList'
+c.ExchangeFactory.release_assignment = 'nbexchange_jlab.plugins.ExchangeReleaseAssignment'
+c.ExchangeFactory.fetch_assignment = 'nbexchange_jlab.plugins.ExchangeFetchAssignment'
+c.ExchangeFactory.submit = 'nbexchange_jlab.plugins.ExchangeSubmit'
+c.ExchangeFactory.collect = 'nbexchange_jlab.plugins.ExchangeCollect'
+c.ExchangeFactory.release_feedback = 'nbexchange_jlab.plugins.ExchangeReleaseFeedback'
+c.ExchangeFactory.fetch_feedback = 'nbexchange_jlab.plugins.ExchangeFetchFeedback'
+```
+
+These plugins will also check the size of _releases_ & _submissions_
+
+`c.Exchange.max_buffer_size = 204800  # 200KB`
+
+[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800  # 200KB`]
+
+By default, upload sizes are limited to 5GB (5253530000)
+The figure is bytes
+
 ## Contributing
 
-### Development install
-
-Note: You will need NodeJS to build the extension package.
-
-The `jlpm` command is JupyterLab's pinned version of
-[yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
-`yarn` or `npm` in lieu of `jlpm` below.
-
-```bash
-# Clone the repo to your local environment
-# Change directory to the nbexchange-jlab directory
-# Install package in development mode
-pip install -e ".[test]"
-# Link your development version of the extension with JupyterLab
-jupyter labextension develop . --overwrite
-# Server extension must be manually installed in develop mode
-jupyter server extension enable nbexchange_jlab
-# Rebuild extension Typescript source after making changes
-jlpm build
-```
-
-You can watch the source directory and run JupyterLab at the same time in different terminals to watch for changes in the extension's source and automatically rebuild the extension.
-
-```bash
-# Watch the source directory in one terminal, automatically rebuilding when needed
-jlpm watch
-# Run JupyterLab in another terminal
-jupyter lab
-```
-
-With the watch command running, every saved change will immediately be built locally and available in your running JupyterLab. Refresh JupyterLab to load the change in your browser (you may need to wait several seconds for the extension to be rebuilt).
-
-By default, the `jlpm build` command generates the source maps for this extension to make it easier to debug using the browser dev tools. To also generate source maps for the JupyterLab core extensions, you can run the following command:
-
-```bash
-jupyter lab build --minimize=False
-```
-
-### Development uninstall
-
-```bash
-# Server extension must be manually disabled in develop mode
-jupyter server extension disable nbexchange_jlab
-pip uninstall nbexchange_jlab
-```
-
-In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
-command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `nbexchange-jlab` within that folder.
-
-### Testing the extension
-
-#### Server tests
-
-This extension is using [Pytest](https://docs.pytest.org/) for Python code testing.
-
-Install test dependencies (needed only once):
-
-```sh
-pip install -e ".[test]"
-# Each time you install the Python package, you need to restore the front-end extension link
-jupyter labextension develop . --overwrite
-```
-
-To execute them, run:
-
-```sh
-pytest -vv -r ap --cov nbexchange-jlab
-```
-
-#### Frontend tests
-
-This extension is using [Jest](https://jestjs.io/) for JavaScript code testing.
-
-To execute them, execute:
-
-```sh
-jlpm
-jlpm test
-```
-
-#### Integration tests
-
-This extension uses [Playwright](https://playwright.dev/docs/intro) for the integration tests (aka user level tests).
-More precisely, the JupyterLab helper [Galata](https://github.com/jupyterlab/jupyterlab/tree/master/galata) is used to handle testing the extension in JupyterLab.
-
-More information are provided within the [ui-tests](./ui-tests/README.md) README.
-
-### Packaging the extension
-
-See [RELEASE](RELEASE.md)
+See [Contributing.md](CONTRIBUTING.md) for details on how to extend/contribute to the code.
