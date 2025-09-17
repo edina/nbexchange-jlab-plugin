@@ -32,11 +32,20 @@ dynamic = ["version", "description", "authors", "urls", "keywords"]
 
 [project.optional-dependencies]
 test = [
+    "beautifulsoup4",
     "coverage",
-    "pytest",
+    "html5lib",
+    "mock>=5.1",
+    "pre-commit",
+    "pytest>=8.3.4",
     "pytest-asyncio",
-    "pytest-cov",
-    "pytest-jupyter[server]>=0.6.0"
+    "pytest-cov[all]",
+    "pytest-docker-tools",
+    "pytest-jupyter[server]",
+    "pytest-tornado",
+    "isort",
+    "black",
+    "flake8",
 ]
 
 [tool.hatch.version]

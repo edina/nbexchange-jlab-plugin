@@ -1,3 +1,5 @@
+.direnv/
+.envrc
 *.bundle.*
 lib/
 node_modules/
