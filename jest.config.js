@@ -24,5 +24,6 @@ module.exports = {
   ],
   coverageReporters: ['lcov', 'text'],
   testRegex: 'src/.*/.*.spec.ts[x]?$',
-  transformIgnorePatterns: [`/node_modules/(?!${esModules}).+`]
+  transformIgnorePatterns: [`/node_modules/(?!${esModules}).+`],
+  modulePathIgnorePatterns: ['<rootDir>/.direnv', '<rootDir>/nbexchange_jlab']
 };
