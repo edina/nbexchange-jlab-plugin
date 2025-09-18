@@ -17,15 +17,11 @@ export async function requestAPI<T>(
 ): Promise<T> {
   // Make request to Jupyter API
   const settings = ServerConnection.makeSettings();
-  const requestUrl = URLExt.join(
-      settings.baseUrl,
-      namespace,
-      endPoint
-  );
+  const requestUrl = URLExt.join(settings.baseUrl, namespace, endPoint);
 
   let response: Response;
   try {
-    console.log("Handler.ts - requestAPI: " + requestUrl)
+    console.log('Handler.ts - requestAPI: ' + requestUrl);
     response = await ServerConnection.makeRequest(requestUrl, init, settings);
   } catch (error) {
     throw new ServerConnection.NetworkError(error as any);
@@ -47,4 +43,3 @@ export async function requestAPI<T>(
 
   return data;
 }
-

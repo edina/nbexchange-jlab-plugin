@@ -140,7 +140,10 @@ def test_exhange_api_request_get_timeout():
     plugin.api_timeout = 2
     naas_token = os.environ.get("NAAS_JWT")
     os.environ["NAAS_JWT"] = "test_token"
-    with patch("nbexchange_jlab.plugins.exchange.requests.get", side_effect=requests.exceptions.Timeout):
+    with patch(
+        "nbexchange_jlab.plugins.exchange.requests.get",
+        side_effect=requests.exceptions.Timeout,
+    ):
         with pytest.raises(requests.exceptions.Timeout):
             plugin.api_request("test")
     if naas_token is not None:

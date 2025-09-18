@@ -30,7 +30,7 @@ Github does a pretty good job testing the plugin and Pull Requests, but it may m
 
 The plugins run python on the jupyter-server backend, and typescript in the jupyterlab frontend, so you will need
 both Python and Node to work on the codeabse. The node version is defined in `.node-version`, and the main developers
-of the system currently run under 3.12.
+of the system currently run python 3.12.
 
 We suggest you set up an appropriate virtual environments.
 
@@ -60,7 +60,9 @@ A simple comment at the top is useful for future developers to know _why_ the co
 
 We use [`pre-commit`](https://pre-commit.com/) to ensure consistency.
 
-All (appropriate) files are checked with `isort`, `black`, and `flake8`.
+All (appropriate) files are checked with `isort`, `black`, `flake8`, and `prettier`
+
+Sadly, eslint is being a pain... and linting for the typescript is `yarn lint` (this will actually check css (using `stylelint`), reformat code (using `prettier`), and check for _well-formedness_ (using `eslint`))
 
 ## Running Tests
 
@@ -82,8 +84,8 @@ There is no such thing as _too many tests_
 This is how I test, using a virtual environment
 
 ```sh
-pip install -r '.[test]'
-pytest nbexchange
+pip install -e '.[test]'
+pytest nbexchange_jlab
 ```
 
 ## Development install

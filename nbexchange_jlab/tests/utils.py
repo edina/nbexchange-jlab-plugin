@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import datetime
 import io
 import os
 import tarfile
@@ -9,9 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from functools import partial
 
-import pytest
 import requests
-
 
 #####
 #
@@ -262,6 +259,3 @@ class AsyncSession(requests.Session):
 
     def request(self, *args, **kwargs):
         return async_requests.executor.submit(super().request, *args, **kwargs)
-
-
-

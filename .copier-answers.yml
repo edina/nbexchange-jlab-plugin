@@ -11,4 +11,3 @@ project_short_description: A JupyterLab extension for NbExchange
 python_name: nbexchange-jlab
 repository: ''
 test: true
-

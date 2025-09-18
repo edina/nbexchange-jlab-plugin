@@ -45,7 +45,9 @@ class Exchange(ABCExchange):
         ),
     ).tag(config=True)
 
-    base_service_url = Unicode(os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(config=True)
+    base_service_url = Unicode(os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")).tag(
+        config=True
+    )
 
     def service_url(self):
         this_url = urljoin(self.base_service_url, "/services/nbexchange/")
@@ -88,13 +90,31 @@ class Exchange(ABCExchange):
         self.log.info(f"Exchange.api_request calling exchange with url {url}")
 
         if method == "GET":
-            get_req = partial(requests.get, url, headers=headers, cookies=cookies, timeout=self.api_timeout)
+            get_req = partial(
+                requests.get,
+                url,
+                headers=headers,
+                cookies=cookies,
+                timeout=self.api_timeout,
+            )
             return get_req(*args, **kwargs)
         elif method == "POST":
-            post_req = partial(requests.post, url, headers=headers, cookies=cookies, timeout=self.api_timeout)
+            post_req = partial(
+                requests.post,
+                url,
+                headers=headers,
+                cookies=cookies,
+                timeout=self.api_timeout,
+            )
             return post_req(*args, **kwargs)
         elif method == "DELETE":
-            delete_req = partial(requests.delete, url, headers=headers, cookies=cookies, timeout=self.api_timeout)
+            delete_req = partial(
+                requests.delete,
+                url,
+                headers=headers,
+                cookies=cookies,
+                timeout=self.api_timeout,
+            )
             return delete_req(*args, **kwargs)
         else:
             raise NotImplementedError(f"HTTP Method {method} is not implemented")

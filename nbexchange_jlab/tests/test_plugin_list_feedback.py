@@ -450,13 +450,25 @@ def test_list_with_5_submit_and_3_feedback(plugin_config, tmpdir):
         feedback_dir1 = f"{assignment_dir}/feedback/{submit_timestamp2}"
 
         os.makedirs(assignment_dir, exist_ok=True)
-        copyfile(notebook1_filename, os.path.join(assignment_dir, basename(notebook1_filename)))
-        copyfile(notebook2_filename, os.path.join(assignment_dir, basename(notebook2_filename)))
+        copyfile(
+            notebook1_filename,
+            os.path.join(assignment_dir, basename(notebook1_filename)),
+        )
+        copyfile(
+            notebook2_filename,
+            os.path.join(assignment_dir, basename(notebook2_filename)),
+        )
 
         # two feedback files collected for the first round, but not the 2nd
         os.makedirs(feedback_dir1, exist_ok=True)
-        copyfile(feedback1_filename, os.path.join(feedback_dir1, basename(feedback1_filename)))
-        copyfile(feedback2_filename, os.path.join(feedback_dir1, basename(feedback2_filename)))
+        copyfile(
+            feedback1_filename,
+            os.path.join(feedback_dir1, basename(feedback1_filename)),
+        )
+        copyfile(
+            feedback2_filename,
+            os.path.join(feedback_dir1, basename(feedback2_filename)),
+        )
 
         plugin = ExchangeList(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
 

@@ -32,20 +32,20 @@ dynamic = ["version", "description", "authors", "urls", "keywords"]
 
 [project.optional-dependencies]
 test = [
-    "beautifulsoup4",
-    "coverage",
-    "html5lib",
+    "beautifulsoup4>=4.13",
+    "coverage>=7.10",
+    "html5lib>=1.1",
     "mock>=5.1",
-    "pre-commit",
+    "pre-commit>=4.3",
     "pytest>=8.3.4",
-    "pytest-asyncio",
-    "pytest-cov[all]",
-    "pytest-docker-tools",
-    "pytest-jupyter[server]",
-    "pytest-tornado",
-    "isort",
-    "black",
-    "flake8",
+    "pytest-asyncio>=1.2",
+    "pytest-cov[all]>=7.0",
+    "pytest-docker-tools>=3.1",
+    "pytest-jupyter[server]>=0.10",
+    "pytest-tornado>=0.8",
+    "isort>=6.0",
+    "black>=25.1",
+    "flake8>=7.3",
 ]
 
 [tool.hatch.version]
@@ -99,3 +99,10 @@ before-build-python = ["jlpm clean:all"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+known_first_party = ["nbexchange"]
