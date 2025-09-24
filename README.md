@@ -2,11 +2,13 @@
 
 [![Github Actions Status](/workflows/Build/badge.svg)](/actions/workflows/build.yml)
 
-A JupyterLab extension for [NbExchange](https://github.com/edina/nbexchange).
-This extension is providing [nbgrader](https://github.com/jupyter/nbgrader) plugins design to use the NbExchange service.
+A JupyterLab extension which provides the plugins for [nbgrader](https://github.com/jupyter/nbgrader) to use [NbExchange](https://github.com/edina/nbexchange) as an external Exchange service.
 
-It is composed of a Python package named `nbexchange_jlab` for the server extension 
-and a NPM package named `nbexchange_jlab` for the frontend extension.
+It is composed of a Python package named `nbexchange_jlab` for the server extension and a NPM package named `nbexchange_jlab` for the frontend extension.
+
+In addition to the usual suite of plugins for exchanging files, the plugin provides a `History` option to the Nbgrader menu - this is a visual render of NbExchanges `history` endpoint:
+
+![A screenshot of the History page](history_screenshot.png)
 
 ## Requirements
 
@@ -15,7 +17,7 @@ and a NPM package named `nbexchange_jlab` for the frontend extension.
 ## Installation
 
 Installing this plugin in a jupyter notebook will automatically install nbgrader.
-This version installs `nbgrader`  0.9.5 (which makes it compatible with JupyterLab & Notebook 7)
+This version installs `nbgrader` 0.9.5 (which makes it compatible with JupyterLab & Notebook 7)
 
 This extension can be directly install from github:
 
@@ -87,9 +89,9 @@ c.ExchangeFactory.fetch_feedback = 'nbexchange_jlab.plugins.ExchangeFetchFeedbac
 
 These plugins will also check the size of _releases_ & _submissions_
 
-`c.Exchange.max_buffer_size = 204800  # 200KB`
+`c.Exchange.max_buffer_size = 204800 # 200KB`
 
-[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800  # 200KB`]
+[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800 # 200KB`]
 
 By default, upload sizes are limited to 5GB (5253530000)
 The figure is bytes

@@ -362,7 +362,10 @@ def test_list_fetched_with_path_includes_course(plugin_config, tmpdir):
         plugin_config.Exchange.path_includes_course = True
 
         os.makedirs("no_course/assign_a", exist_ok=True)
-        copyfile(notebook1_filename, os.path.join("no_course", "assign_a", basename(notebook1_filename)))
+        copyfile(
+            notebook1_filename,
+            os.path.join("no_course", "assign_a", basename(notebook1_filename)),
+        )
 
         plugin = ExchangeList(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
 

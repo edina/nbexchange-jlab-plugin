@@ -1,16 +1,13 @@
 """Tornado handlers for nbgrader course list web service."""
 
-import os
 import json
+import logging
+import os
+from urllib.parse import urljoin
 
 import requests
-import tornado
-from tornado import web
-
-from urllib.parse import urljoin
 from jupyter_server.base.handlers import JupyterHandler
-
-import logging
+from tornado import web
 
 
 class HistoryListHandler(JupyterHandler):
@@ -21,9 +18,12 @@ class HistoryListHandler(JupyterHandler):
 
     @web.authenticated
     def get(self):
-        course_id = self.get_argument('course_id')
+        course_id = self.get_argument("course_id")
         logging.info(f"get HISTORY for course: {course_id}")
-        url = urljoin(self.base_service_url, f"/services/nbexchange/history?course_code={course_id}")
+        url = urljoin(
+            self.base_service_url,
+            f"/services/nbexchange/history?course_code={course_id}",
+        )
         logging.info(f"api_request: {url}")
 
         jwt_token = os.environ.get("NAAS_JWT")
@@ -40,19 +40,25 @@ class HistoryListHandler(JupyterHandler):
             d = json.loads(response_content)
             self.finish(d)
         except requests.exceptions.ConnectionError:
-            self.finish({
-                "success": False,
-                "value": f"Could not connect to NbExchange service.",
-            })
+            self.finish(
+                {
+                    "success": False,
+                    "value": "Could not connect to NbExchange service.",
+                }
+            )
         except requests.exceptions.RequestException as e:
-            logging.error("Http Error:",e)
-            self.finish({
-                "success": False,
-                "value": f"Could not fetch history data from NbExchange service.",
-            })
+            logging.error("Http Error:", e)
+            self.finish(
+                {
+                    "success": False,
+                    "value": "Could not fetch history data from NbExchange service.",
+                }
+            )
         except json.JSONDecodeError:
             logging.error("Could not decode response content")
-            self.finish({
-                "success": False,
-                "value": "Could not decode response content from NbExchange service."
-            })
+            self.finish(
+                {
+                    "success": False,
+                    "value": "Could not decode response content from NbExchange service.",
+                }
+            )

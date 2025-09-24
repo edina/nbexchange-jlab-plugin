@@ -3,24 +3,21 @@ try:
 except ImportError:
     # Fallback when using the package in dev mode without installing
     # in editable mode with pip. It is highly recommended to install
-    # the package from a stable release or in editable mode: https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs
+    # the package from a stable release or in editable mode:
+    #  https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs
     import warnings
+
     warnings.warn("Importing 'nbexchange_jlab' outside a proper installation.")
     __version__ = "dev"
 from .handlers import setup_handlers
 
 
 def _jupyter_labextension_paths():
-    return [{
-        "src": "labextension",
-        "dest": "nbexchange_jlab"
-    }]
+    return [{"src": "labextension", "dest": "nbexchange_jlab"}]
 
 
 def _jupyter_server_extension_points():
-    return [{
-        "module": "nbexchange_jlab"
-    }]
+    return [{"module": "nbexchange_jlab"}]
 
 
 def _load_jupyter_server_extension(server_app):

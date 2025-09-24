@@ -5,44 +5,48 @@
 */
 
 .action-group {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 0;
-    border-top: #d5d5d5 1px solid;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-top: #d5d5d5 1px solid;
 }
+
 .action-group:last-child {
-    border-bottom: #d5d5d5 1px solid;
+  border-bottom: #d5d5d5 1px solid;
 }
+
 .action-row {
-    display: flex;
-    padding: 5px 0;
-    border-top: #d5d5d5 1px solid;
+  display: flex;
+  padding: 5px 0;
+  border-top: #d5d5d5 1px solid;
 }
+
 .action-row:first-of-type {
-    margin-top: 10px;
+  margin-top: 10px;
 }
+
 .action-badge {
-    display: inline-block;
-    float: right;
-    min-width: 20px;
-    padding: 2px;
-    border-radius: 50%;
-    font-size: smaller;
-    text-align: center;
-    background: #1976d2;
-    color: #fefefe;
-    margin-left: 1em;
+  display: inline-block;
+  float: right;
+  min-width: 20px;
+  padding: 2px;
+  border-radius: 50%;
+  font-size: smaller;
+  text-align: center;
+  background: #1976d2;
+  color: #fefefe;
+  margin-left: 1em;
 }
 
 #nbexchange-history-list .panel-group .panel {
-    margin-top: 3px;
-    margin-bottom: 1em;
+  margin-top: 3px;
+  margin-bottom: 1em;
 }
 
 #nbexchange-history-list .version_error {
-    display: none;
+  display: none;
 }
 
-#history_toolbar {
-    padding: 3px;
+#history-toolbar {
+  padding: 3px;
 }

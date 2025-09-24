@@ -93,7 +93,13 @@ def test_release_feedback_normal(plugin_config, tmpdir):
     ) as fp:
         fp.write("2020-01-01 00:00:00.000000 UTC")
 
-    unique_key = make_unique_key("no_course", assignment_id, "feedback", student_id, "2020-01-01 00:00:00.000000 UTC")
+    unique_key = make_unique_key(
+        "no_course",
+        assignment_id,
+        "feedback",
+        student_id,
+        "2020-01-01 00:00:00.000000 UTC",
+    )
     checksum = notebook_hash(
         os.path.join(
             plugin_config.CourseDirectory.submitted_directory,
@@ -165,12 +171,24 @@ def test_release_feedback_several_normal(plugin_config, tmpdir):
         fp.write("2020-01-01 00:01:00.000000 UTC")
 
     # this makes the unique key & checksums for the submission
-    unique_key1 = make_unique_key("no_course", assignment_id, "feedback1", student_id, "2020-01-01 00:01:00.000000 UTC")
+    unique_key1 = make_unique_key(
+        "no_course",
+        assignment_id,
+        "feedback1",
+        student_id,
+        "2020-01-01 00:01:00.000000 UTC",
+    )
     checksum1 = notebook_hash(
         os.path.join(submitted_directory, student_id, assignment_id, "feedback1.ipynb"),
         unique_key1,
     )
-    unique_key2 = make_unique_key("no_course", assignment_id, "feedback2", student_id, "2020-01-01 00:01:00.000000 UTC")
+    unique_key2 = make_unique_key(
+        "no_course",
+        assignment_id,
+        "feedback2",
+        student_id,
+        "2020-01-01 00:01:00.000000 UTC",
+    )
     checksum2 = notebook_hash(
         os.path.join(submitted_directory, student_id, assignment_id, "feedback2.ipynb"),
         unique_key2,
@@ -395,7 +413,13 @@ def test_release_feedback_filename_with_surrounding_whitespace(plugin_config, tm
     ) as fp:
         fp.write("2020-01-01 00:00:00.000000 UTC")
 
-    unique_key = make_unique_key("no_course", assignment_id, notebook_id, student_id, "2020-01-01 00:00:00.000000 UTC")
+    unique_key = make_unique_key(
+        "no_course",
+        assignment_id,
+        notebook_id,
+        student_id,
+        "2020-01-01 00:00:00.000000 UTC",
+    )
     checksum = notebook_hash(
         os.path.join(
             plugin_config.CourseDirectory.submitted_directory,

@@ -16,7 +16,7 @@ First working version of nbexchange_jlab_plugin tested locally and on the kubern
 
 None
 
-### Maintenance  and upkeep improvements
+### Maintenance and upkeep improvements
 
 No Upgrade
 

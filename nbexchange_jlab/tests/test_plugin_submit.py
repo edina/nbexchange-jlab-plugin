@@ -51,7 +51,7 @@ def test_submit_methods(plugin_config, tmpdir, caplog):
     plugin = ExchangeSubmit(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
     plugin.set_timestamp()
     plugin.init_src()
-    assert re.search(r"nbexchange-jlab/assign_1_1$", plugin.src_path)
+    assert re.search(r"nbexchange_jlab_plugin/assign_1_1$", plugin.src_path)
     plugin.init_dest()
     with pytest.raises(AttributeError) as e_info:
         plugin.dest_path
@@ -190,7 +190,7 @@ def test_submit_single_item(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -264,7 +264,7 @@ def test_submit_single_item_with_path_includes_course(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -341,7 +341,10 @@ def test_submit_fail(plugin_config, tmpdir):
                     },
                 )
 
-        with pytest.raises(ExchangeError) as e_info, patch.object(Exchange, "api_request", side_effect=api_request):
+        with (
+            pytest.raises(ExchangeError) as e_info,
+            patch.object(Exchange, "api_request", side_effect=api_request),
+        ):
             plugin.start()
         assert str(e_info.value) == "failure note"
     finally:
@@ -408,7 +411,7 @@ def test_submit_multiple_notebooks_in_assignment(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -478,7 +481,7 @@ def test_submit_fail_no_folder(plugin_config, tmpdir):
             assert "assignment.tar.gz" == files["assignment"][0]
             tar_file = io.BytesIO(files["assignment"][1])
             with tarfile.open(fileobj=tar_file) as handle:
-                handle.extraction_filter = (lambda member, path: member)
+                handle.extraction_filter = lambda member, path: member
                 handle.extractall(path=pth)
 
             assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -552,7 +555,7 @@ def test_submit_warning_no_notebook(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -632,7 +635,7 @@ def test_submit_warning_wrong_notebook(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -708,7 +711,7 @@ def test_submit_no_notebook_strict_means_fail(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -787,7 +790,7 @@ def test_submit_wrong_notebook_strict_means_fail(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -870,7 +873,7 @@ def test_submit_warning_wrong_notebook_two(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -949,7 +952,7 @@ def test_submit_extra_notebook_strict_means_fail(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1039,7 +1042,7 @@ def test_submit_two_releases_newest_first(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1128,7 +1131,7 @@ def test_submit_two_releases_newest_last(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1223,7 +1226,7 @@ def test_submit_warning_wrong_notebook_three(plugin_config, tmpdir):
                     assert "assignment.tar.gz" == files["assignment"][0]
                     tar_file = io.BytesIO(files["assignment"][1])
                     with tarfile.open(fileobj=tar_file) as handle:
-                        handle.extraction_filter = (lambda member, path: member)
+                        handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                     assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1431,7 +1434,7 @@ def test_submit_with_multiple_assignments_newest_first(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1638,7 +1641,7 @@ def test_submit_with_multiple_assignments_oldest_first(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1733,7 +1736,7 @@ def test_submit_honours_ignore_lost(plugin_config, tmpdir):
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
                     assert len(handle.getmembers()) == 2
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1809,7 +1812,7 @@ def test_submit_reducing_max_buffer_size_honoured(plugin_config, tmpdir):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))
@@ -1893,7 +1896,10 @@ def test_release_105MB_not_blocked(plugin_config, tmpdir):
             with patch.object(
                 ExchangeSubmit,
                 "tar_source",
-                return_value=(create_any_tarball(110100480), "2020-01-01 00:00:00.000000 UTC"),  # 105MB
+                return_value=(
+                    create_any_tarball(110100480),
+                    "2020-01-01 00:00:00.000000 UTC",
+                ),  # 105MB
             ):
                 plugin.start()
         assert True  # No failure
@@ -1955,7 +1961,10 @@ def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
             with patch.object(
                 ExchangeSubmit,
                 "tar_source",
-                return_value=(create_any_tarball(5476083302), "2020-01-01 00:00:00.000000 UTC"),  # 5.1GB
+                return_value=(
+                    create_any_tarball(5476083302),
+                    "2020-01-01 00:00:00.000000 UTC",
+                ),  # 5.1GB
             ):
                 with pytest.raises(ExchangeError) as e_info:
                     plugin.start()
@@ -2037,7 +2046,7 @@ def test_submit_exchange_failure_code(plugin_config, tmpdir, caplog):
                 assert "assignment.tar.gz" == files["assignment"][0]
                 tar_file = io.BytesIO(files["assignment"][1])
                 with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extraction_filter = (lambda member, path: member)
+                    handle.extraction_filter = lambda member, path: member
                     handle.extractall(path=pth)
 
                 assert os.path.exists(os.path.join(pth, "assignment-0.6.ipynb"))

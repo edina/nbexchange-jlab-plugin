@@ -361,7 +361,11 @@ def test_release_105MB_not_blocked(plugin_config, tmpdir):
         )
 
     with patch.object(Exchange, "api_request", side_effect=api_request):
-        with patch.object(ExchangeReleaseAssignment, "tar_source", return_value=create_any_tarball(110100480)):  # 105MB
+        with patch.object(
+            ExchangeReleaseAssignment,
+            "tar_source",
+            return_value=create_any_tarball(110100480),
+        ):  # 105MB
             plugin.start()
     assert True  # No failure
 
@@ -384,7 +388,9 @@ def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
 
     with patch.object(Exchange, "api_request", side_effect=api_request):
         with patch.object(
-            ExchangeReleaseAssignment, "tar_source", return_value=create_any_tarball(5476083302)  # 5.1GB
+            ExchangeReleaseAssignment,
+            "tar_source",
+            return_value=create_any_tarball(5476083302),  # 5.1GB
         ):
             with pytest.raises(ExchangeError) as e_info:
                 plugin.start()

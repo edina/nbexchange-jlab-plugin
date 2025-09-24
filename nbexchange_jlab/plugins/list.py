@@ -157,7 +157,9 @@ class ExchangeList(abc.ExchangeList, Exchange):
         for assignment in self.assignments:
             if self.path_includes_course:
                 assignment_directory = os.path.join(
-                    self.assignment_dir, assignment["course_id"], assignment["assignment_id"]
+                    self.assignment_dir,
+                    assignment["course_id"],
+                    assignment["assignment_id"],
                 )
             else:
                 assignment_directory = os.path.join(self.assignment_dir, assignment["assignment_id"])
