@@ -18,6 +18,37 @@ const actionTypes: IActionType[] = [
   { id: 'AssignmentActions.feedback_fetched', display: 'Feedback Fetched' }
 ];
 
+interface IActionData {
+  action: string;
+  timestamp: string;
+  user: string;
+}
+
+// `foo?:` indicates a field that may not be present
+interface IActionSummaryData {
+  released: number;
+  fetched?: number;
+  submitted?: number;
+  collected?: number;
+  feedback_released?: number;
+  feedback_fetched?: number;
+}
+interface IAssignmentData {
+  assignment_id: number;
+  assignment_code: string;
+  actions: IActionData[];
+  action_summary: IActionSummaryData;
+}
+interface ICourseData {
+  role: { Instructor?: number; Student?: number };
+  user_id: any;
+  assignments: IAssignmentData[];
+  isInstructor: boolean;
+  course_id: number;
+  course_code: string;
+  course_title: string;
+}
+
 export class HistoryList {
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
@@ -40,55 +71,96 @@ export class HistoryList {
     this.panel_group_element.innerHTML = '';
   }
 
-  private load_list_success(data: any[]): void {
+  private group_data_into_courses(data: ICourseData[]) {
+    const results: { [key: string]: ICourseData } = {};
+
+    data.forEach(record => {
+      const courseTitle = record.course_title;
+
+      // Check if we already have an entry for this course title
+      if (results[courseTitle]) {
+        // Merge assignments into existing record
+        results[courseTitle].assignments = [
+          ...results[courseTitle].assignments,
+          ...record.assignments
+        ];
+      } else {
+        // Create the first entry with this course title
+        results[courseTitle] = record;
+      }
+    });
+
+    // Convert the results object back to an array
+    return results;
+  }
+
+  private load_list_success(data: ICourseData[]): void {
     this.clear_list();
 
-    for (let i = 0; i < data.length; i++) {
-      const assignments: any[] = data[i]['assignments'];
+    const sorted_data = this.group_data_into_courses(data);
 
-      console.log('Assignments count', assignments.length);
-      for (let j = 0; j < assignments.length; j++) {
-        const assignment = assignments[j];
-        const assignment_code = assignment['assignment_code'];
-        const assignment_id = assignment['assignment_id'];
-        console.log('Assignment: ', assignment_code);
-        // Create assignment panel
-        const assignment_panel_elem = document.createElement('details');
-        assignment_panel_elem.classList.add('panel', 'panel-default');
-        const panel_body_id = 'assignment-panel-body-' + assignment_id;
-        assignment_panel_elem.innerHTML = [
-          '      <summary class="panel-heading">',
-          '        ' + assignment_code + ' <' + assignment_id + '>',
-          '      </summary>',
-          '      <div class="panel-body" id="' + panel_body_id + '">',
-          '      </div>'
-        ].join('\n');
-        this.panel_group_element.append(assignment_panel_elem);
+    for (const key in sorted_data) {
+      const this_course = sorted_data[key];
+      const assignments: IAssignmentData[] = this_course['assignments'];
 
-        const actions: any[] = assignment['actions'];
-        console.log('Actions: \n' + JSON.stringify(actions));
-        // actions.sort((a,b) => (a.action > b.action) ? 1 : ((b.action > a.action) ? -1 : 0))
+      if (assignments.length === 0) {
+        continue;
+      }
 
-        for (let j = 0; j < actionTypes.length; j++) {
-          const groupActions: any[] = actions.filter(
-            a => a.action === actionTypes[j].id
-          );
+      const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
+      const detail_group_name = this_course['course_code'];
+      const course_panel_elem = document.createElement('article');
+      course_panel_elem.classList.add('course_group');
+      this.panel_group_element.append(course_panel_elem);
+      const para_elem = document.createElement('p');
+      course_panel_elem.append(para_elem);
+      para_elem.textContent +=
+        this_course['course_title'] + ' (' + detail_group_name + ')';
 
-          if (groupActions.length <= 0) {
-            console.log("Didn't find any actions for: " + actionTypes[j].id);
+      for (let i = 0; i < assignments.length; i++) {
+        console.log('Assignments count', assignments.length);
+        for (let j = 0; j < assignments.length; j++) {
+          const assignment = assignments[j];
+          const assignment_code = assignment['assignment_code'];
+          const assignment_id = assignment['assignment_id'];
+
+          // Create assignment panel
+          const assignment_panel_elem = document.createElement('details');
+          assignment_panel_elem.classList.add('panel', 'panel-default');
+          assignment_panel_elem.setAttribute('name', detail_group_name);
+          const panel_body_id = 'assignment-panel-body-' + assignment_id;
+          assignment_panel_elem.innerHTML = [
+            '      <summary class="panel-heading">',
+            '        ' + assignment_code + ' &lt;' + role + '&gt;',
+            '      </summary>',
+            '      <div class="panel-body" id="' + panel_body_id + '">',
+            '      </div>'
+          ].join('\n');
+          course_panel_elem.append(assignment_panel_elem);
+
+          const actions: IActionData[] = assignment['actions'];
+          console.log('Actions: \n' + JSON.stringify(actions));
+
+          for (let j = 0; j < actionTypes.length; j++) {
+            const groupActions: any[] = actions.filter(
+              a => a.action === actionTypes[j].id
+            );
+
+            if (groupActions.length <= 0) {
+              console.log("Didn't find any actions for: " + actionTypes[j].id);
+            }
+
+            // Add group in panel_body_id
+            new ActionGroup(
+              assignment_panel_elem,
+              panel_body_id,
+              actionTypes[j].display,
+              groupActions
+            );
           }
-
-          // Add group in panel_body_id
-          new ActionGroup(
-            assignment_panel_elem,
-            panel_body_id,
-            actionTypes[j].display,
-            groupActions
-          );
         }
       }
     }
-
     // TODO
 
     if (this.callback) {
