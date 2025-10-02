@@ -95,6 +95,15 @@ export class HistoryList {
   }
 
   private load_list_success(data: ICourseData[]): void {
+    if (data === null) {
+      const course_panel_elem = document.createElement('article');
+      course_panel_elem.classList.add('course_group');
+      this.panel_group_element.append(course_panel_elem);
+      const para_elem = document.createElement('p');
+      para_elem.textContent +=
+        'You are not authorised to contact the exchange from your current course';
+      return;
+    }
     this.clear_list();
 
     const sorted_data = this.group_data_into_courses(data);
