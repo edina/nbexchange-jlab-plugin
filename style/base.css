@@ -52,14 +52,9 @@
 }
 
 .course_group {
-  background-color:#cccccc; 
+  background-color: #ccc;
   border: 1px solid #666;
   border-radius: 10px;
   padding: 0 1em;
   margin-bottom: 1em;
-
-  details {
-    border-radius: 10px;
-    border: 1px solid inherit;
-  }
 }
