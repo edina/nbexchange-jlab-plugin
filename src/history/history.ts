@@ -321,7 +321,13 @@ export class CourseList {
     this.clear_list();
 
     if (this.data.length === 0) {
-      this.default_course_element!.innerText = 'No courses found.';
+      const root = document.getElementById('#nbexchange-history');
+      const para_elem = document.createElement('p');
+      para_elem.textContent +=
+        'You are not authorised to contact the exchange from your current course';
+      root?.append(para_elem);
+
+      // this.default_course_element!.innerText = 'No courses found.';
       this.history.clear_list();
       this.enable_list();
       return;
