@@ -399,9 +399,9 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
-    const f = document.getElementById('#jp-main-doc-panel');
+    const f = document.getElementById('#main');
     console.log(
-      'when CourseList wants to show an errot, the Panel is:' + f?.innerHTML
+      'when CourseList wants to show an errot, the Panel is:' + f?.outerHTML
     );
     const elem = document.getElementById('#nbexchange-history');
     console.log('CourseList.show_error: ' + error + ' on element ' + elem);
