@@ -321,13 +321,13 @@ export class CourseList {
     this.clear_list();
 
     if (this.data.length === 0) {
+      // this.default_course_element!.innerText = 'No courses found.';
+      this.history.clear_list();
+      this.enable_list();
       this.show_error(
         'You are not authorised to contact the exchange from your current course'
       );
 
-      // this.default_course_element!.innerText = 'No courses found.';
-      this.history.clear_list();
-      this.enable_list();
       return;
     }
 
