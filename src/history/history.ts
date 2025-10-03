@@ -325,6 +325,7 @@ export class CourseList {
       'When CourseList.handle_load_list() runs, the Panel is:' + f?.outerHTML
     );
     console.log('   ..... and data is:' + data);
+    console.log(data);
     if (data.success) {
       this.load_list_success(data.value);
     } else {
