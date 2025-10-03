@@ -204,7 +204,7 @@ export class HistoryList {
     );
 
     const elem = document.getElementById('#nbexchange-history');
-    console.log('Showing error: ' + error + ' on element ' + elem);
+    console.log('HistoryList.show_error: ' + error + ' on element ' + elem);
 
     // if (!elem) {
     //   return;
@@ -399,8 +399,12 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
+    const f = document.getElementById('#jp-main-doc-panel');
+    console.log(
+      'when CourseList wants to show an errot, the Panel is:' + f?.innerHTML
+    );
     const elem = document.getElementById('#nbexchange-history');
-    console.log('Showing error: ' + error + ' on element ' + elem);
+    console.log('CourseList.show_error: ' + error + ' on element ' + elem);
 
     // if (!elem) {
     //   return;
