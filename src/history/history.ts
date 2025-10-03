@@ -186,7 +186,8 @@ export class HistoryList {
     this.clear_list();
     try {
       const data = await requestAPI<any>('history?course_id=' + course);
-      // console.log(data)
+      console.log('HistoryList.load_list queried & got data:');
+      console.log(data);
       if (data.success) {
         this.load_list_success(<any[]>data.value);
       } else {
