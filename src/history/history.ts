@@ -95,6 +95,10 @@ export class HistoryList {
   }
 
   private load_list_success(data: ICourseData[]): void {
+    console.log(
+      'HistoryList.load_list_success passed the following course data:'
+    );
+    console.log(data);
     if (data === null) {
       alert('There is no history available from the Exchange service');
       return;
