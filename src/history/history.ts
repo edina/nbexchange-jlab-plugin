@@ -198,6 +198,11 @@ export class HistoryList {
   }
 
   public show_error(error: string): void {
+    const f = document.getElementById('#jp-main-doc-panel');
+    console.log(
+      'when HistoryList wants to show an errot, the Panel is:' + f?.innerHTML
+    );
+
     const elem = document.getElementById('#nbexchange-history');
     console.log('Showing error: ' + error + ' on element ' + elem);
 
