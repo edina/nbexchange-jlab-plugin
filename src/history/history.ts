@@ -103,6 +103,10 @@ export class HistoryList {
       alert('There is no history available from the Exchange service');
       return;
     }
+    if (data.length === 0) {
+      alert('There is zero history available from the Exchange service');
+      return;
+    }
     this.clear_list();
 
     const sorted_data = this.group_data_into_courses(data);
