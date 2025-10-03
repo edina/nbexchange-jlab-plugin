@@ -321,11 +321,9 @@ export class CourseList {
     this.clear_list();
 
     if (this.data.length === 0) {
-      const root = document.getElementById('#nbexchange-history');
-      const para_elem = document.createElement('p');
-      para_elem.textContent +=
-        'You are not authorised to contact the exchange from your current course';
-      root?.append(para_elem);
+      this.show_error(
+        'You are not authorised to contact the exchange from your current course'
+      );
 
       // this.default_course_element!.innerText = 'No courses found.';
       this.history.clear_list();
@@ -384,6 +382,19 @@ export class CourseList {
       this.data = [];
     }
     this.enable_list();
+  }
+
+  public show_error(error: string): void {
+    const elem = document.getElementById('#nbexchange-history');
+    console.log('Showing error: ' + error + ' on element ' + elem);
+
+    // if (!elem) {
+    //   return;
+    // }
+    const para_elem = document.createElement('p');
+    para_elem.textContent += error;
+    elem?.append(para_elem);
+    return;
   }
 }
 
