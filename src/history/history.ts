@@ -310,7 +310,8 @@ export class CourseList {
     this.disable_list();
     this.clear_list();
     // this.history.clear_list(true);
-
+    console.log('CourseList.load_list called. history is');
+    console.log(self.history);
     try {
       const data = await requestAPI<any>('courses', '');
       this.handle_load_list(data);
