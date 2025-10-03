@@ -420,7 +420,7 @@ export class CourseList {
     const para_elem = document.createElement('p');
     para_elem.textContent += error;
     elem?.append(para_elem);
-    alert(error);
+    // alert(error);
     return;
   }
 }
