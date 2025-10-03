@@ -198,7 +198,16 @@ export class HistoryList {
   }
 
   public show_error(error: string): void {
-    // TODO
+    const elem = document.getElementById('#nbexchange-history');
+    console.log('Showing error: ' + error + ' on element ' + elem);
+
+    // if (!elem) {
+    //   return;
+    // }
+    const para_elem = document.createElement('p');
+    para_elem.textContent += error;
+    elem?.append(para_elem);
+    return;
   }
 }
 
