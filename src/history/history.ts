@@ -320,12 +320,17 @@ export class CourseList {
   }
 
   private handle_load_list(data: { success: any; value: any }): void {
+    const f = document.getElementById('#main');
+    console.log(
+      'When CourseList.handle_load_list() runs, the Panel is:' + f?.outerHTML
+    );
+    console.log('   ..... and data is:' + data);
     if (data.success) {
       this.load_list_success(data.value);
     } else {
       this.default_course_element!.innerText = 'Error fetching courses!';
       this.enable_list();
-      // this.history.show_error(data.value);
+      this.show_error('HistoryList.handle_load_list() failed' + this.data);
     }
   }
 
@@ -333,16 +338,16 @@ export class CourseList {
     this.data = data;
     this.disable_list();
     this.clear_list();
-
+    const f = document.getElementById('#main');
+    console.log(
+      'When CourseList.load_list_success() runs, the Panel is:' + f?.outerHTML
+    );
+    console.log('   ..... and data is:' + data);
     if (this.data.length === 0) {
       // this.default_course_element!.innerText = 'No courses found.';
       this.history.clear_list();
       this.enable_list();
-      this.show_error(
-        'You are not authorised to contact the exchange from your current course'
-      );
-
-      return;
+      this.show_error('CourseList.load_list_success() has no data' + this.data);
     }
 
     if (
