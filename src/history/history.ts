@@ -96,12 +96,7 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      const course_panel_elem = document.createElement('article');
-      course_panel_elem.classList.add('course_group');
-      this.panel_group_element.append(course_panel_elem);
-      const para_elem = document.createElement('p');
-      para_elem.textContent +=
-        'You are not authorised to contact the exchange from your current course';
+      alert('There is no history available from the Exchange service');
       return;
     }
     this.clear_list();
@@ -341,32 +336,36 @@ export class CourseList {
     this.data = data;
     this.disable_list();
     this.clear_list();
-    const f = document.getElementById('#main');
-    console.log(
-      'When CourseList.load_list_success() runs, the Panel is:' + f?.outerHTML
-    );
-    console.log('   ..... and data is:' + data);
-    if (this.data.length === 0) {
-      // this.default_course_element!.innerText = 'No courses found.';
-      this.history.clear_list();
-      this.enable_list();
-      this.show_error('CourseList.load_list_success() has no data' + this.data);
-    }
 
-    if (
-      this.current_course !== null &&
-      !this.data.includes(this.current_course)
-    ) {
-      this.current_course = null;
-    }
+    // Bypass all the junk about knows courses & stuff
+    this.history.load_list('moot');
 
-    if (this.current_course === null) {
-      this.change_course(this.data[0]);
-    } else {
-      // we still want to "change" the course here to update the
-      // history list
-      this.change_course(this.current_course);
-    }
+    // const f = document.getElementById('#main');
+    // console.log(
+    //   'When CourseList.load_list_success() runs, the Panel is:' + f?.outerHTML
+    // );
+    // console.log('   ..... and data is:' + data);
+    // if (this.data.length === 0) {
+    //   // this.default_course_element!.innerText = 'No courses found.';
+    //   this.history.clear_list();
+    //   this.enable_list();
+    //   this.show_error('CourseList.load_list_success() has no data' + this.data);
+    // }
+
+    // if (
+    //   this.current_course !== null &&
+    //   !this.data.includes(this.current_course)
+    // ) {
+    //   this.current_course = null;
+    // }
+
+    // if (this.current_course === null) {
+    //   this.change_course(this.data[0]);
+    // } else {
+    //   // we still want to "change" the course here to update the
+    //   // history list
+    //   this.change_course(this.current_course);
+    // }
   }
 
   private change_course(course: string): void {
