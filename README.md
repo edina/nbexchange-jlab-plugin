@@ -59,10 +59,10 @@ jupyter labextension list
 
 ### Environment
 
-NbExchange is using a couple of environment variable to know how to connect with the [NbExchange service](https://github.com/edina/nbexchange)
+NbExchange uses a couple of environment variable to know how to connect with the [NbExchange service](https://github.com/edina/nbexchange)
 
 ```bash
-export NAAS_BASE_URL="http://localhost:9000/"
+export NAAS_BASE_URL="http://example.com:9876/"
 export NAAS_COURSE_ID="My Course"
 ```
 
@@ -86,6 +86,7 @@ c.ExchangeFactory.collect = 'nbexchange_jlab.plugins.ExchangeCollect'
 c.ExchangeFactory.release_feedback = 'nbexchange_jlab.plugins.ExchangeReleaseFeedback'
 c.ExchangeFactory.fetch_feedback = 'nbexchange_jlab.plugins.ExchangeFetchFeedback'
 ```
+(note the change to `plugins`, _plural_)
 
 These plugins will also check the size of _releases_ & _submissions_
 
