@@ -48,10 +48,7 @@ export class HistoryWidget extends Widget {
     const options = new Map();
     options.set('base_url', base_url);
     const history_l = new HistoryList(this, 'actions-panel-group');
-    console.log(
-      'HistoryWidget.constructor has queried the exchange and got back'
-    );
-    console.log(history_l);
+
     new CourseList(
       this,
       'course_list',

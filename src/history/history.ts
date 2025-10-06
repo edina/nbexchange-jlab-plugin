@@ -95,10 +95,6 @@ export class HistoryList {
   }
 
   private load_list_success(data: ICourseData[]): void {
-    console.log(
-      'HistoryList.load_list_success passed the following course data:'
-    );
-    console.log(data);
     if (data === null) {
       alert('There is no history available from the Exchange service');
       return;
@@ -130,7 +126,6 @@ export class HistoryList {
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
       for (let i = 0; i < assignments.length; i++) {
-        console.log('Assignments count', assignments.length);
         for (let j = 0; j < assignments.length; j++) {
           const assignment = assignments[j];
           const assignment_code = assignment['assignment_code'];
@@ -151,7 +146,6 @@ export class HistoryList {
           course_panel_elem.append(assignment_panel_elem);
 
           const actions: IActionData[] = assignment['actions'];
-          console.log('Actions: \n' + JSON.stringify(actions));
 
           for (let j = 0; j < actionTypes.length; j++) {
             const groupActions: any[] = actions.filter(
@@ -189,8 +183,6 @@ export class HistoryList {
     this.clear_list();
     try {
       const data = await requestAPI<any>('history?course_id=' + course);
-      console.log('HistoryList.load_list queried & got data:');
-      console.log(data);
       if (data.success) {
         this.load_list_success(<any[]>data.value);
       } else {
@@ -202,21 +194,7 @@ export class HistoryList {
   }
 
   public show_error(error: string): void {
-    const f = document.getElementById('#jp-main-doc-panel');
-    console.log(
-      'when HistoryList wants to show an errot, the Panel is:' + f?.innerHTML
-    );
-
-    const elem = document.getElementById('#nbexchange-history');
-    console.log('HistoryList.show_error: ' + error + ' on element ' + elem);
-
-    // if (!elem) {
-    //   return;
-    // }
-    const para_elem = document.createElement('p');
-    para_elem.textContent += error;
-    elem?.append(para_elem);
-    return;
+    // to do
   }
 }
 
@@ -259,7 +237,6 @@ export class CourseList {
     this.history = history;
     this.current_course = 'select a course';
 
-    //options = options || {};
     this.options = options;
     this.base_url = options.get('base_url') || PageConfig.getBaseUrl();
 
@@ -313,9 +290,7 @@ export class CourseList {
   private async load_list() {
     this.disable_list();
     this.clear_list();
-    // this.history.clear_list(true);
-    console.log('CourseList.load_list called. history is');
-    console.log(self.history);
+
     try {
       const data = await requestAPI<any>('courses', '');
       this.handle_load_list(data);
@@ -325,12 +300,6 @@ export class CourseList {
   }
 
   private handle_load_list(data: { success: any; value: any }): void {
-    const f = document.getElementById('#main');
-    console.log(
-      'When CourseList.handle_load_list() runs, the Panel is:' + f?.outerHTML
-    );
-    console.log('   ..... and data is:' + data);
-    console.log(data);
     if (data.success) {
       this.load_list_success(data.value);
     } else {
@@ -345,90 +314,12 @@ export class CourseList {
     this.disable_list();
     this.clear_list();
 
-    // Bypass all the junk about knows courses & stuff
+    // Bypass all the junk about known courses & stuff
     this.history.load_list('moot');
-
-    // const f = document.getElementById('#main');
-    // console.log(
-    //   'When CourseList.load_list_success() runs, the Panel is:' + f?.outerHTML
-    // );
-    // console.log('   ..... and data is:' + data);
-    // if (this.data.length === 0) {
-    //   // this.default_course_element!.innerText = 'No courses found.';
-    //   this.history.clear_list();
-    //   this.enable_list();
-    //   this.show_error('CourseList.load_list_success() has no data' + this.data);
-    // }
-
-    // if (
-    //   this.current_course !== null &&
-    //   !this.data.includes(this.current_course)
-    // ) {
-    //   this.current_course = null;
-    // }
-
-    // if (this.current_course === null) {
-    //   this.change_course(this.data[0]);
-    // } else {
-    //   // we still want to "change" the course here to update the
-    //   // history list
-    //   this.change_course(this.current_course);
-    // }
-  }
-
-  private change_course(course: string): void {
-    this.disable_list();
-    if (this.current_course !== null) {
-      this.default_course_element!.innerText = course;
-    }
-    this.current_course = course;
-    this.default_course_element!.innerText = this.current_course;
-    const success = () => {
-      this.load_history_success();
-    };
-    this.history.load_list(course, success);
-  }
-
-  private load_history_success(): void {
-    if (this.data) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const that = this;
-      const set_course = function (course: string) {
-        return function () {
-          that.change_course(course);
-        };
-      };
-
-      for (let i = 0; i < this.data.length; i++) {
-        const a = document.createElement('a');
-        a.href = '#';
-        a.innerText = this.data[i];
-        const element = document.createElement('li');
-        element.append(a);
-        element.onclick = set_course(this.data[i]);
-        this.course_list_element!.append(element);
-      }
-      this.data = [];
-    }
-    this.enable_list();
   }
 
   public show_error(error: string): void {
-    const f = document.getElementById('#main');
-    console.log(
-      'when CourseList wants to show an errot, the Panel is:' + f?.outerHTML
-    );
-    const elem = document.getElementById('#nbexchange-history');
-    console.log('CourseList.show_error: ' + error + ' on element ' + elem);
-
-    // if (!elem) {
-    //   return;
-    // }
-    const para_elem = document.createElement('p');
-    para_elem.textContent += error;
-    elem?.append(para_elem);
-    // alert(error);
-    return;
+    // to do
   }
 }
 
