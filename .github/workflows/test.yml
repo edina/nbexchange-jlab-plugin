@@ -18,8 +18,8 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install nbexchange
+    - name: Install nbexchange_jlab
       run: |
         python -m pip install .[test]
     - name: Run tests
-      run: pytest --cov=nbexchange --cov-report=xml
+      run: pytest --cov=nbexchange_jlab --cov-report=xml
