@@ -16,9 +16,10 @@ export class HistoryWidget extends Widget {
 
     this.node.innerHTML = [
       '<div id="nbexchange-history-list" class="tab-pane">',
-      '  <div id="history-toolbar" class="row list_toolbar">',
-      '    <div class="col-sm-8 no-padding">',
-      '      <span id="history_list_info" class="toolbar_info">History for course:</span>',
+      '  <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
+      '  <div id="history-toolbar" class="row list_toolbar" style="display: none">',
+      '    <div class="col-sm-8 no-padding"> <!-- -->',
+      '      <span id="history_list_info" class="toolbar_info">Current course:</span>',
       '      <div class="btn-group btn-group-xs">',
       '        <button type="button" class="btn btn-default" id="course_list_default">Loading, please wait...</button>',
       '        <button type="button" class="btn btn-default dropdown-toggle" id="course_list_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">',
@@ -28,7 +29,7 @@ export class HistoryWidget extends Widget {
       '        <ul class="dropdown-menu" id="course_list">',
       '        </ul>',
       '      </div>',
-      '    </div>',
+      '    </div> <!-- -->',
       '    <div class="col-sm-4 no-padding tree-buttons">',
       '      <span id="history_buttons" class="pull-right toolbar_buttons">',
       '      <button id="refresh_history_list" title="Refresh history list" class="btn btn-default btn-xs"><i class="fa fa-refresh"></i></button>',
@@ -47,6 +48,7 @@ export class HistoryWidget extends Widget {
     const options = new Map();
     options.set('base_url', base_url);
     const history_l = new HistoryList(this, 'actions-panel-group');
+
     new CourseList(
       this,
       'course_list',

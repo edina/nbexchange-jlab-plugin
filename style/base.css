@@ -50,3 +50,11 @@
 #history-toolbar {
   padding: 3px;
 }
+
+.course_group {
+  background-color: #ccc;
+  border: 1px solid #666;
+  border-radius: 10px;
+  padding: 0 1em;
+  margin-bottom: 1em;
+}

@@ -16,6 +16,7 @@ from nbexchange_jlab.tests.utils import create_any_tarball, get_feedback_file
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.ERROR)
 
+course_id = "no_course"
 release_dir = "release_test"
 source_dir = "source_test"
 notebook1_filename = os.path.join(os.path.dirname(__file__), "data", "assignment-0.6.ipynb")
@@ -122,6 +123,7 @@ def test_release_assignment_methods_the_rest(plugin_config, tmpdir, caplog):
 @pytest.mark.gen_test
 def test_release_assignment_normal(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -163,6 +165,7 @@ def test_release_assignment_normal(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_assignment_several_normal(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -226,6 +229,7 @@ def test_release_assignment_several_normal(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_assignment_missing_files(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -240,6 +244,7 @@ def test_release_assignment_missing_files(plugin_config, tmpdir, caplog):
 @pytest.mark.gen_test
 def test_release_assignment_known_failure_from_exchange(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -282,6 +287,7 @@ def test_release_assignment_known_failure_from_exchange(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_reducing_max_buffer_size_honoured(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -328,6 +334,7 @@ def test_release_reducing_max_buffer_size_honoured(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_105MB_not_blocked(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -373,6 +380,7 @@ def test_release_105MB_not_blocked(plugin_config, tmpdir):
 # @pytest.mark.gen_test
 def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -401,6 +409,7 @@ def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_does_timeout(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"
@@ -437,6 +446,7 @@ def test_release_does_timeout(plugin_config, tmpdir, caplog):
 @pytest.mark.gen_test
 def test_release_assignment_exchange_failure_code(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin_config.CourseDirectory.release_directory = str(tmpdir.mkdir(release_dir).realpath())
     plugin_config.CourseDirectory.assignment_id = "assign_1"

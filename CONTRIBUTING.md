@@ -26,6 +26,35 @@ Some guidelines on contributing to nbexchange:
 
 Github does a pretty good job testing the plugin and Pull Requests, but it may make sense to manually perform tests.
 
+## How the code fits together
+
+### Server-side extensions
+
+jupyterlab server-extensions are magically enabled using the `_load_jupyter_server_extension` function in the `__init__` file.
+
+`nbextension_jlab/__init__.py` loads the `load_jupyter_server_extension` (as `load_history`) from the `nbexchange_jlab/history_list/__init__.py` file.
+`nbextension_jlab/__init__.py` defines the `_load_jupyter_server_extension` function as running a set of commands - currently just the `load_history` function, but this is extensable by just adding more functions here.
+
+`nbextension_jlab/history_list/__init__.py` maps `_load_jupyter_server_extension` `load_jupyter_server_extension`, which it loads from the `nbexchange_jlab/history_list/handlers.py` file.
+`nbexchange_jlab/history_list/handlers.py` defines the `load_jupyter_server_extension` function to set up the handler (`<base_url>/nbexchange-jlab/history` -> `HistoryListHandler`).
+
+`nbexchange_jlab/history_list/handlers.py` itself, when wanting to query the exchange, creates an instance of the Exchange plugin object [thus inheriting all the configuration and authentication details that provides the nbgrader-centric plugins], which it uses to query the external service.
+
+When creating additional functionailty / extensions, essentially you create code in parallel to `nbexchange_jlab/history_list`, and include it in the initialisers in `nbexchange_jlab/__init__.py`.
+
+### Client-side extensions
+
+On the client-side, labextensions are automatically enabled, but can be disabled via configuration or command-line. nbexchange_jlab _disables_ the nbgrader menu, and replaces it with its own.
+
+All code is in `src`. `src/index.ts` creates the commands and menus, and pulls in the `HistoryWidget` from `./history/index.ts`.
+
+`./history/index.ts` pulls in two things:
+
+1. A common `requestAPI` function from `src/handler.ts` - which is used by the front-end code to call the back-end server-side code. Note that we _namespace_ this, to avoid any possible clashes with handler URLs
+2. The `HistoryList` and `CourseList` classes from `./history.ts` - These are the bits of code that make the request to the server-side, and translate the return into HTML that is injected into the base Widget (https://lumino.readthedocs.io/en/latest/api/index.html)
+
+When creating additional functionailty / extensions, essentially you create code in parallel to `src/history`, and include it in the initialisers in `src/index.ts`
+
 ## Developing nbexchange_jlab
 
 The plugins run python on the jupyter-server backend, and typescript in the jupyterlab frontend, so you will need

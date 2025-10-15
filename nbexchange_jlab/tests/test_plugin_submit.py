@@ -1977,6 +1977,7 @@ def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
 # Check the client-side oversizxe limit works
 @pytest.mark.gen_test
 def test_submit_timeout(plugin_config, tmpdir, caplog):
+    plugin_config.CourseDirectory.course_id = course_id
 
     plugin = ExchangeSubmit(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
 

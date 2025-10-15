@@ -30,6 +30,7 @@ notebook2_file = get_feedback_file(notebook2_filename)
 
 student_id = "1"
 assignment_id = "assign_1"
+course_id = "no_course"
 
 
 @pytest.mark.gen_test
@@ -53,6 +54,7 @@ def test_release_feedback_methods(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_feedback_normal(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -140,6 +142,7 @@ def test_release_feedback_several_normal(plugin_config, tmpdir):
     feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = feedback_directory
     plugin_config.CourseDirectory.submitted_directory = submitted_directory
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -255,6 +258,7 @@ def test_release_feedback_several_normal(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_feedback_fail(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -316,6 +320,7 @@ def test_release_feedback_fail(plugin_config, tmpdir):
 @pytest.mark.gen_test
 def test_release_feedback_timeout(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -373,6 +378,7 @@ def test_release_feedback_timeout(plugin_config, tmpdir, caplog):
 def test_release_feedback_filename_with_surrounding_whitespace(plugin_config, tmpdir):
     notebook_id = " test with spaces "
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -461,6 +467,7 @@ def test_release_feedback_filename_with_surrounding_whitespace(plugin_config, tm
 @pytest.mark.gen_test
 def test_release_feedback_missing_timestamp_file(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id
@@ -492,6 +499,7 @@ def test_release_feedback_missing_timestamp_file(plugin_config, tmpdir, caplog):
 @pytest.mark.gen_test
 def test_release_feedback_missing_notebook_file(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
+    plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.feedback_directory = str(tmpdir.mkdir("feedback_test").realpath())
     plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted_test").realpath())
     plugin_config.CourseDirectory.assignment_id = assignment_id

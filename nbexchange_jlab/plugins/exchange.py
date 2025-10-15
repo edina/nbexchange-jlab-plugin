@@ -54,7 +54,8 @@ class Exchange(ABCExchange):
         self.log.debug(f"service_url: {this_url}")
         return this_url
 
-    course_id = Unicode(os.environ.get("NAAS_COURSE_ID", "no_course")).tag(config=True)
+    # this is set in the nbgrader_config file
+    # course_id = Unicode(os.environ.get("NAAS_COURSE_ID", "no_course")).tag(config=True)
 
     max_buffer_size = Integer(5253530000, help="The maximum size, in bytes, of an upload (defaults to 5GB)").tag(
         config=True
@@ -165,8 +166,6 @@ class Exchange(ABCExchange):
     def start(self):
         self.log.debug(f"Called start on {self.__class__.__name__}")
         self.set_timestamp()  # a datetime object
-        if self.coursedir and not self.coursedir.course_id:
-            self.coursedir.course_id = self.course_id
 
         self.init_src()
         self.init_dest()

@@ -21,7 +21,6 @@ export async function requestAPI<T>(
 
   let response: Response;
   try {
-    console.log('Handler.ts - requestAPI: ' + requestUrl);
     response = await ServerConnection.makeRequest(requestUrl, init, settings);
   } catch (error) {
     throw new ServerConnection.NetworkError(error as any);
