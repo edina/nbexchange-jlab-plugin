@@ -16,65 +16,11 @@ In addition to the usual suite of plugins for exchanging files, the plugin provi
 
 ## Installation
 
-Installing this plugin in a jupyter notebook will automatically install nbgrader.
-This version installs `nbgrader` 0.9.5 (which makes it compatible with JupyterLab & Notebook 7)
+The primary reference for this should be the `nbgrader` documentation - but in short:
 
-This extension can be directly install from github:
-
-```bash
-pip install https://github.com/edina/nbexchange_jlab_plugin/archive/refs/tags/v0.2.2-beta.tar.gz
-```
-
-or from this cloned repository:
-
-```bash
-pip install nbexchange_jlab
-```
-
-## Uninstall
-
-To remove the extension, execute:
-
-```bash
-pip uninstall nbexchange_jlab
-```
-
-## Troubleshoot
-
-If you are seeing the frontend extension, but it is not working, check
-that the server extension is enabled:
-
-```bash
-jupyter server extension list
-```
-
-If the server extension is installed and enabled, but you are not seeing
-the frontend extension, check the frontend extension is installed:
-
-```bash
-jupyter labextension list
-```
-
-## Configuration
-
-### Environment
-
-NbExchange uses a couple of environment variable to know how to connect with the [NbExchange service](https://github.com/edina/nbexchange)
-
-```bash
-export NAAS_BASE_URL="http://example.com:9876/"
-export NAAS_COURSE_ID="My Course"
-```
-
-If you are using [mise](https://mise.jdx.dev/) make sure the right values are in the `mise.toml` file.
-
-### Nbgrader configuration
-
-Configuring `nbgrader` to use the alternative exchange in Jupyterlab/Jupyter-Notebook
-
-The primary reference for this should be the [nbgrader documentation](https://nbgrader.readthedocs.io/en/stable/configuration/nbgrader_config.html)
-This repository contain a config file example: `nbgrader_config.py`.
-It basically needs to include the following line:
+1. Install `nbexchange_jlab_plugin` into your jupyter environment [from github, using pip]
+  - This will also install `nbgrader` - this release installs 0.9.5 (which makes it compatible with JupyterLab & Notebook 7) 
+3. Include the following in your `nbgrader_config.py` file:
 
 ```python
 c.ExchangeFactory.exchange = 'nbexchange_jlab.plugins.Exchange'
@@ -90,12 +36,43 @@ c.ExchangeFactory.fetch_feedback = 'nbexchange_jlab.plugins.ExchangeFetchFeedbac
 
 These plugins will also check the size of _releases_ & _submissions_
 
-`c.Exchange.max_buffer_size = 204800 # 200KB`
+`c.Exchange.max_buffer_size = 204800  # 200KB`
 
-[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800 # 200KB`]
+[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800  # 200KB`]
 
 By default, upload sizes are limited to 5GB (5253530000)
 The figure is bytes
+
+### Configuring the plugins to talk to the NbExchange server
+
+The plugins make http requests to the server, which requires it to prepare several things:
+
+- `base_service_url` is the `http origin` of the NbExchange service - we default this to `https://noteable.edina.ac.uk`, 'cos.... _advertising_
+- `base_path` is the path-part of requests into the exchange. This needs to match `base_url` defined in the NbExchange service, and (likewise) defaults to `/services/nbexchange/`.
+- `api_plugin_class` is the name of the class that sets up headers, cookies, etc for the `api_request` to call the external exchange (see the `test_plugin_exchange_with_bespoke_apiPlugin.py` test file.)
+
+eg:
+
+```python
+from nbexchange_jlab.plugins import BaseApiPlugin
+
+class JWTApiPlugin(BaseApiPlugin):
+    def prep_api_call(self, path):
+        jwt_token = os.environ.get("DEMO_JWT")
+        cookies = dict()
+        headers = dict()
+
+        if jwt_token:
+            cookies["demo_auth"] = jwt_token
+
+        url = self.service_url() + path
+        return url, cookies, headers
+        
+c.Exchange.api_plugin_class = JWTApiPlugin
+c.Exchange.base_service_url = 'https://nbexchange.example.com'
+c.Exchange.base_path = '/services/exchange'
+
+```
 
 ## Contributing
 

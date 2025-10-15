@@ -9,7 +9,7 @@ except ImportError:
 
     warnings.warn("Importing 'nbexchange_jlab' outside a proper installation.")
     __version__ = "dev"
-# from .handlers import load_jupyter_server_extension
+
 from nbexchange_jlab.history_list import load_jupyter_server_extension as load_history
 
 
