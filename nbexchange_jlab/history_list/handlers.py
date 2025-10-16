@@ -57,6 +57,9 @@ class HistoryList(LoggingConfigurable):
         app.load_config_file()
         yield app.config
 
+    def get_current_course(self):
+        return os.environ('NAAS_COURSE_ID', None)
+    
     def query_exchange(self):
         """
         This queries the database for all the actions for a course
@@ -87,6 +90,13 @@ class HistoryList(LoggingConfigurable):
                 "Got back an invalid response when history\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}"
             )
             return []
+        currnent_course_code = self.get_current_course()
+
+        for item in history["value"]:
+            if item['course_coce'] == currnent_course_code:
+                item['isCurrnet'] = True
+            else:
+                item['isCurrnet'] = False
 
         return history["value"]
 
@@ -119,7 +129,7 @@ class HistoryList(LoggingConfigurable):
                 else:
                     retvalue = {"success": False, "value": traceback.format_exc()}
             else:
-                retvalue = {"success": True, "value": history}
+                retvalue = {"success": True, "value": history }
 
         return retvalue
 
