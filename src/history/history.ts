@@ -93,7 +93,7 @@ export class HistoryList {
       const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
       const detail_group_name = this_course['course_code'];
       // const course_panel_elem = document.createElement('article');
-      const course_panel_elem = document.createElement('detail');
+      const course_panel_elem = document.createElement('details');
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
       this.panel_group_element.append(course_panel_elem);
