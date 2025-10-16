@@ -44,6 +44,7 @@ interface ICourseData {
   user_id: any;
   assignments: IAssignmentData[];
   isInstructor: boolean;
+  isCurrent: boolean;
   course_id: number;
   course_code: string;
   course_title: string;
@@ -98,6 +99,9 @@ export class HistoryList {
       const course_panel_elem = document.createElement('details');
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
+      if (this_course['isCurrent']) {
+        course_panel_elem.classList.add('current_course');
+      }
       this.panel_group_element.append(course_panel_elem);
       // const para_elem = document.createElement('p');
       const para_elem = document.createElement('summary');
