@@ -94,10 +94,10 @@ class HistoryList(LoggingConfigurable):
         currnent_course_code = self.get_current_course()
 
         for item in history["value"]:
-            if item['course_code'] == currnent_course_code:
-                item['isCurrnet'] = True
+            if item["course_code"] == currnent_course_code:
+                item["isCurrnet"] = True
             else:
-                item['isCurrnet'] = False
+                item["isCurrnet"] = False
 
         return history["value"]
 
