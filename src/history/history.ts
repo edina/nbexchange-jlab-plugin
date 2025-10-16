@@ -85,8 +85,6 @@ export class HistoryList {
     for (const key in data) {
       const this_course = data[key];
       const assignments: IAssignmentData[] = this_course['assignments'];
-      console.log('Working with new course: ' + this_course['course_code']);
-      console.log(assignments);
 
       if (assignments.length === 0) {
         continue;
@@ -94,17 +92,18 @@ export class HistoryList {
 
       const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
       const detail_group_name = this_course['course_code'];
-      const course_panel_elem = document.createElement('article');
+      // const course_panel_elem = document.createElement('article');
+      const course_panel_elem = document.createElement('detail');
+      course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
       this.panel_group_element.append(course_panel_elem);
-      const para_elem = document.createElement('p');
+      // const para_elem = document.createElement('p');
+      const para_elem = document.createElement('summary');
       course_panel_elem.append(para_elem);
       para_elem.textContent +=
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
-      // for (let i = 0; i < assignments.length; i++) {
       for (const assignment of assignments) {
-        // const assignment = assignments[i];
         const assignment_code = assignment['assignment_code'];
         const assignment_id = assignment['assignment_id'];
 
@@ -143,7 +142,6 @@ export class HistoryList {
         }
       }
     }
-    // TODO
 
     if (this.callback) {
       this.callback();
