@@ -1,10 +1,10 @@
 # NbExchange JupyterLab Plugin
 
-[![Github Actions Status](/workflows/Build/badge.svg)](/actions/workflows/build.yml)
-
 A JupyterLab extension which provides the plugins for [nbgrader](https://github.com/jupyter/nbgrader) to use [NbExchange](https://github.com/edina/nbexchange) as an external Exchange service.
 
 It is composed of a Python package named `nbexchange_jlab` for the server extension and a NPM package named `nbexchange_jlab` for the frontend extension.
+
+## Additional Functionality
 
 In addition to the usual suite of plugins for exchanging files, the plugin provides a `History` option to the Nbgrader menu - this is a visual render of NbExchanges `history` endpoint:
 
@@ -13,6 +13,7 @@ In addition to the usual suite of plugins for exchanging files, the plugin provi
 ## Requirements
 
 - JupyterLab >= 4.0.0
+- NbGrader (this package will install for you)
 
 ## Installation
 
@@ -49,26 +50,30 @@ The plugins make http requests to the server, which requires it to prepare sever
 
 - `base_service_url` is the `http origin` of the NbExchange service - we default this to `https://noteable.edina.ac.uk`, 'cos.... _advertising_
 - `base_path` is the path-part of requests into the exchange. This needs to match `base_url` defined in the NbExchange service, and (likewise) defaults to `/services/nbexchange/`.
-- `api_plugin_class` is the name of the class that sets up headers, cookies, etc for the `api_request` to call the external exchange (see the `test_plugin_exchange_with_bespoke_apiPlugin.py` test file.)
+- `api_plugin_class` is the name of the class that sets up headers, cookies, etc for the `api_request` to call the external exchange
+  - Whatever is used here needs to match whatever the [nbexchange `get_current_user`](https://github.com/edina/nbexchange?tab=readme-ov-file#user_plugin_class-revisited) will use to identify the user.
+  - This see the `test_plugin_exchange_with_bespoke_apiPlugin.py` test file for an simplistic example using JSON Web Tokens
 
 eg:
 
 ```python
 from nbexchange_jlab.plugins import BaseApiPlugin
 
-class JWTApiPlugin(BaseApiPlugin):
+class AuthApiPlugin(BaseApiPlugin):
     def prep_api_call(self, path):
-        jwt_token = os.environ.get("DEMO_JWT")
+
+        # Gets an HTTP Authentication Token
+        auth_token = _some_magic_function()
         cookies = dict()
         headers = dict()
 
-        if jwt_token:
-            cookies["demo_auth"] = jwt_token
+        if auth_token:
+            headers["Authorization"] = f"Basic {auth_token}"
 
         url = self.service_url() + path
         return url, cookies, headers
         
-c.Exchange.api_plugin_class = JWTApiPlugin
+c.Exchange.api_plugin_class = AuthApiPlugin
 c.Exchange.base_service_url = 'https://nbexchange.example.com'
 c.Exchange.base_path = '/services/exchange'
 
