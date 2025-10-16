@@ -58,7 +58,7 @@ class HistoryList(LoggingConfigurable):
         yield app.config
 
     def get_current_course(self):
-        return os.environ('NAAS_COURSE_ID', None)
+        return os.environ.get('NAAS_COURSE_ID', None)
 
     def query_exchange(self):
         """
