@@ -95,9 +95,9 @@ class HistoryList(LoggingConfigurable):
 
         for item in history["value"]:
             if item["course_code"] == currnent_course_code:
-                item["isCurrnet"] = True
+                item["isCurrent"] = True
             else:
-                item["isCurrnet"] = False
+                item["isCurrent"] = False
 
         return history["value"]
 
