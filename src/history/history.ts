@@ -99,7 +99,9 @@ export class HistoryList {
       const course_panel_elem = document.createElement('details');
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
+      console.log(this_course['isCurrent']);
       if (this_course['isCurrent']) {
+        console.log('isCurrent True');
         course_panel_elem.classList.add('current_course');
       }
       this.panel_group_element.append(course_panel_elem);
