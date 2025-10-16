@@ -157,12 +157,9 @@ export class HistoryList {
       this.callback = callback;
     }
     this.clear_list();
-    let query_string = 'history';
-    if (course) {
-      query_string += '?course_id=' + course;
-    }
+
     try {
-      const data = await requestAPI<any>(query_string);
+      const data = await requestAPI<any>('history?course_id=' + course);
       if (data.success) {
         this.load_list_success(<any[]>data.value);
       } else {
@@ -295,7 +292,7 @@ export class CourseList {
     this.clear_list();
 
     // Bypass all the junk about known courses & stuff
-    this.history.load_list();
+    this.history.load_list('moot');
   }
 
   public show_error(error: string): void {
