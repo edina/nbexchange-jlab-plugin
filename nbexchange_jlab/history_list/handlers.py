@@ -103,7 +103,7 @@ class HistoryList(LoggingConfigurable):
                 self.exchange = Exchange(coursedir=coursedir, authenticator=authenticator, config=config)
 
                 history = self.query_exchange()
-
+                self.log.info(f"#### current course: {self.exchange.coursedir.__dict__}")
             except Exception as e:
                 self.log.error(traceback.format_exc())
                 if isinstance(e, ExchangeError):

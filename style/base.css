@@ -52,9 +52,10 @@
 }
 
 .course_group {
-  background-color: #ccc;
-  border: 1px solid #666;
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-layout-color2);
+  border-color: var(--jp-border-color2);
   border-radius: 10px;
-  padding: 0 1em;
+  padding: 0.25em 0.5em;
   margin-bottom: 1em;
 }
