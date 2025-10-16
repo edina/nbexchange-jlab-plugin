@@ -44,7 +44,7 @@ When creating additional functionailty / extensions, essentially you create code
 
 ### Client-side extensions
 
-On the client-side, labextensions are automatically enabled, but can be disabled via configuration or command-line. nbexchange_jlab _disables_ the nbgrader menu, and replaces it with its own.
+On the client-side, labextensions are automatically enabled, but can be disabled via configuration or command-line. nbexchange*jlab \_disables* the nbgrader menu, and replaces it with its own.
 
 All code is in `src`. `src/index.ts` creates the commands and menus, and pulls in the `HistoryWidget` from `./history/index.ts`.
 

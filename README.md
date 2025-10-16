@@ -20,7 +20,9 @@ In addition to the usual suite of plugins for exchanging files, the plugin provi
 The primary reference for this should be the `nbgrader` documentation - but in short:
 
 1. Install `nbexchange_jlab_plugin` into your jupyter environment [from github, using pip]
-  - This will also install `nbgrader` - this release installs 0.9.5 (which makes it compatible with JupyterLab & Notebook 7) 
+
+- This will also install `nbgrader` - this release installs 0.9.5 (which makes it compatible with JupyterLab & Notebook 7)
+
 3. Include the following in your `nbgrader_config.py` file:
 
 ```python
@@ -33,13 +35,14 @@ c.ExchangeFactory.collect = 'nbexchange_jlab.plugins.ExchangeCollect'
 c.ExchangeFactory.release_feedback = 'nbexchange_jlab.plugins.ExchangeReleaseFeedback'
 c.ExchangeFactory.fetch_feedback = 'nbexchange_jlab.plugins.ExchangeFetchFeedback'
 ```
+
 (note the change to `plugins`, _plural_)
 
 These plugins will also check the size of _releases_ & _submissions_
 
 `c.Exchange.max_buffer_size = 204800  # 200KB`
 
-[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800  # 200KB`]
+[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800 # 200KB`]
 
 By default, upload sizes are limited to 5GB (5253530000)
 The figure is bytes
@@ -72,7 +75,7 @@ class AuthApiPlugin(BaseApiPlugin):
 
         url = self.service_url() + path
         return url, cookies, headers
-        
+
 c.Exchange.api_plugin_class = AuthApiPlugin
 c.Exchange.base_service_url = 'https://nbexchange.example.com'
 c.Exchange.base_path = '/services/exchange'
