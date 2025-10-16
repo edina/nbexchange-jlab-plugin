@@ -102,8 +102,9 @@ export class HistoryList {
       para_elem.textContent +=
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
-      for (let i = 0; i < assignments.length; i++) {
-        const assignment = assignments[i];
+      // for (let i = 0; i < assignments.length; i++) {
+      for (const assignment of assignments) {
+        // const assignment = assignments[i];
         const assignment_code = assignment['assignment_code'];
         const assignment_id = assignment['assignment_id'];
 
