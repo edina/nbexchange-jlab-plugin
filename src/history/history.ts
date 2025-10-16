@@ -110,11 +110,13 @@ export class HistoryList {
     }
     this.clear_list();
 
-    const sorted_data = this.group_data_into_courses(data);
+    // const sorted_data = this.group_data_into_courses(data);
 
-    for (const key in sorted_data) {
-      const this_course = sorted_data[key];
+    for (const key in data) {
+      const this_course = data[key];
       const assignments: IAssignmentData[] = this_course['assignments'];
+      console.log('Working with new course: ' + this_course['course_code']);
+      console.log(assignments);
 
       if (assignments.length === 0) {
         continue;
