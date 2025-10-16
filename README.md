@@ -42,7 +42,7 @@ These plugins will also check the size of _releases_ & _submissions_
 
 `c.Exchange.max_buffer_size = 204800  # 200KB`
 
-[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800  # 200KB`]
+[or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800 # 200KB`]
 
 By default, upload sizes are limited to 5GB (5253530000)
 The figure is bytes
@@ -75,7 +75,6 @@ class AuthApiPlugin(BaseApiPlugin):
 
         url = self.service_url() + path
         return url, cookies, headers
-
 c.Exchange.api_plugin_class = AuthApiPlugin
 c.Exchange.base_service_url = 'https://nbexchange.example.com'
 c.Exchange.base_path = '/services/exchange'

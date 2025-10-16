@@ -1,6 +1,7 @@
 import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -109,7 +110,6 @@ export class HistoryList {
       if (this_course['isCurrent']) {
         course_panel_elem.classList.add('current_course');
       }
-
       const para_elem = document.createElement('summary');
       course_panel_elem.append(para_elem);
 
@@ -199,8 +199,9 @@ export class HistoryList {
     }
   }
 
+  // {"success": False, "value": <text>}
   public show_error(error: string): void {
-    // to do
+    Notification.emit(error, 'error', { autoClose: false });
   }
 }
 
@@ -301,7 +302,9 @@ export class CourseList {
       const data = await requestAPI<any>('courses', '');
       this.handle_load_list(data);
     } catch (reason) {
-      console.error(`Error on GET /courses.\n${reason}`);
+      const msg: string = 'Error on GET /courses.\n' + reason;
+      console.error(msg);
+      Notification.emit(msg, 'error', { autoClose: false });
     }
   }
 
@@ -325,7 +328,7 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
-    // to do
+    Notification.emit(error, 'error', { autoClose: false });
   }
 }
 

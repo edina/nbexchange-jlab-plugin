@@ -27,6 +27,10 @@ def chdir(dirname):
     os.chdir(currdir)
 
 
+class HistoryError(Exception):
+    pass
+
+
 class HistoryList(LoggingConfigurable):
     SUPPORTED_METHODS = ("GET", "HEAD")
 
@@ -52,10 +56,7 @@ class HistoryList(LoggingConfigurable):
 
     @contextlib.contextmanager
     def get_history_config(self):
-        app = NbGrader()
-        app.config_file_paths.append(os.getcwd())
-        app.load_config_file()
-        yield app.config
+        yield self.load_config()
 
     def get_current_course(self):
         return os.environ.get("NAAS_COURSE_ID", None)
@@ -79,17 +80,35 @@ class HistoryList(LoggingConfigurable):
                 self.log.info("calling exchange.api_request withOUT course_code")
                 r = self.exchange.api_request("history")
         except requests.exceptions.Timeout:
-            self.fail("Timed out trying to reach the exchange service to list history.")
-
+            raise HistoryError("Timed out trying to reach the exchange service to list history.")
+        except Exception as e:
+            raise HistoryError(f"Connection to the exchange failed: {e}")
+        if r.status_code >= 400:
+            raise HistoryError(r.reason)
         self.log.debug(f"Got back {r} when listing history")
 
         try:
             history = r.json()
-        except json.decoder.JSONDecodeError as err:
-            self.log.error(
-                "Got back an invalid response when history\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}"
-            )
-            return []
+        except AttributeError as err:
+            msg = f"Got back an invalid response when history: response text: '{r.text}'"
+            self.log.error(msg)
+            raise HistoryError(msg)
+        if type(history) != dict:
+            raise HistoryError(f"Invalid response from the exchange: {history}")
+        response_keys = list(history.keys())
+        if set(response_keys) != set(["success", "value"]):
+            raise HistoryError(f"Invalid response from the exchange: {history}")
+
+        if not history["success"]:
+            raise HistoryError(f"Error message from exchange: '{history['value']}'")
+
+        currnent_course_code = self.get_current_course()
+
+        for item in history["value"]:
+            if item["course_code"] == currnent_course_code:
+                item["isCurrent"] = True
+            else:
+                item["isCurrent"] = False
 
         currnent_course_code = self.get_current_course()
 
@@ -102,6 +121,8 @@ class HistoryList(LoggingConfigurable):
         return history["value"]
 
     def list_history(self, course_id: str = None):
+        if not self.get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
 
         with self.get_history_config() as config:
 
@@ -114,18 +135,20 @@ class HistoryList(LoggingConfigurable):
                 self.exchange = Exchange(coursedir=coursedir, authenticator=authenticator, config=config)
 
                 history = self.query_exchange()
-                self.log.info(f"#### current course: {self.exchange.coursedir.__dict__}")
+            except HistoryError as e:
+                retvalue = {"success": False, "value": str(e)}
             except Exception as e:
                 self.log.error(traceback.format_exc())
                 if isinstance(e, ExchangeError):
                     retvalue = {
                         "success": False,
-                        "value": """The exchange directory does not exist and could
-                                    not be created. The "release" and "collect" functionality will not be available.
-                                    Please see the documentation on
-                                    http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange
-                                    for instructions.
-                                """,
+                        "value": (
+                            "The exchange directory does not exist and could",
+                            "not be created. The 'release' and 'collect' functionality will not be available.",
+                            "Please see the documentation on",
+                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",
+                            "for instructions.",
+                        ),
                     }
                 else:
                     retvalue = {"success": False, "value": traceback.format_exc()}
@@ -141,7 +164,6 @@ class HistoryList(LoggingConfigurable):
         self.log.info(f"Called head on {self.__class__.__name__}")
 
 
-# class HistoryListHandler(JupyterHandler):
 class BaseHistoryHandler(JupyterHandler):
     @property
     def manager(self):
