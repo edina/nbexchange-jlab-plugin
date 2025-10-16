@@ -71,34 +71,6 @@ export class HistoryList {
     this.panel_group_element.innerHTML = '';
   }
 
-  // private group_data_into_courses(data: ICourseData[]) {
-  //   const results: { [key: string]: ICourseData } = {};
-  //   console.log(data);
-  //   data.forEach(record => {
-  //     console.log(record);
-  //     const courseTitle = record.course_title;
-  //     console.log(
-  //       'looking for existing entry: ' + courseTitle + ' in ' + results
-  //     );
-  //     // Check if we already have an entry for this course title
-  //     if (results[courseTitle]) {
-  //       // Merge assignments into existing record
-  //       console.log('merging record');
-  //       results[courseTitle].assignments = [
-  //         ...results[courseTitle].assignments,
-  //         ...record.assignments
-  //       ];
-  //     } else {
-  //       // Create the first entry with this course title
-  //       console.log('new record');
-  //       results[courseTitle] = record;
-  //     }
-  //   });
-  //   console.log('final data: ' + results);
-  //   // Convert the results object back to an array
-  //   return results;
-  // }
-
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
       alert('There is no history available from the Exchange service');
@@ -109,8 +81,6 @@ export class HistoryList {
       return;
     }
     this.clear_list();
-
-    // const sorted_data = this.group_data_into_courses(data);
 
     for (const key in data) {
       const this_course = data[key];
@@ -133,44 +103,42 @@ export class HistoryList {
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
       for (let i = 0; i < assignments.length; i++) {
-        for (let j = 0; j < assignments.length; j++) {
-          const assignment = assignments[j];
-          const assignment_code = assignment['assignment_code'];
-          const assignment_id = assignment['assignment_id'];
+        const assignment = assignments[i];
+        const assignment_code = assignment['assignment_code'];
+        const assignment_id = assignment['assignment_id'];
 
-          // Create assignment panel
-          const assignment_panel_elem = document.createElement('details');
-          assignment_panel_elem.classList.add('panel', 'panel-default');
-          assignment_panel_elem.setAttribute('name', detail_group_name);
-          const panel_body_id = 'assignment-panel-body-' + assignment_id;
-          assignment_panel_elem.innerHTML = [
-            '      <summary class="panel-heading">',
-            '        ' + assignment_code + ' &lt;' + role + '&gt;',
-            '      </summary>',
-            '      <div class="panel-body" id="' + panel_body_id + '">',
-            '      </div>'
-          ].join('\n');
-          course_panel_elem.append(assignment_panel_elem);
+        // Create assignment panel
+        const assignment_panel_elem = document.createElement('details');
+        assignment_panel_elem.classList.add('panel', 'panel-default');
+        assignment_panel_elem.setAttribute('name', detail_group_name);
+        const panel_body_id = 'assignment-panel-body-' + assignment_id;
+        assignment_panel_elem.innerHTML = [
+          '      <summary class="panel-heading">',
+          '        ' + assignment_code + ' &lt;' + role + '&gt;',
+          '      </summary>',
+          '      <div class="panel-body" id="' + panel_body_id + '">',
+          '      </div>'
+        ].join('\n');
+        course_panel_elem.append(assignment_panel_elem);
 
-          const actions: IActionData[] = assignment['actions'];
+        const actions: IActionData[] = assignment['actions'];
 
-          for (let j = 0; j < actionTypes.length; j++) {
-            const groupActions: any[] = actions.filter(
-              a => a.action === actionTypes[j].id
-            );
+        for (let j = 0; j < actionTypes.length; j++) {
+          const groupActions: any[] = actions.filter(
+            a => a.action === actionTypes[j].id
+          );
 
-            if (groupActions.length <= 0) {
-              console.log("Didn't find any actions for: " + actionTypes[j].id);
-            }
-
-            // Add group in panel_body_id
-            new ActionGroup(
-              assignment_panel_elem,
-              panel_body_id,
-              actionTypes[j].display,
-              groupActions
-            );
+          if (groupActions.length <= 0) {
+            console.log("Didn't find any actions for: " + actionTypes[j].id);
           }
+
+          // Add group in panel_body_id
+          new ActionGroup(
+            assignment_panel_elem,
+            panel_body_id,
+            actionTypes[j].display,
+            groupActions
+          );
         }
       }
     }
