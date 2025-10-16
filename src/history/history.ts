@@ -71,33 +71,33 @@ export class HistoryList {
     this.panel_group_element.innerHTML = '';
   }
 
-  private group_data_into_courses(data: ICourseData[]) {
-    const results: { [key: string]: ICourseData } = {};
-    console.log(data);
-    data.forEach(record => {
-      console.log(record);
-      const courseTitle = record.course_title;
-      console.log(
-        'looking for existing entry: ' + courseTitle + ' in ' + results
-      );
-      // Check if we already have an entry for this course title
-      if (results[courseTitle]) {
-        // Merge assignments into existing record
-        console.log('merging record');
-        results[courseTitle].assignments = [
-          ...results[courseTitle].assignments,
-          ...record.assignments
-        ];
-      } else {
-        // Create the first entry with this course title
-        console.log('new record');
-        results[courseTitle] = record;
-      }
-    });
-    console.log('final data: ' + results);
-    // Convert the results object back to an array
-    return results;
-  }
+  // private group_data_into_courses(data: ICourseData[]) {
+  //   const results: { [key: string]: ICourseData } = {};
+  //   console.log(data);
+  //   data.forEach(record => {
+  //     console.log(record);
+  //     const courseTitle = record.course_title;
+  //     console.log(
+  //       'looking for existing entry: ' + courseTitle + ' in ' + results
+  //     );
+  //     // Check if we already have an entry for this course title
+  //     if (results[courseTitle]) {
+  //       // Merge assignments into existing record
+  //       console.log('merging record');
+  //       results[courseTitle].assignments = [
+  //         ...results[courseTitle].assignments,
+  //         ...record.assignments
+  //       ];
+  //     } else {
+  //       // Create the first entry with this course title
+  //       console.log('new record');
+  //       results[courseTitle] = record;
+  //     }
+  //   });
+  //   console.log('final data: ' + results);
+  //   // Convert the results object back to an array
+  //   return results;
+  // }
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
