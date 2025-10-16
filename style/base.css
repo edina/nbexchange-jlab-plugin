@@ -54,12 +54,12 @@
 .course_group {
   color: var(--jp-ui-font-color1);
   background-color: var(--jp-layout-color2);
-  border-color: var(--jp-border-color2);
+  border: 1px solid var(--jp-border-color);
   border-radius: 10px;
   padding: 0.25em 0.5em;
   margin-bottom: 1em;
 }
 .current_course {
-  border-color: var(--jp-success-color1);
-  background-color: var(--jp-success-color1) / 50%;
+  border-color: green;
+  background-color: lightgreen;
 }
