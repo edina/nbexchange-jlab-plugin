@@ -142,7 +142,7 @@ export class HistoryList {
 
         // Try and get 1st & last dates
         for (const action of actions) {
-          const this_date = new Date(action['timestamp']).toLocaleDateString();
+          const this_date = this.formatDate(new Date(action['timestamp']));
           if (this_date < first_date) {
             first_date = this_date;
           }
