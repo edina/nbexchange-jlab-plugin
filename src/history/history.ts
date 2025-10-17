@@ -111,6 +111,9 @@ export class HistoryList {
       para_elem.textContent +=
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
+      let first_date: string = new Date().toLocaleDateString(); // today
+      let latest_date: string = new Date(2000, 1, 1).toLocaleDateString(); // yonks back
+
       for (const assignment of assignments) {
         const assignment_code = assignment['assignment_code'];
         const assignment_id = assignment['assignment_id'];
@@ -131,6 +134,18 @@ export class HistoryList {
 
         const actions: IActionData[] = assignment['actions'];
 
+        // Try and get 1st & last dates
+        for (const action of actions) {
+          const date = new Date(action['timestamp']);
+          const this_date = date.toLocaleDateString();
+          if (this_date < first_date) {
+            first_date = this_date;
+          }
+          if (this_date > latest_date) {
+            latest_date = this_date;
+          }
+        }
+
         for (let j = 0; j < actionTypes.length; j++) {
           const groupActions: any[] = actions.filter(
             a => a.action === actionTypes[j].id
@@ -149,6 +164,9 @@ export class HistoryList {
           );
         }
       }
+
+      // Update the course name string to includes dates
+      para_elem.textContent += ' - ' + first_date + ' -> ' + latest_date;
     }
 
     if (this.callback) {
