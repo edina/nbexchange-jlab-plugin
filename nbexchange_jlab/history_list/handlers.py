@@ -58,7 +58,7 @@ class HistoryList(LoggingConfigurable):
         yield app.config
 
     def get_current_course(self):
-        return os.environ.get('NAAS_COURSE_ID', None)
+        return os.environ.get("NAAS_COURSE_ID", None)
 
     def query_exchange(self):
         """
@@ -90,7 +90,7 @@ class HistoryList(LoggingConfigurable):
                 "Got back an invalid response when history\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}"
             )
             return []
-        
+
         currnent_course_code = self.get_current_course()
 
         for item in history["value"]:
