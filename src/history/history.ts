@@ -83,7 +83,7 @@ export class HistoryList {
     }
     this.clear_list();
 
-    for (const key in data) {
+    for (const key in data.reverse()) {
       const this_course = data[key];
       console.log('This course:');
       console.log(this_course);
