@@ -120,7 +120,11 @@ export class HistoryList {
 
         // Create assignment panel
         const assignment_panel_elem = document.createElement('details');
-        assignment_panel_elem.classList.add('panel', 'panel-default');
+        assignment_panel_elem.classList.add(
+          'panel',
+          'panel-default',
+          'panel_radiused'
+        );
         assignment_panel_elem.setAttribute('name', detail_group_name);
         const panel_body_id = 'assignment-panel-body-' + assignment_id;
         assignment_panel_elem.innerHTML = [
@@ -166,7 +170,7 @@ export class HistoryList {
       }
 
       // Update the course name string to includes dates
-      para_elem.textContent += ' - ' + first_date + ' -> ' + latest_date;
+      para_elem.textContent += ' - ' + latest_date + ' -> ' + first_date;
     }
 
     if (this.callback) {

@@ -89,16 +89,17 @@ A simple comment at the top is useful for future developers to know _why_ the co
 
 We use [`pre-commit`](https://pre-commit.com/) to ensure consistency.
 
-All (appropriate) files are checked with `isort`, `black`, `flake8`, and `prettier`
+All (appropriate) files are checked with `isort`, `black`, `flake8`, and lints the typescript code
 
-Sadly, eslint is being a pain... and linting for the typescript is `yarn lint` (this will actually check css (using `stylelint`), reformat code (using `prettier`), and check for _well-formedness_ (using `eslint`))
+Linting for the typescript is `jlpm lint` (this will actually check css (using `stylelint`), reformat code (using `prettier`), and check for _well-formedness_ (using `eslint`))
+
+**NOTE**: we use `jlpm` rather than `yarn` - there's something broken in the system that's broken `yarn` :sadness:
 
 ## Running Tests
 
 Tests should be run locally before final commit & Pull Request is made.
 
-GitHub `Actions` run Tests. These teste include checking that files are _linted_ to our preferred styles:
-[black](https://github.com/psf/black), [eslint](https://eslint.org/), and [prettier](https://github.com/pre-commit/mirrors-prettier)
+GitHub `Actions` run Tests. These teste include checking that files are _linted_ to our preferred styles
 
 When you add/change/improve functionality, please _please_ **please** write tests as well.
 
@@ -122,8 +123,7 @@ pytest nbexchange_jlab
 Note: You will need NodeJS to build the extension package.
 
 The `jlpm` command is JupyterLab's pinned version of
-[yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
-`yarn` or `npm` in lieu of `jlpm` below.
+[yarn](https://yarnpkg.com/) that is installed with JupyterLab.
 
 ```bash
 # Clone the repo to your local environment
