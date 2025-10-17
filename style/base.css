@@ -26,7 +26,8 @@
 }
 
 .action-badge {
-  display: inline-block;
+  /* display: inline-block; */
+  float: right;
   min-width: 20px;
   padding: 2px;
   border-radius: 50%;

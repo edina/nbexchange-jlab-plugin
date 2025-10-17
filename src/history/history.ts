@@ -56,7 +56,6 @@ export class HistoryList {
   // eslint-disable-next-line @typescript-eslint/ban-types
   callback: Function | null = null;
 
-  // TODO
   constructor(widget: Widget, panel_group_selector: string) {
     this.panel_group_selector = panel_group_selector;
     this.callback = null;
@@ -65,11 +64,17 @@ export class HistoryList {
     this.panel_group_element = <HTMLDivElement>(
       div_elements.namedItem(panel_group_selector)
     );
-    // TODO
   }
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private load_list_success(data: ICourseData[]): void {
@@ -85,34 +90,31 @@ export class HistoryList {
 
     for (const key in data.reverse()) {
       const this_course = data[key];
-      console.log('This course:');
-      console.log(this_course);
       const assignments: IAssignmentData[] = this_course['assignments'];
 
       if (assignments.length === 0) {
         continue;
       }
 
+      let first_date: string = this.formatDate(new Date()); // today
+      let latest_date: string = this.formatDate(new Date(2000, 1, 1)); // yonks back
       const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
       const detail_group_name = this_course['course_code'];
-      // const course_panel_elem = document.createElement('article');
+
       const course_panel_elem = document.createElement('details');
+      this.panel_group_element.append(course_panel_elem);
+
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
-      console.log(this_course['isCurrent']);
       if (this_course['isCurrent']) {
-        console.log('isCurrent True');
         course_panel_elem.classList.add('current_course');
       }
-      this.panel_group_element.append(course_panel_elem);
-      // const para_elem = document.createElement('p');
+
       const para_elem = document.createElement('summary');
       course_panel_elem.append(para_elem);
+
       para_elem.textContent +=
         this_course['course_title'] + ' (' + detail_group_name + ')';
-
-      let first_date: string = new Date().toLocaleDateString(); // today
-      let latest_date: string = new Date(2000, 1, 1).toLocaleDateString(); // yonks back
 
       for (const assignment of assignments) {
         const assignment_code = assignment['assignment_code'];
@@ -140,8 +142,7 @@ export class HistoryList {
 
         // Try and get 1st & last dates
         for (const action of actions) {
-          const date = new Date(action['timestamp']);
-          const this_date = date.toLocaleDateString();
+          const this_date = new Date(action['timestamp']).toLocaleDateString();
           if (this_date < first_date) {
             first_date = this_date;
           }
@@ -170,7 +171,7 @@ export class HistoryList {
       }
 
       // Update the course name string to includes dates
-      para_elem.textContent += ' - ' + latest_date + ' -> ' + first_date;
+      para_elem.textContent += ' - ' + first_date + ' -> ' + latest_date;
     }
 
     if (this.callback) {
