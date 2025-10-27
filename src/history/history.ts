@@ -44,6 +44,7 @@ interface ICourseData {
   user_id: any;
   assignments: IAssignmentData[];
   isInstructor: boolean;
+  isCurrent: boolean;
   course_id: number;
   course_code: string;
   course_title: string;
@@ -55,7 +56,6 @@ export class HistoryList {
   // eslint-disable-next-line @typescript-eslint/ban-types
   callback: Function | null = null;
 
-  // TODO
   constructor(widget: Widget, panel_group_selector: string) {
     this.panel_group_selector = panel_group_selector;
     this.callback = null;
@@ -64,34 +64,17 @@ export class HistoryList {
     this.panel_group_element = <HTMLDivElement>(
       div_elements.namedItem(panel_group_selector)
     );
-    // TODO
   }
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
   }
 
-  private group_data_into_courses(data: ICourseData[]) {
-    const results: { [key: string]: ICourseData } = {};
-
-    data.forEach(record => {
-      const courseTitle = record.course_title;
-
-      // Check if we already have an entry for this course title
-      if (results[courseTitle]) {
-        // Merge assignments into existing record
-        results[courseTitle].assignments = [
-          ...results[courseTitle].assignments,
-          ...record.assignments
-        ];
-      } else {
-        // Create the first entry with this course title
-        results[courseTitle] = record;
-      }
-    });
-
-    // Convert the results object back to an array
-    return results;
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private load_list_success(data: ICourseData[]): void {
@@ -105,69 +88,91 @@ export class HistoryList {
     }
     this.clear_list();
 
-    const sorted_data = this.group_data_into_courses(data);
-
-    for (const key in sorted_data) {
-      const this_course = sorted_data[key];
+    for (const key in data.reverse()) {
+      const this_course = data[key];
       const assignments: IAssignmentData[] = this_course['assignments'];
 
       if (assignments.length === 0) {
         continue;
       }
 
+      let first_date: string = this.formatDate(new Date()); // today
+      let latest_date: string = this.formatDate(new Date(2000, 1, 1)); // yonks back
       const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
       const detail_group_name = this_course['course_code'];
-      const course_panel_elem = document.createElement('article');
-      course_panel_elem.classList.add('course_group');
+
+      const course_panel_elem = document.createElement('details');
       this.panel_group_element.append(course_panel_elem);
-      const para_elem = document.createElement('p');
+
+      course_panel_elem.setAttribute('name', 'course_level_group');
+      course_panel_elem.classList.add('course_group');
+      if (this_course['isCurrent']) {
+        course_panel_elem.classList.add('current_course');
+      }
+
+      const para_elem = document.createElement('summary');
       course_panel_elem.append(para_elem);
+
       para_elem.textContent +=
         this_course['course_title'] + ' (' + detail_group_name + ')';
 
-      for (let i = 0; i < assignments.length; i++) {
-        for (let j = 0; j < assignments.length; j++) {
-          const assignment = assignments[j];
-          const assignment_code = assignment['assignment_code'];
-          const assignment_id = assignment['assignment_id'];
+      for (const assignment of assignments) {
+        const assignment_code = assignment['assignment_code'];
+        const assignment_id = assignment['assignment_id'];
 
-          // Create assignment panel
-          const assignment_panel_elem = document.createElement('details');
-          assignment_panel_elem.classList.add('panel', 'panel-default');
-          assignment_panel_elem.setAttribute('name', detail_group_name);
-          const panel_body_id = 'assignment-panel-body-' + assignment_id;
-          assignment_panel_elem.innerHTML = [
-            '      <summary class="panel-heading">',
-            '        ' + assignment_code + ' &lt;' + role + '&gt;',
-            '      </summary>',
-            '      <div class="panel-body" id="' + panel_body_id + '">',
-            '      </div>'
-          ].join('\n');
-          course_panel_elem.append(assignment_panel_elem);
+        // Create assignment panel
+        const assignment_panel_elem = document.createElement('details');
+        assignment_panel_elem.classList.add(
+          'panel',
+          'panel-default',
+          'panel_radiused'
+        );
+        assignment_panel_elem.setAttribute('name', detail_group_name);
+        const panel_body_id = 'assignment-panel-body-' + assignment_id;
+        assignment_panel_elem.innerHTML = [
+          '      <summary class="panel-heading">',
+          '        ' + assignment_code + ' &lt;' + role + '&gt;',
+          '      </summary>',
+          '      <div class="panel-body" id="' + panel_body_id + '">',
+          '      </div>'
+        ].join('\n');
+        course_panel_elem.append(assignment_panel_elem);
 
-          const actions: IActionData[] = assignment['actions'];
+        const actions: IActionData[] = assignment['actions'];
 
-          for (let j = 0; j < actionTypes.length; j++) {
-            const groupActions: any[] = actions.filter(
-              a => a.action === actionTypes[j].id
-            );
-
-            if (groupActions.length <= 0) {
-              console.log("Didn't find any actions for: " + actionTypes[j].id);
-            }
-
-            // Add group in panel_body_id
-            new ActionGroup(
-              assignment_panel_elem,
-              panel_body_id,
-              actionTypes[j].display,
-              groupActions
-            );
+        // Try and get 1st & last dates
+        for (const action of actions) {
+          const this_date = this.formatDate(new Date(action['timestamp']));
+          if (this_date < first_date) {
+            first_date = this_date;
+          }
+          if (this_date > latest_date) {
+            latest_date = this_date;
           }
         }
+
+        for (let j = 0; j < actionTypes.length; j++) {
+          const groupActions: any[] = actions.filter(
+            a => a.action === actionTypes[j].id
+          );
+
+          if (groupActions.length <= 0) {
+            console.log("Didn't find any actions for: " + actionTypes[j].id);
+          }
+
+          // Add group in panel_body_id
+          new ActionGroup(
+            assignment_panel_elem,
+            panel_body_id,
+            actionTypes[j].display,
+            groupActions
+          );
+        }
       }
+
+      // Update the course name string to includes dates
+      para_elem.textContent += ' - ' + first_date + ' -> ' + latest_date;
     }
-    // TODO
 
     if (this.callback) {
       this.callback();
@@ -176,11 +181,12 @@ export class HistoryList {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public async load_list(course: string, callback?: Function) {
+  public async load_list(course?: string, callback?: Function) {
     if (callback) {
       this.callback = callback;
     }
     this.clear_list();
+
     try {
       const data = await requestAPI<any>('history?course_id=' + course);
       if (data.success) {

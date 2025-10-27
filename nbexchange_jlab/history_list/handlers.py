@@ -57,6 +57,9 @@ class HistoryList(LoggingConfigurable):
         app.load_config_file()
         yield app.config
 
+    def get_current_course(self):
+        return os.environ.get("NAAS_COURSE_ID", None)
+
     def query_exchange(self):
         """
         This queries the database for all the actions for a course
@@ -88,6 +91,14 @@ class HistoryList(LoggingConfigurable):
             )
             return []
 
+        currnent_course_code = self.get_current_course()
+
+        for item in history["value"]:
+            if item["course_code"] == currnent_course_code:
+                item["isCurrent"] = True
+            else:
+                item["isCurrent"] = False
+
         return history["value"]
 
     def list_history(self, course_id: str = None):
@@ -103,7 +114,7 @@ class HistoryList(LoggingConfigurable):
                 self.exchange = Exchange(coursedir=coursedir, authenticator=authenticator, config=config)
 
                 history = self.query_exchange()
-
+                self.log.info(f"#### current course: {self.exchange.coursedir.__dict__}")
             except Exception as e:
                 self.log.error(traceback.format_exc())
                 if isinstance(e, ExchangeError):

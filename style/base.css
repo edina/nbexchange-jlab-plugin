@@ -8,17 +8,17 @@
   display: flex;
   flex-direction: column;
   padding: 10px 0;
-  border-top: #d5d5d5 1px solid;
+  border-top: var(--jp-inverse-border-color) 1px solid;
 }
 
 .action-group:last-child {
-  border-bottom: #d5d5d5 1px solid;
+  border-bottom: var(--jp-inverse-border-color) 1px solid;
 }
 
 .action-row {
   display: flex;
   padding: 5px 0;
-  border-top: #d5d5d5 1px solid;
+  border-top: var(--jp-inverse-border-color) 1px solid;
 }
 
 .action-row:first-of-type {
@@ -26,15 +26,15 @@
 }
 
 .action-badge {
-  display: inline-block;
+  /* display: inline-block; */
   float: right;
   min-width: 20px;
   padding: 2px;
   border-radius: 50%;
   font-size: smaller;
   text-align: center;
-  background: #1976d2;
-  color: #fefefe;
+  background: var(--jp-brand-color1);
+  color: var(--jp-ui-inverse-font-color0);
   margin-left: 1em;
 }
 
@@ -52,9 +52,19 @@
 }
 
 .course_group {
-  background-color: #ccc;
-  border: 1px solid #666;
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-dialog-background);
+  border: 1px solid var(--jp-border-color);
   border-radius: 10px;
-  padding: 0 1em;
+  padding: 0.25em 0.5em;
   margin-bottom: 1em;
+}
+
+.current_course {
+  border-color: var(--jp-success-color1);
+  background-color: var(--jp-success-color3);
+}
+
+.panel_radiused {
+  border-radius: 8px;
 }
