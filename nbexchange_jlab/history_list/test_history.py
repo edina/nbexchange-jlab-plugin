@@ -3,7 +3,6 @@ import requests
 from mock import patch
 from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
-from traitlets.config.loader import LazyConfigValue
 
 from nbexchange_jlab.plugins import Exchange, ExchangeError
 
@@ -77,8 +76,13 @@ def test_load_config():
 
     config = plugin.load_config()
 
-    assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
-    assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
+    # Need to use it for traitlets to actually load the config
+    coursedir = CourseDirectory(config=config)
+    authenticator = Authenticator(config=config)
+    plugin.exchange = Exchange(coursedir=coursedir, authenticator=authenticator, config=config)
+
+    assert plugin.exchange.path_includes_course is True
+    assert plugin.exchange.coursedir.course_id == "missing"
 
 
 @pytest.mark.gen_test
@@ -86,9 +90,13 @@ def test_load_history_config():
 
     plugin = HistoryList()
 
+    # Need to use it for traitlets to actually load the config
     with plugin.get_history_config() as config:
-        assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
-        assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
+        coursedir = CourseDirectory(config=config)
+        authenticator = Authenticator(config=config)
+        plugin.exchange = Exchange(coursedir=coursedir, authenticator=authenticator, config=config)
+        assert plugin.exchange.path_includes_course is True
+        assert plugin.exchange.coursedir.course_id == "missing"
 
 
 @pytest.mark.gen_test
