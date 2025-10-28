@@ -80,13 +80,27 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      alert('There is no history available from the Exchange service');
+      this.show_info('There is no history available from the Exchange service');
       return;
     }
     if (data.length === 0) {
-      alert('There is zero history available from the Exchange service');
+      this.show_info(
+        'There is zero history available from the Exchange service'
+      );
       return;
     }
+    if (data.length === 1) {
+      for (const key in data) {
+        const this_course = data[key];
+        const assignments: IAssignmentData[] = this_course['assignments'];
+
+        if (assignments.length === 0) {
+          this.show_info('There is no History to show you');
+          return;
+        }
+      }
+    }
+
     this.clear_list();
 
     for (const key in data.reverse()) {
@@ -202,8 +216,12 @@ export class HistoryList {
   }
 
   // {"success": False, "value": <text>}
-  public show_error(error: string): void {
-    Notification.emit(error, 'error', { autoClose: false });
+  public show_error(message: string): void {
+    Notification.emit(message, 'error', { autoClose: false });
+  }
+
+  public show_info(message: string): void {
+    Notification.emit(message, 'info', { autoClose: false });
   }
 }
 
