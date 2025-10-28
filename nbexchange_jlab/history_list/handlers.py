@@ -89,11 +89,11 @@ class HistoryList(LoggingConfigurable):
 
         try:
             history = r.json()
-        except AttributeError as err:
+        except AttributeError:
             msg = f"Got back an invalid response when history: response text: '{r.text}'"
             self.log.error(msg)
             raise HistoryError(msg)
-        if type(history) != dict:
+        if not isinstance(history, dict):
             raise HistoryError(f"Invalid response from the exchange: {history}")
         response_keys = list(history.keys())
         if set(response_keys) != set(["success", "value"]):
@@ -146,7 +146,7 @@ class HistoryList(LoggingConfigurable):
                             "The exchange directory does not exist and could",
                             "not be created. The 'release' and 'collect' functionality will not be available.",
                             "Please see the documentation on",
-                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",
+                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
                             "for instructions.",
                         ),
                     }

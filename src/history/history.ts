@@ -195,7 +195,7 @@ export class HistoryList {
         this.show_error(<string>data.value);
       }
     } catch (reason) {
-      const msg: string = `Error on GET /history.\n${reason}`
+      const msg: string = `Error on GET /history.\n${reason}`;
       console.error(msg);
       this.show_error(msg);
     }

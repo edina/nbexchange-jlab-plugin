@@ -264,7 +264,7 @@ def test_query_exchange_success(monkeypatch):
         "isCurrent",
     ]
     assert list(record["assignments"][0].keys()) == ["assignment_id", "assignment_code", "actions", "action_summary"]
-    assert record["isCurrent"] == False
+    assert record["isCurrent"] is False
 
 
 @pytest.mark.gen_test
@@ -291,7 +291,7 @@ def test_query_exchange_success_on_current_course(monkeypatch):
     data = {}
     with patch.object(Exchange, "api_request", side_effect=api_request):
         data = plugin.query_exchange()
-    assert data[0]["isCurrent"] == True
+    assert data[0]["isCurrent"] is True
 
 
 @pytest.mark.gen_test
@@ -300,7 +300,7 @@ def test_list_history_fail_no_course_code_env():
     plugin = HistoryList()
     data = plugin.list_history()
 
-    assert data["success"] == False
+    assert data["success"] is False
     assert data["value"] == "You need to have a current course code."
 
 
@@ -325,8 +325,8 @@ def test_list_history_wrong_course_code(monkeypatch):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         data = plugin.list_history()
 
-    assert data["success"] == True
-    assert data["value"][0]["isCurrent"] == False
+    assert data["success"] is True
+    assert data["value"][0]["isCurrent"] is False
 
 
 @pytest.mark.gen_test
@@ -350,8 +350,8 @@ def test_list_history_correct_course_code(monkeypatch):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         data = plugin.list_history()
 
-    assert data["success"] == True
-    assert data["value"][0]["isCurrent"] == True
+    assert data["success"] is True
+    assert data["value"][0]["isCurrent"] is True
 
 
 @pytest.mark.gen_test
@@ -368,7 +368,7 @@ def test_list_history_error_raised_by_query_exchange(monkeypatch):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         data = plugin.list_history()
 
-    assert data["success"] == False
+    assert data["success"] is False
     assert data["value"] == "Connection to the exchange failed: This is an error message"
 
 
@@ -386,7 +386,7 @@ def test_list_history_api_query_times_out(monkeypatch):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         data = plugin.list_history()
 
-    assert data["success"] == False
+    assert data["success"] is False
     assert data["value"] == "Timed out trying to reach the exchange service to list history."
 
 
@@ -404,7 +404,7 @@ def test_list_history_query_exchange_throws_exchange_error(monkeypatch):
     with patch.object(HistoryList, "query_exchange", side_effect=query_exchange):
         data = plugin.list_history()
 
-    assert data["success"] == False
+    assert data["success"] is False
     error_string = data["value"]
     assert "The exchange directory does not exist and could" in error_string
 
@@ -422,7 +422,7 @@ def test_list_history_query_exchange_throws_base_exception(monkeypatch):
     with patch.object(HistoryList, "query_exchange", side_effect=query_exchange):
         data = plugin.list_history()
     pprint(data)
-    assert data["success"] == False
+    assert data["success"] is False
     assert "Traceback (most recent call last):" in data["value"]
 
 
@@ -440,5 +440,5 @@ def test_list_history_query_exchange_times_out(monkeypatch):
     with patch.object(HistoryList, "query_exchange", side_effect=query_exchange):
         data = plugin.list_history()
 
-    assert data["success"] == False
+    assert data["success"] is False
     assert "Traceback (most recent call last):" in data["value"]
