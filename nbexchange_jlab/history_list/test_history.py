@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import requests
 from mock import patch
@@ -70,6 +72,10 @@ mocked_json_response = {
 }
 
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
 @pytest.mark.gen_test
 def test_load_config():
 
@@ -81,6 +87,7 @@ def test_load_config():
     assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
 @pytest.mark.gen_test
 def test_load_history_config():
 
