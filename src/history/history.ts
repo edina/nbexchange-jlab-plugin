@@ -195,7 +195,9 @@ export class HistoryList {
         this.show_error(<string>data.value);
       }
     } catch (reason) {
-      console.error(`Error on GET /history.\n${reason}`);
+      const msg: string = `Error on GET /history.\n${reason}`
+      console.error(msg);
+      this.show_error(msg);
     }
   }
 
@@ -304,7 +306,7 @@ export class CourseList {
     } catch (reason) {
       const msg: string = 'Error on GET /courses.\n' + reason;
       console.error(msg);
-      Notification.emit(msg, 'error', { autoClose: false });
+      this.show_error(msg);
     }
   }
 
