@@ -10,10 +10,12 @@ In addition to the usual suite of plugins for exchanging files, the plugin provi
 
 ![A screenshot of the History page](history_screenshot.png)
 
+The current course is shown in green, and each course indicates the first and last date of any activity _for the whole course_
+
 ## Requirements
 
 - JupyterLab >= 4.0.0
-- NbGrader (this package will install for you)
+- NbGrader
 
 ## Installation
 
@@ -45,6 +47,7 @@ These plugins will also check the size of _releases_ & _submissions_
 [or even a more specific `c.ExchangeSubmit.max_buffer_size = 204800 # 200KB`]
 
 By default, upload sizes are limited to 5GB (5253530000)
+
 The figure is bytes
 
 ### Configuring the plugins to talk to the NbExchange server
