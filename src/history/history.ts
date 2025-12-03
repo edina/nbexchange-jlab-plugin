@@ -143,13 +143,21 @@ export class HistoryList {
         );
         assignment_panel_elem.setAttribute('name', detail_group_name);
         const panel_body_id = 'assignment-panel-body-' + assignment_id;
+        const top_level_summary_id = 'top_level_summary_' + assignment_id;
         assignment_panel_elem.innerHTML = [
-          '      <summary class="panel-heading">',
+          '      <summary class="panel-heading" id="' +
+            top_level_summary_id +
+            '">',
           '        ' + assignment_code + ' &lt;' + role + '&gt;',
           '      </summary>',
           '      <div class="panel-body" id="' + panel_body_id + '">',
           '      </div>'
         ].join('\n');
+        assignment_panel_elem.setAttribute(
+          'aria-labelledby',
+          top_level_summary_id
+        );
+
         course_panel_elem.append(assignment_panel_elem);
 
         const actions: IActionData[] = assignment['actions'];
