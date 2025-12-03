@@ -73,6 +73,14 @@ class ExchangeCollect(ABCExchangeCollect, NBExchange):
                     f"Error failing to collect for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {data['note']}"  # noqa: E501
                 )
 
+    def _get_duedate(self):
+        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
+            try:
+                assignment = gb.find_assignment(self.coursedir.assignment_id)
+                return assignment.duedate
+            except MissingEntry:
+                return None
+
     def do_collect(self):
         """
         Downloads submitted files
@@ -112,7 +120,12 @@ class ExchangeCollect(ABCExchangeCollect, NBExchange):
                 f"Processing {len(submissions)} submissions of '{self.coursedir.assignment_id}' for course '{self.coursedir.course_id}'"  # noqa: E501
             )
 
+        self.duedate = self._get_duedate()
         for submission in submissions:
+            # Skip any submissions after the due date
+            if self.duedate and submission["timestamp"] > self.duedate:
+                continue
+
             student_id = submission["student_id"]
             full_name = submission.get("full_name") or ""
             if " " in full_name:
