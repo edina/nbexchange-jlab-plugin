@@ -10,14 +10,14 @@ from urllib.parse import quote_plus
 import humanize
 import requests
 from dateutil import parser
-from nbgrader.exchange.abc import ExchangeSubmit as ABCExchangeSubmit
+from nbgrader.exchange import ExchangeSubmit as ABCExchangeSubmit
 from nbgrader.utils import find_all_notebooks
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 from .list import ExchangeList
 
 
-class ExchangeSubmit(Exchange, ABCExchangeSubmit):
+class ExchangeSubmit(ABCExchangeSubmit, NBExchange):
     def do_copy(self, src, dest):
         pass
 

@@ -83,7 +83,9 @@ def test_load_config():
 
     config = plugin.load_config()
 
-    assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
+    assert config["Exchange"]["path_includes_course"] is True or isinstance(
+        config["Exchange"]["path_includes_course"], LazyConfigValue
+    )
     assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
 
 
@@ -94,7 +96,9 @@ def test_load_history_config():
     plugin = HistoryList()
 
     with plugin.get_history_config() as config:
-        assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
+        assert config["Exchange"]["path_includes_course"] is True or isinstance(
+            config["Exchange"]["path_includes_course"], LazyConfigValue
+        )
         assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
 
 

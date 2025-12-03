@@ -5,14 +5,14 @@ import shutil
 import tarfile
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
 from nbgrader.api import Gradebook, MissingEntry
+from nbgrader.exchange import ExchangeCollect as ABCExchangeCollect
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeCollect(abc.ExchangeCollect, Exchange):
+class ExchangeCollect(ABCExchangeCollect, NBExchange):
     def do_copy(self, src, dest):
         pass
 

@@ -6,14 +6,14 @@ import shutil
 import tarfile
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
 from nbgrader.api import new_uuid
+from nbgrader.exchange import ExchangeFetchAssignment as ABCExchangeFetchAssignment
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeFetchAssignment(abc.ExchangeFetchAssignment, Exchange):
+class ExchangeFetchAssignment(ABCExchangeFetchAssignment, NBExchange):
     def _load_config(self, cfg, **kwargs):
         if "ExchangeFetch" in cfg:
             self.log.warning(

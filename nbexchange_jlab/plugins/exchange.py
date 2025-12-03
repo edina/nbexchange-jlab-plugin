@@ -9,8 +9,8 @@ from urllib.parse import urljoin
 from zoneinfo import ZoneInfo
 
 import requests
+from nbgrader.exchange import Exchange as ABCExchange
 from nbgrader.exchange import ExchangeError
-from nbgrader.exchange.abc import Exchange as ABCExchange
 from traitlets import Bool, Integer, Type, Unicode
 
 
