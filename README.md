@@ -78,7 +78,6 @@ class AuthApiPlugin(BaseApiPlugin):
 
         url = self.service_url() + path
         return url, cookies, headers
-
 c.Exchange.api_plugin_class = AuthApiPlugin
 c.Exchange.base_service_url = 'https://nbexchange.example.com'
 c.Exchange.base_path = '/services/exchange'

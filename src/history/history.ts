@@ -1,6 +1,7 @@
 import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -79,13 +80,27 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      alert('There is no history available from the Exchange service');
+      this.show_info('There is no history available from the Exchange service');
       return;
     }
     if (data.length === 0) {
-      alert('There is zero history available from the Exchange service');
+      this.show_info(
+        'There is zero history available from the Exchange service'
+      );
       return;
     }
+    if (data.length === 1) {
+      for (const key in data) {
+        const this_course = data[key];
+        const assignments: IAssignmentData[] = this_course['assignments'];
+
+        if (assignments.length === 0) {
+          this.show_info('There is no History to show you');
+          return;
+        }
+      }
+    }
+
     this.clear_list();
 
     for (const key in data.reverse()) {
@@ -109,7 +124,6 @@ export class HistoryList {
       if (this_course['isCurrent']) {
         course_panel_elem.classList.add('current_course');
       }
-
       const para_elem = document.createElement('summary');
       course_panel_elem.append(para_elem);
 
@@ -195,12 +209,19 @@ export class HistoryList {
         this.show_error(<string>data.value);
       }
     } catch (reason) {
-      console.error(`Error on GET /history.\n${reason}`);
+      const msg: string = `Error on GET /history.\n${reason}`;
+      console.error(msg);
+      this.show_error(msg);
     }
   }
 
-  public show_error(error: string): void {
-    // to do
+  // {"success": False, "value": <text>}
+  public show_error(message: string): void {
+    Notification.emit(message, 'error', { autoClose: false });
+  }
+
+  public show_info(message: string): void {
+    Notification.emit(message, 'info', { autoClose: false });
   }
 }
 
@@ -301,7 +322,9 @@ export class CourseList {
       const data = await requestAPI<any>('courses', '');
       this.handle_load_list(data);
     } catch (reason) {
-      console.error(`Error on GET /courses.\n${reason}`);
+      const msg: string = 'Error on GET /courses.\n' + reason;
+      console.error(msg);
+      this.show_error(msg);
     }
   }
 
@@ -325,7 +348,7 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
-    // to do
+    Notification.emit(error, 'error', { autoClose: false });
   }
 }
 
