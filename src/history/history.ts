@@ -124,7 +124,12 @@ export class HistoryList {
       if (this_course['isCurrent']) {
         course_panel_elem.classList.add('current_course');
       }
+      const top_level_summary_id = 'course_id_' + this_course['course_id'];
+      course_panel_elem.setAttribute('aria-labelledby', top_level_summary_id);
+
       const para_elem = document.createElement('summary');
+      para_elem.setAttribute('id', top_level_summary_id);
+
       course_panel_elem.append(para_elem);
 
       para_elem.textContent +=
@@ -143,10 +148,11 @@ export class HistoryList {
         );
         assignment_panel_elem.setAttribute('name', detail_group_name);
         const panel_body_id = 'assignment-panel-body-' + assignment_id;
-        const top_level_summary_id = 'top_level_summary_' + assignment_id;
+        const assignment_level_summary_id =
+          'assignment_level_summary_' + assignment_id;
         assignment_panel_elem.innerHTML = [
           '      <summary class="panel-heading" id="' +
-            top_level_summary_id +
+            assignment_level_summary_id +
             '">',
           '        ' + assignment_code + ' &lt;' + role + '&gt;',
           '      </summary>',
@@ -155,7 +161,7 @@ export class HistoryList {
         ].join('\n');
         assignment_panel_elem.setAttribute(
           'aria-labelledby',
-          top_level_summary_id
+          assignment_level_summary_id
         );
 
         course_panel_elem.append(assignment_panel_elem);
