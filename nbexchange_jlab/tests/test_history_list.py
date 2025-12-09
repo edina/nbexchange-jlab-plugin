@@ -7,9 +7,8 @@ from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
 from traitlets.config.loader import LazyConfigValue
 
-from nbexchange_jlab.plugins import Exchange, ExchangeError
-
 from nbexchange_jlab.history_list.handlers import HistoryError, HistoryList
+from nbexchange_jlab.plugins import Exchange, ExchangeError
 
 mocked_json_response = {
     "success": True,
