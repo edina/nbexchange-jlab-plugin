@@ -3,6 +3,7 @@ from typing import Dict, List, Set, Tuple
 
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
+from nbgrader import utils
 from nbgrader.preprocessors.base import NbGraderPreprocessor
 
 # from datetime import datetime
@@ -19,15 +20,20 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         """
         ids: List[str] = []
         for cell in notebook.get("cells", []):
-            metadata = cell.get("metadata", {})
-            nbgrader = metadata.get("nbgrader", {})
-            grade_id = nbgrader.get("grade_id")
+            if not (utils.is_grade(cell) or utils.is_solution(cell) or utils.is_locked(cell)):
+                continue
+            # metadata = cell.get("metadata", {})
+            # nbgrader = metadata.get("nbgrader", {})
+            # grade_id = nbgrader.get("grade_id")
+            grade_id = cell.metadata.nbgrader["grade_id"]
             if grade_id is not None:
                 ids.append(str(grade_id))
         counts = Counter(ids)
         return {grade_id: count for grade_id, count in counts.items() if count > 1}
 
-    # def write_log(self, found_dict: dict, resources: ResourcesDict):
+    def write_log(self, found_dict: dict, resources: ResourcesDict):
+        pass
+
     #     print("write_log starting")
     #     pprint(self.__dict__)
     #     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -105,19 +111,19 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         # if modified, write a note into the submission directory
         if modified:
             self.log.warning(
-                f"Duplicates removed for student {resources['nbgrader']['student']}:",
-                f" {len(dupes_before)} cells removed.",
-                " Full report in submission directory\n",
+                f"Duplicates removed for student {resources['nbgrader']['student']}:"
+                f" {len(dupes_before)} cells removed."
+                " Full report in submission directory\n"
             )
-            # msg = self.write_log(
-            #           {
-            #             'modified': modified,
-            #             'before': dupes_before,
-            #             'after': dupes_after,
-            #             'removed_details': removed_details
-            #           },
-            #           resources
-            #          )
+            self.write_log(
+                {
+                    "modified": modified,
+                    "before": dupes_before,
+                    "after": dupes_after,
+                    "removed_details": removed_details,
+                },
+                resources,
+            )
         return nb, resources
 
     def preprocess_cell(
