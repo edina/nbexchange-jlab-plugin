@@ -40,8 +40,8 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
             msg.append(f"Cell count: {detail[0]}, cell-id: {detail[1]}")
         msg.append(f"\nThere are {len(found_dict['after'])} remaining after this processor completes")
         msg.append(" Full report in submission directory")
-
-        self.log.warning(msg)
+        msg_string = "\n".join(msg)
+        self.log.warning(msg_string)
 
     #     print("write_log starting")
     #     pprint(self.__dict__)
