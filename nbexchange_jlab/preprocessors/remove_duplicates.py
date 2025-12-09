@@ -32,7 +32,16 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         return {grade_id: count for grade_id, count in counts.items() if count > 1}
 
     def write_log(self, found_dict: dict, resources: ResourcesDict):
-        pass
+        msg = [
+            f"Duplicates removed for student {resources['nbgrader']['student']}:",
+            f" {len(found_dict['before'])} cells removed:\n",
+        ]
+        for detail in found_dict["removed_details"]:
+            msg.append(f"Cell count: {detail[0]}, cell-id: {detail[1]}")
+        msg.append(f"\nThere are {len(found_dict['after'])} remaining after this processor completes")
+        msg.append(" Full report in submission directory")
+
+        self.log.warning(msg)
 
     #     print("write_log starting")
     #     pprint(self.__dict__)
@@ -41,13 +50,6 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
     #     filename = os.path.join(
     #        resources['metadata']['path'],
     #        f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt")
-    #     msg = [
-    #         f"A total of {len(found_dict['before'])} cells were found to be duplicates\n",
-    #         "The Following cells were removed before the book was passed to the autograder:\n"
-    #     ]
-    #     for detail in found_dict['removed_details']:
-    #         msg.append(f"Cell count: {detail[0]}, cell-id: {detail[1]}")
-    #     msg.append(f"\nThere are {len(found_dict['after'])} remaining after this processor completes")
     #     with open(filename, 'w') as f:
     #         f.write("\n".join(msg))
     #     return msg
@@ -110,11 +112,6 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
 
         # if modified, write a note into the submission directory
         if modified:
-            self.log.warning(
-                f"Duplicates removed for student {resources['nbgrader']['student']}:"
-                f" {len(dupes_before)} cells removed."
-                " Full report in submission directory\n"
-            )
             self.write_log(
                 {
                     "modified": modified,
