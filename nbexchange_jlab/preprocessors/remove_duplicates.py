@@ -22,9 +22,7 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         for cell in notebook.get("cells", []):
             if not (utils.is_grade(cell) or utils.is_solution(cell) or utils.is_locked(cell)):
                 continue
-            # metadata = cell.get("metadata", {})
-            # nbgrader = metadata.get("nbgrader", {})
-            # grade_id = nbgrader.get("grade_id")
+
             grade_id = cell.metadata.nbgrader["grade_id"]
             if grade_id is not None:
                 ids.append(str(grade_id))
@@ -43,16 +41,21 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         msg_string = "\n".join(msg)
         self.log.warning(msg_string)
 
-    #     print("write_log starting")
-    #     pprint(self.__dict__)
-    #     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    #     sub_dir = self.coursedir.submitted_directory
-    #     filename = os.path.join(
-    #        resources['metadata']['path'],
-    #        f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt")
-    #     with open(filename, 'w') as f:
-    #         f.write("\n".join(msg))
-    #     return msg
+        # Preprocessors know nothing of the wider nbgrader ecosystem, so we need get it
+        # from nbgrader.apps import NbGrader, NbGraderAPI
+        import os
+        from datetime import datetime
+
+        # app = NbGrader()
+        # app.load_config_file()
+        # config = app.config
+        # api = NbGraderAPI(config=config)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = os.path.join(
+            resources["metadata"]["path"], f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt"
+        )
+        with open(filename, "w") as f:
+            f.write("\n".join(msg))
 
     def deduplicate_notebook_by_grade_id(
         self, nb: NotebookNode
