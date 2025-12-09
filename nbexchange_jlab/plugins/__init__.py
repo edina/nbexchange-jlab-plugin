@@ -1,13 +1,3 @@
-"""
-nbgrader authenticator that uses EDINAs noteable service.
-
-After installation, you can enable it by adding:
-
-    c.Authenticator.plugin_class = NoteableAuthPlugin
-
-in your root `nbgrader_config.py` file.
-"""
-
 from .collect import ExchangeCollect
 from .exchange import BaseApiPlugin, Exchange, ExchangeError
 from .fetch import ExchangeFetch
