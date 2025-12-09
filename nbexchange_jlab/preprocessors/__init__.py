@@ -1,5 +1,5 @@
-from .remove_duplicates import DeduplicateIds
+from .remove_duplicates import NbExDeduplicateIds
 
 __all__ = [
-    "DeduplicateIds",
+    "NbExDeduplicateIds",
 ]

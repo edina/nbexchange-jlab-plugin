@@ -9,7 +9,7 @@ from nbgrader.preprocessors.base import NbGraderPreprocessor
 # import os
 
 
-class DeduplicateIds(NbGraderPreprocessor):
+class NbExDeduplicateIds(NbGraderPreprocessor):
     """A preprocessor which removes second and subsequent duplicated cells."""
 
     def find_duplicate_grade_ids(self, notebook: Dict) -> Dict[str, int]:
