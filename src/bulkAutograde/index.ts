@@ -4,8 +4,8 @@ import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
 
+import { BaAssignmentsList, AssignmentsList } from './bulkAutograde';
 // import { HistoryList, CourseList } from './history';
-// import { requestAPI } from '../handler';
 
 export class BulkAutogradeWidget extends Widget {
   app: JupyterFrontEnd;
@@ -15,49 +15,43 @@ export class BulkAutogradeWidget extends Widget {
     this.app = app;
 
     this.node.innerHTML = [
-      '<section id="bulkautograder" class="tab-pane">',
-      '  <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
-      '  <div id="history-toolbar" class="row list_toolbar" style="display: none">',
+      '<div id="bulkautograder" class="tab-pane">',
+      '  <p>Select the list of Assignments to be autograded.</p>',
+      '  <div id="assignments-toolbar" class="row list_toolbar" style="display: none">',
       '    <div class="col-sm-8 no-padding"> <!-- -->',
-      '      <span id="history_list_info" class="toolbar_info">Current course:</span>',
       '      <div class="btn-group btn-group-xs">',
-      '        <button type="button" class="btn btn-default" id="course_list_default">Loading, please wait...</button>',
-      '        <button type="button" class="btn btn-default dropdown-toggle" id="course_list_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">',
-      '          <span class="caret"></span>',
-      '          <span class="sr-only">Toggle Dropdown</span>',
-      '        </button>',
-      '        <ul class="dropdown-menu" id="course_list">',
-      '        </ul>',
+      '        <button type="button" class="btn btn-default" id="assignment_list_default">Loading, please wait...</button>',
+      '        <form class="dropdown-menu" id="assignment_list">',
+      '        </form>',
       '      </div>',
       '    </div> <!-- -->',
       '    <div class="col-sm-4 no-padding tree-buttons">',
       '      <span id="history_buttons" class="pull-right toolbar_buttons">',
-      '      <button id="refresh_history_list" title="Refresh history list" class="btn btn-default btn-xs"><i class="fa fa-refresh"></i></button>',
+      '      <button id="refresh_assignment_list" title="Refresh history list" class="btn btn-default btn-xs"><i class="fa fa-refresh"></i></button>',
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <section class="alert alert-danger version_error">',
-      '  </section>',
-      '  <section class="panel-group" id="actions-panel-group">',
-      '  <section>',
-      '</section>'
+      '  <div class="alert alert-danger version_error">',
+      '  </div>',
+      '  <div class="panel-group" id="results-panel-group">',
+      '  <div>',
+      '</div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 
     const base_url = PageConfig.getBaseUrl();
     const options = new Map();
     options.set('base_url', base_url);
-    // const history_l = new HistoryList(this, 'actions-panel-group');
+    const assignments = new BaAssignmentsList(this, 'results-panel-group');
 
-    // new CourseList(
-    //   this,
-    //   'course_list',
-    //   'course_list_default',
-    //   'course_list_dropdown',
-    //   'refresh_history_list',
-    //   history_l,
-    //   options
-    // );
+    new AssignmentsList(
+      this,
+      'assignment_list', // id for element to put checkboxes into
+      'assignment_list_default', // the "loading..." message
+      'refresh_assignment_list', // refresh the page
+      assignments, // big list of assignments for the course
+      options
+    );
 
     // this.checkNbGraderVersion();
   }
