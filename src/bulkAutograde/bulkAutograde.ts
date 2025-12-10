@@ -157,11 +157,18 @@ export class AssignmentsList {
     }
   }
 
-  private make_button(id: string, text: string): HTMLButtonElement {
+  private make_button(
+    id: string,
+    text: string,
+    disabled: boolean
+  ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-xs');
     button.setAttribute('id', id + '_' + text);
     button.style.margin = '0 1em';
+    if (disabled) {
+      button.setAttribute('disabled', 'True');
+    }
     // button.onclick = async function(){ ... do something ... }
     button.innerText = text;
     return button;
@@ -184,13 +191,19 @@ export class AssignmentsList {
     values_span.innerText =
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
 
+    let disabled_button = false;
+    if (data.exchange === data.locally) {
+      disabled_button = true;
+    }
     const collectButton: HTMLButtonElement = this.make_button(
       'assignent_code',
-      'collect'
+      'collect',
+      disabled_button
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
-      'Bulk Autograde'
+      'Bulk Autograde',
+      disabled_button
     );
     buttons_span.append(collectButton, autogradeButton);
   }
