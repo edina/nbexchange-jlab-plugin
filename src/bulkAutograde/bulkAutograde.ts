@@ -167,7 +167,7 @@ export class AssignmentsList {
     button.setAttribute('id', id + '_' + text);
     button.style.margin = '0 1em';
     if (disabled) {
-      button.setAttribute('disabled', 'True');
+      button.disabled = true;
     }
     // button.onclick = async function(){ ... do something ... }
     button.innerText = text;
@@ -193,6 +193,7 @@ export class AssignmentsList {
 
     let disabled_button = false;
     if (data.exchange === data.locally) {
+      console.log();
       disabled_button = true;
     }
     const collectButton: HTMLButtonElement = this.make_button(
