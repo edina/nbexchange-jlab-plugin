@@ -31,7 +31,7 @@ export class BulkAutogradeWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div class="alert alert-danger version_error">',
+      '  <div id="alert-box" class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="results-panel-group">',
       '  <div>',

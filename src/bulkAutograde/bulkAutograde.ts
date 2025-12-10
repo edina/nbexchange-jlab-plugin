@@ -192,6 +192,7 @@ export class AssignmentsList {
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
 
     let disabled_button = false;
+    console.log('Compare ' + data.exchange + ' and ' + data.locally);
     if (data.exchange === data.locally) {
       console.log();
       disabled_button = true;
