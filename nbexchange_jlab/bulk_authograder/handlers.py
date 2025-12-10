@@ -61,7 +61,7 @@ class BaAssignmentsList(LoggingConfigurable):
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
-        data: Dict = []
+        data: Dict = {}
         with self.get_BaAssignment_config() as config:
             api = NbGraderAPI(config=config)
 
@@ -70,7 +70,7 @@ class BaAssignmentsList(LoggingConfigurable):
                 for assignment in history.keys():
                     api.coursedir.assignment_id = assignment
                     local_submissions = api.get_submissions(assignment)
-                    data[assignment] = {"exchange": len(data[assignment]), "locally": len(local_submissions)}
+                    data[assignment] = {"exchange": len(history[assignment]), "locally": len(local_submissions)}
         retvalue = {"success": True, "value": data}
         return retvalue
 
