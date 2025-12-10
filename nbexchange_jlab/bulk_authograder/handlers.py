@@ -89,7 +89,7 @@ class BaAssignmentsListHandler(BaseBaAssignmentHandler):
     # get a dict of assignments: name; in exchange; locally
     @web.authenticated
     def get(self):
-        course_id = self.get_argument("course_id")
+        course_id = self.get_argument("course_id", get_current_course())
         self.log.info(f"get assignments for course: {course_id}")
 
         self.finish(json.dumps(self.manager.list_BaAssignment(course_id=course_id)))

@@ -38,6 +38,9 @@ export class AssignmentsList {
   //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  callback: Function | null = null;
+
   constructor(
     widget: Widget,
     assignment_list_selector: string, // where checkboxes go
@@ -105,11 +108,15 @@ export class AssignmentsList {
     this.refresh_element!.click();
   }
 
-  private async load_list() {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  private async load_list(course?: string, callback?: Function) {
+    if (callback) {
+      this.callback = callback;
+    }
     this.clear_list();
 
     try {
-      const data = await requestAPI<any>('BaAssignment', '');
+      const data = await requestAPI<any>('BaAssignment');
       this.handle_load_list(data);
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
