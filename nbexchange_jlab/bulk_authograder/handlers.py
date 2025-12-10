@@ -12,8 +12,8 @@ from nbgrader.apps import NbGrader, NbGraderAPI
 from tornado import web
 from traitlets.config import LoggingConfigurable
 
-from nbexchange_jlab import get_current_course
 from nbexchange_jlab.history_list import HistoryList
+from nbexchange_jlab.utils import get_current_course
 
 # import traceback
 

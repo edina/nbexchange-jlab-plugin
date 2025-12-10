@@ -16,8 +16,8 @@ from nbgrader.coursedir import CourseDirectory
 from tornado import web
 from traitlets.config import LoggingConfigurable
 
-from nbexchange_jlab import get_current_course
 from nbexchange_jlab.plugins import Exchange, ExchangeError
+from nbexchange_jlab.utils import get_current_course
 
 
 @contextlib.contextmanager
@@ -119,7 +119,7 @@ class HistoryList(LoggingConfigurable):
         return history["value"]
 
     def list_history(self, course_id: str = None):
-        if not self.get_current_course():
+        if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
         with self.get_history_config() as config:
