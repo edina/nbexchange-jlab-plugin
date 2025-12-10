@@ -19,7 +19,7 @@ export class BulkAutogradeWidget extends Widget {
       '  <p>Select the list of Assignments to be autograded.</p>',
       '  <div id="assignments-toolbar" class="row list_toolbar">',
       '    <div class="col-sm-8 no-padding"> <!-- -->',
-      '      <div class="btn-group btn-group-xs">',
+      '      <div>',
       '        <button type="button" class="btn btn-default" id="assignment_list_default">Loading, please wait...</button>',
       '        <ul class="dropdown-menu" id="assignment_list">',
       '        </ul>',

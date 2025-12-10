@@ -88,6 +88,10 @@ export class AssignmentsList {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
+    const alert_box = document.getElementById('alert-box');
+    if (alert_box) {
+      alert_box.style.display = 'hidden';
+    }
     // /* Open the dropdown course_list when clicking on dropdown toggle button */
     // if (this.dropdown_element) {
     //   this.dropdown_element.onclick = function () {
@@ -157,6 +161,7 @@ export class AssignmentsList {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-xs');
     button.setAttribute('id', id + '_' + text);
+    button.style.margin = '0 1em';
     // button.onclick = async function(){ ... do something ... }
     button.innerText = text;
     return button;
@@ -185,7 +190,7 @@ export class AssignmentsList {
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
-      'collect'
+      'Bulk Autograde'
     );
     buttons_span.append(collectButton, autogradeButton);
   }
@@ -205,6 +210,7 @@ export class AssignmentsList {
     }
     if (this.assignment_list_element) {
       this.assignment_list_element.style.display = 'block';
+      this.assignment_list_element.style.width = '100%';
     }
   }
 }
