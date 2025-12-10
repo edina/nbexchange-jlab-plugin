@@ -1,3 +1,5 @@
+import os
+
 try:
     from ._version import __version__
 except ImportError:
@@ -11,6 +13,10 @@ except ImportError:
     __version__ = "dev"
 
 from nbexchange_jlab.history_list import load_jupyter_server_extension as load_history
+
+
+def get_current_course(self):
+    return os.environ.get("NAAS_COURSE_ID", None)
 
 
 def _jupyter_labextension_paths():

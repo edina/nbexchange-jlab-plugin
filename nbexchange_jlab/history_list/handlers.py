@@ -16,6 +16,7 @@ from nbgrader.coursedir import CourseDirectory
 from tornado import web
 from traitlets.config import LoggingConfigurable
 
+from nbexchange_jlab import get_current_course
 from nbexchange_jlab.plugins import Exchange, ExchangeError
 
 
@@ -58,9 +59,6 @@ class HistoryList(LoggingConfigurable):
     def get_history_config(self):
         yield self.load_config()
 
-    def get_current_course(self):
-        return os.environ.get("NAAS_COURSE_ID", None)
-
     def query_exchange(self):
         """
         This queries the database for all the actions for a course
@@ -102,7 +100,7 @@ class HistoryList(LoggingConfigurable):
         if not history["success"]:
             raise HistoryError(f"Error message from exchange: '{history['value']}'")
 
-        currnent_course_code = self.get_current_course()
+        currnent_course_code = get_current_course()
 
         for item in history["value"]:
             if item["course_code"] == currnent_course_code:
@@ -110,7 +108,7 @@ class HistoryList(LoggingConfigurable):
             else:
                 item["isCurrent"] = False
 
-        currnent_course_code = self.get_current_course()
+        currnent_course_code = get_current_course()
 
         for item in history["value"]:
             if item["course_code"] == currnent_course_code:
