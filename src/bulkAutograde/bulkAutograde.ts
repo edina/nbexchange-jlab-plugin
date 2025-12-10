@@ -199,5 +199,12 @@ export class AssignmentsList {
       element.classList.add('action-row');
       this.make_row(element, assignment_code, data[assignment_code]);
     }
+    // Now toggle the "loading" for the table
+    if (this.default_assignment_element) {
+      this.default_assignment_element.style.display = 'None';
+    }
+    if (this.assignment_list_element) {
+      this.assignment_list_element.style.display = 'block';
+    }
   }
 }
