@@ -5,6 +5,19 @@ import { PageConfig } from '@jupyterlab/coreutils';
 
 import { requestAPI } from '../handler';
 
+interface IAssignmentDetail {
+  exchange: number;
+  locally: number;
+}
+
+interface IAssignmentRecord {
+  [key: string]: IAssignmentDetail;
+}
+
+interface IBaAssignmentResponse {
+  success: string;
+  value: string | IAssignmentRecord;
+}
 export class BaAssignmentsList {
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
@@ -32,8 +45,8 @@ export class AssignmentsList {
   //   current_course: string | null;
   options = new Map();
   base_url: string;
-  data: string[];
-  assignment_list_element: HTMLFormElement | null;
+  assignmentResponseData: IBaAssignmentResponse | null;
+  assignment_list_element: HTMLUListElement | null;
   default_assignment_element: HTMLButtonElement | null;
   //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
@@ -55,7 +68,7 @@ export class AssignmentsList {
     // this.dropdown_selector = dropdown_selector;
     this.refresh_selector = refresh_selector;
     this.assignment_list_element = widget.node
-      .getElementsByTagName('form')
+      .getElementsByTagName('ul')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
     this.default_assignment_element = buttons.namedItem(
@@ -70,7 +83,7 @@ export class AssignmentsList {
     this.options = options;
     this.base_url = options.get('base_url') || PageConfig.getBaseUrl();
 
-    this.data = [];
+    this.assignmentResponseData = null;
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
@@ -116,7 +129,7 @@ export class AssignmentsList {
     this.clear_list();
 
     try {
-      const data = await requestAPI<any>('BaAssignment');
+      const data: IBaAssignmentResponse = await requestAPI<any>('BaAssignment');
       this.handle_load_list(data);
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
@@ -125,9 +138,14 @@ export class AssignmentsList {
     }
   }
 
-  private handle_load_list(data: { success: any; value: any }): void {
+  private handle_load_list(data: IBaAssignmentResponse): void {
     if (data.success) {
-      this.load_list_success(data.value);
+      if (typeof data.value === 'string') {
+        this.default_assignment_element!.innerText =
+          'Error fetching gradable assignments:' + data.value;
+      } else {
+        this.load_list_success(data.value);
+      }
     } else {
       this.default_assignment_element!.innerText =
         'Error fetching gradable assignments!';
@@ -135,11 +153,51 @@ export class AssignmentsList {
     }
   }
 
-  private load_list_success(data: string[]): void {
-    this.data = data;
-    this.clear_list();
+  private make_button(id: string, text: string): HTMLButtonElement {
+    const button: HTMLButtonElement = document.createElement('button');
+    button.classList.add('btn', 'btn-primary', 'btn-xs');
+    button.setAttribute('id', id + '_' + text);
+    // button.onclick = async function(){ ... do something ... }
+    button.innerText = text;
+    return button;
+  }
 
-    // Bypass all the junk about known courses & stuff
-    // this.history.load_list('moot');
+  private make_row(
+    element: HTMLLIElement,
+    assignent_code: string,
+    data: IAssignmentDetail
+  ): void {
+    const assignment_name_span = document.createElement('span');
+    assignment_name_span.classList.add('col-sm-4');
+    const values_span = document.createElement('span');
+    values_span.classList.add('col-sm-4');
+    const buttons_span = document.createElement('span');
+    buttons_span.classList.add('col-sm-4');
+    element.append(assignment_name_span, values_span, buttons_span);
+
+    assignment_name_span.innerText = assignent_code;
+    values_span.innerText =
+      'Exchange:' + data.exchange + ', Locally:' + data.locally;
+
+    const collectButton: HTMLButtonElement = this.make_button(
+      'assignent_code',
+      'collect'
+    );
+    const autogradeButton: HTMLButtonElement = this.make_button(
+      'assignent_code',
+      'collect'
+    );
+    buttons_span.append(collectButton, autogradeButton);
+  }
+
+  private load_list_success(data: IAssignmentRecord): void {
+    this.clear_list();
+    // build the list of items lin the list
+    for (const assignment_code in data) {
+      const element: HTMLLIElement = document.createElement('li');
+      this.assignment_list_element?.append(element);
+      element.classList.add('action-row');
+      this.make_row(element, assignment_code, data[assignment_code]);
+    }
   }
 }
