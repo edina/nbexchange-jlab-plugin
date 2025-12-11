@@ -21,7 +21,7 @@ export class BulkAutogradeWidget extends Widget {
       '    <div class="col-sm-8 no-padding"> <!-- -->',
       '      <div>',
       '        <button type="button" class="btn btn-default" id="assignment_list_default">Loading, please wait...</button>',
-      '        <table id="assignment-table">',
+      '        <table id="assignment-table" border="0">',
       '        </table>',
       '      </div>',
       '    </div> <!-- -->',
