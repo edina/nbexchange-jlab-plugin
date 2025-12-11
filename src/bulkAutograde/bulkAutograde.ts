@@ -222,9 +222,5 @@ export class AssignmentsList {
     if (this.default_assignment_element) {
       this.default_assignment_element.style.display = 'None';
     }
-    if (this.assignment_table_element) {
-      this.assignment_table_element.style.display = 'block';
-      this.assignment_table_element.style.width = '100%';
-    }
   }
 }
