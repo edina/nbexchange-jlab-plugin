@@ -46,7 +46,7 @@ export class AssignmentsList {
   options = new Map();
   base_url: string;
   assignmentResponseData: IBaAssignmentResponse | null;
-  assignment_list_element: HTMLUListElement | null;
+  assignment_table_element: HTMLTableElement | null;
   default_assignment_element: HTMLButtonElement | null;
   //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
@@ -67,8 +67,8 @@ export class AssignmentsList {
     this.default_assignment_selector = default_assignment_selector;
     // this.dropdown_selector = dropdown_selector;
     this.refresh_selector = refresh_selector;
-    this.assignment_list_element = widget.node
-      .getElementsByTagName('ul')
+    this.assignment_table_element = widget.node
+      .getElementsByTagName('table')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
     this.default_assignment_element = buttons.namedItem(
@@ -88,25 +88,10 @@ export class AssignmentsList {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
-    const alert_box = document.getElementById('alert-box');
+    const alert_box = document.getElementById('baautograde-alert-box');
     if (alert_box) {
       alert_box.style.display = 'hidden';
     }
-    // /* Open the dropdown course_list when clicking on dropdown toggle button */
-    // if (this.dropdown_element) {
-    //   this.dropdown_element.onclick = function () {
-    //     that.course_list_element!.classList.toggle('open');
-    //   };
-    // }
-
-    // /* Close the dropdown course_list if clicking anywhere else */
-    // document.onclick = function (event) {
-    //   if (
-    //     (<HTMLElement>event.target).closest('button') !== that.dropdown_element
-    //   ) {
-    //     that.assignment_list_element!.classList.remove('open');
-    //   }
-    // };
 
     this.refresh_element!.onclick = function () {
       that.load_list();
@@ -117,8 +102,8 @@ export class AssignmentsList {
 
   public clear_list(): void {
     // remove list items
-    if (this.assignment_list_element!.children.length > 0) {
-      this.assignment_list_element!.innerHTML = '';
+    if (this.assignment_table_element!.children.length > 0) {
+      this.assignment_table_element!.innerHTML = '';
     }
   }
   private bind_events(): void {
@@ -163,11 +148,13 @@ export class AssignmentsList {
     disabled: boolean
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
-    button.classList.add('btn', 'btn-primary', 'btn-xs');
+    button.classList.add('btn');
     button.setAttribute('id', id + '_' + text);
     button.style.margin = '0 1em';
     if (disabled) {
       button.disabled = true;
+    } else {
+      button.classList.add('btn-primary');
     }
     // button.onclick = async function(){ ... do something ... }
     button.innerText = text;
@@ -175,57 +162,72 @@ export class AssignmentsList {
   }
 
   private make_row(
-    element: HTMLLIElement,
+    table_body: HTMLTableSectionElement,
     assignent_code: string,
     data: IAssignmentDetail
   ): void {
-    const assignment_name_span = document.createElement('span');
-    assignment_name_span.classList.add('col-sm-4');
-    const values_span = document.createElement('span');
-    values_span.classList.add('col-sm-4');
-    const buttons_span = document.createElement('span');
-    buttons_span.classList.add('col-sm-4');
-    element.append(assignment_name_span, values_span, buttons_span);
+    const row = document.createElement('tr');
+    table_body.append(row);
+    const assignment_name_cell = document.createElement('td');
+    assignment_name_cell.classList.add('col-sm-4');
+    const values_cell = document.createElement('td');
+    values_cell.classList.add('col-sm-4');
+    const buttons_cell = document.createElement('td');
+    buttons_cell.classList.add('col-sm-4');
+    row.append(assignment_name_cell, values_cell, buttons_cell);
 
-    assignment_name_span.innerText = assignent_code;
-    values_span.innerText =
+    assignment_name_cell.innerText = assignent_code;
+    values_cell.innerText =
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
 
-    let disabled_button = false;
+    let disable_button = false;
     console.log('Compare ' + data.exchange + ' and ' + data.locally);
     if (data.exchange === data.locally) {
-      console.log();
-      disabled_button = true;
+      console.log('setting disabl_button true');
+      disable_button = true;
     }
     const collectButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'collect',
-      disabled_button
+      disable_button
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
-      disabled_button
+      false
     );
-    buttons_span.append(collectButton, autogradeButton);
+    buttons_cell.append(collectButton, autogradeButton);
+  }
+
+  private make_table_heading(table: HTMLTableElement): void {
+    const thead = table.createTHead();
+    const thead_row = thead.insertRow();
+    const head_items = ['Assignment Name', 'Submission Counts', 'Actions'];
+    head_items.forEach(headerText => {
+      const header_cell = document.createElement('th'); // 'cos the API route is depreciated
+      header_cell.textContent = headerText;
+      thead_row.appendChild(header_cell);
+    });
   }
 
   private load_list_success(data: IAssignmentRecord): void {
     this.clear_list();
     // build the list of items lin the list
-    for (const assignment_code in data) {
-      const element: HTMLLIElement = document.createElement('li');
-      this.assignment_list_element?.append(element);
-      element.classList.add('action-row');
-      this.make_row(element, assignment_code, data[assignment_code]);
+    const table = this.assignment_table_element;
+    if (table) {
+      this.make_table_heading(table);
+      const table_body = table.createTBody();
+      for (const assignment_code in data) {
+        this.make_row(table_body, assignment_code, data[assignment_code]);
+      }
     }
     // Now toggle the "loading" for the table
     if (this.default_assignment_element) {
       this.default_assignment_element.style.display = 'None';
     }
-    if (this.assignment_list_element) {
-      this.assignment_list_element.style.display = 'block';
-      this.assignment_list_element.style.width = '100%';
+    if (this.assignment_table_element) {
+      this.assignment_table_element.style.display = 'block';
+      this.assignment_table_element.style.width = '100%';
     }
   }
 }

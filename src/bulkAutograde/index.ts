@@ -21,8 +21,8 @@ export class BulkAutogradeWidget extends Widget {
       '    <div class="col-sm-8 no-padding"> <!-- -->',
       '      <div>',
       '        <button type="button" class="btn btn-default" id="assignment_list_default">Loading, please wait...</button>',
-      '        <ul class="dropdown-menu" id="assignment_list">',
-      '        </ul>',
+      '        <table class="dropdown-menu" id="assignment_table">',
+      '        </table>',
       '      </div>',
       '    </div> <!-- -->',
       '    <div class="col-sm-4 no-padding tree-buttons">',
@@ -31,7 +31,7 @@ export class BulkAutogradeWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div id="alert-box" class="alert alert-danger version_error">',
+      '  <div id="baautograde-alert-box" class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="results-panel-group">',
       '  <div>',
@@ -46,7 +46,7 @@ export class BulkAutogradeWidget extends Widget {
 
     new AssignmentsList(
       this,
-      'assignment_list', // id for element to put checkboxes into
+      'assignment_table', // id for element to put assignments into
       'assignment_list_default', // the "loading..." message
       'refresh_assignment_list', // refresh the page
       assignments, // big list of assignments for the course
