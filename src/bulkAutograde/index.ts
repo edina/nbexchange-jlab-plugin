@@ -15,8 +15,7 @@ export class BulkAutogradeWidget extends Widget {
     this.app = app;
 
     this.node.innerHTML = [
-      '<div id="bulkautograder" class="tab-pane">',
-      '  <!-- poodles -->',
+      'section id="bulkautograder" class="tab-pane" aria-label="NBExchange bulk autograder page">',
       '  <p>Select the list of Assignments to be autograded.</p>',
       '  <div id="assignments-toolbar" class="row list_toolbar">',
       '    <div class="col-sm-8 no-padding"> <!-- -->',
@@ -36,7 +35,7 @@ export class BulkAutogradeWidget extends Widget {
       '  </div>',
       '  <div class="panel-group" id="results-panel-group">',
       '  <div>',
-      '</div>'
+      '</section>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 

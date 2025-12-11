@@ -18,6 +18,7 @@ interface IBaAssignmentResponse {
   success: string;
   value: string | IAssignmentRecord;
 }
+
 export class BaAssignmentsList {
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
@@ -145,7 +146,8 @@ export class AssignmentsList {
   private make_button(
     id: string,
     text: string,
-    disabled: boolean
+    disabled: boolean,
+    url: string
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
@@ -156,7 +158,9 @@ export class AssignmentsList {
     } else {
       button.classList.add('btn-primary');
     }
-    // button.onclick = async function(){ ... do something ... }
+    button.onclick = () => {
+      alert('This button would call ' + url);
+    };
     button.innerText = text;
     return button;
   }
@@ -186,12 +190,14 @@ export class AssignmentsList {
     const collectButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'collect',
-      disable_button
+      disable_button,
+      'collect --assignment=' + assignent_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
-      false
+      false,
+      'autograde --assignment=' + assignent_code
     );
     buttons_cell.append(collectButton, autogradeButton);
   }
