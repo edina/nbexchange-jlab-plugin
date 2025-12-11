@@ -21,7 +21,7 @@ export class BulkAutogradeWidget extends Widget {
       '    <div class="col-sm-8 no-padding"> <!-- -->',
       '      <div>',
       '        <button type="button" class="btn btn-default" id="assignment_list_default">Loading, please wait...</button>',
-      '        <table class="dropdown-menu" id="assignment_table">',
+      '        <table id="assignment-table">',
       '        </table>',
       '      </div>',
       '    </div> <!-- -->',
@@ -46,7 +46,7 @@ export class BulkAutogradeWidget extends Widget {
 
     new AssignmentsList(
       this,
-      'assignment_table', // id for element to put assignments into
+      'assignment-table', // id for element to put assignments into
       'assignment_list_default', // the "loading..." message
       'refresh_assignment_list', // refresh the page
       assignments, // big list of assignments for the course

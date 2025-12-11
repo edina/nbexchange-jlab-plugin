@@ -169,11 +169,8 @@ export class AssignmentsList {
     const row = document.createElement('tr');
     table_body.append(row);
     const assignment_name_cell = document.createElement('td');
-    assignment_name_cell.classList.add('col-sm-4');
     const values_cell = document.createElement('td');
-    values_cell.classList.add('col-sm-4');
     const buttons_cell = document.createElement('td');
-    buttons_cell.classList.add('col-sm-4');
     row.append(assignment_name_cell, values_cell, buttons_cell);
 
     assignment_name_cell.innerText = assignent_code;

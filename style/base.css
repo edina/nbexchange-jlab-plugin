@@ -68,3 +68,11 @@
 .panel_radiused {
   border-radius: 8px;
 }
+
+#assignment-table {
+  width: 75%;
+
+  td {
+    text-align: center;
+  }
+}
