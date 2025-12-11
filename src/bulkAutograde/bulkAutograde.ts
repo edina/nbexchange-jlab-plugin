@@ -119,7 +119,8 @@ export class AssignmentsList {
     this.clear_list();
 
     try {
-      const data: IBaAssignmentResponse = await requestAPI<any>('BaAssignment');
+      const data: IBaAssignmentResponse =
+        await requestAPI<any>('getAssignment');
       this.handle_load_list(data);
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
