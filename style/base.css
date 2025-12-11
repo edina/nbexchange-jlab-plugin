@@ -76,3 +76,7 @@
     text-align: center;
   }
 }
+
+#baautograde-alert-box {
+  display: none;
+}
