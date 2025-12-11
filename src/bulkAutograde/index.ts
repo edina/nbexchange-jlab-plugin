@@ -16,6 +16,7 @@ export class BulkAutogradeWidget extends Widget {
 
     this.node.innerHTML = [
       '<div id="bulkautograder" class="tab-pane">',
+      '  <!-- poodles -->',
       '  <p>Select the list of Assignments to be autograded.</p>',
       '  <div id="assignments-toolbar" class="row list_toolbar">',
       '    <div class="col-sm-8 no-padding"> <!-- -->',
