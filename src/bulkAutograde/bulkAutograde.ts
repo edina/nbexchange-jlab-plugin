@@ -174,16 +174,17 @@ export class AssignmentsList {
     const results_area = document.getElementById('results-panel-group');
     if (results_area) {
       this.clear_area(results_area);
+      results_area.append(data.value);
 
-      if (data.success) {
-        const pre_element = document.createElement('pre');
-        pre_element.innerText = data.value;
-        results_area.append(pre_element);
-      } else {
-        const error_message = document.createElement('p');
-        error_message.innerText = data.value;
-        results_area.append(error_message);
-      }
+      // if (data.success) {
+      //   const pre_element = document.createElement('pre');
+      //   pre_element.innerText = data.value;
+      //   results_area.append(pre_element);
+      // } else {
+      //   const error_message = document.createElement('p');
+      //   error_message.innerText = data.value;
+      //   results_area.append(error_message);
+      // }
     }
   }
 
