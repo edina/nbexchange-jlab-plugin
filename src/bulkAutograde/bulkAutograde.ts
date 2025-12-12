@@ -192,13 +192,13 @@ export class AssignmentsList {
       'assignent_code',
       'collect',
       disable_button,
-      'collect --assignment=' + assignent_code
+      'doCollect?assignment_code:' + assignent_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
       false,
-      'autograde --assignment=' + assignent_code
+      'doAutograde?assignment_code:' + assignent_code
     );
     buttons_cell.append(collectButton, autogradeButton);
   }

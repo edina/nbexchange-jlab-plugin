@@ -22,7 +22,7 @@ class BaAssignmentsList(LoggingConfigurable):
 
     SUPPORTED_METHODS = ("GET", "HEAD")
 
-    def load_config(self):
+    def load_config(self) -> LoggingConfigurable:
         paths = jupyter_config_path()
         paths.insert(0, os.getcwd())
         app = NbGrader()
@@ -76,23 +76,55 @@ class BaAssignmentsList(LoggingConfigurable):
 
 
 class BaseBaAssignmentHandler(JupyterHandler):
-    @property
-    def manager(self):
-        return self.settings["BaAssignment_list_manager"]
-
-
-class BaAssignmentsListHandler(BaseBaAssignmentHandler):
     api_timeout = 10
 
     base_service_url = os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")
 
+    @property
+    def manager(self) -> JupyterHandler:
+        return self.settings["BaAssignment_list_manager"]
+
+
+# All three Handler classes use the same BaAssignmentsList class, but call different methods inside it
+class BaAssignmentsListHandler(BaseBaAssignmentHandler):
+
     # get a dict of assignments: name; in exchange; locally
     @web.authenticated
-    def get(self):
+    def get(self) -> JupyterHandler:
         course_id = self.get_argument("course_id", get_current_course())
         self.log.info(f"get assignments for course: {course_id}")
 
         self.finish(json.dumps(self.manager.list_BaAssignment(course_id=course_id)))
+
+
+class BaCollectAssignmentHandler(BaseBaAssignmentHandler):
+
+    # kick of a collect script & return the result
+    @web.authenticated
+    def get(self) -> JupyterHandler:
+        course_id = self.get_argument("course_id", get_current_course())
+        assignment_code = self.get_argument("assignment_code")
+
+        if not assignment_code:
+            self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
+
+        self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.finish(json.dumps({"success": True, "value": "blah blah"}))
+
+
+class BaBulkAutogradeHandler(BaseBaAssignmentHandler):
+
+    # kick of a autograde script & return the result
+    @web.authenticated
+    def get(self) -> JupyterHandler:
+        course_id = self.get_argument("course_id", get_current_course())
+        assignment_code = self.get_argument("assignment_code")
+
+        if not assignment_code:
+            self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
+
+        self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.finish(json.dumps({"success": True, "value": "blah blah"}))
 
 
 def setup_handlers(web_app):
@@ -100,7 +132,11 @@ def setup_handlers(web_app):
 
     base_url = web_app.settings["base_url"]
 
-    default_handlers = [(r"getAssignment", BaAssignmentsListHandler)]
+    default_handlers = [
+        (r"getAssignment", BaAssignmentsListHandler)(r"doCollect", BaCollectAssignmentHandler)(
+            r"doAutograde", BaBulkAutogradeHandler
+        )
+    ]
     # route_pattern_BaAssignment = url_path_join(base_url, "nbexchange-jlab", "getAssignment")
     # handlers = [(route_pattern_BaAssignment, BaAssignmentsListHandler)]
     # web_app.add_handlers(host_pattern, handlers)
