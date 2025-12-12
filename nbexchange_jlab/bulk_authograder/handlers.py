@@ -115,6 +115,7 @@ class BaAssignmentsList(LoggingConfigurable):
                 html_fragment = '<section class="ba_response_section">\n'
                 if not data["success"]:
                     html_fragment = html_fragment + f'<p class="ba_response_failure">Failure: {student}</p>\n'
+                    html_fragment = html_fragment + f'<pre>\n{data["log"]}\n</pre>\n'
                     html_fragment = html_fragment + f'<pre>\n{data["error"]}\n</pre>\n'
                 else:
                     html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
