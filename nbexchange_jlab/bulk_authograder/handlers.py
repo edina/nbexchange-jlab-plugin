@@ -1,6 +1,7 @@
 """Tornado handlers for nbgrader course list web service."""
 
 import contextlib
+import html
 import json
 import os
 from typing import Dict, Set
@@ -91,10 +92,10 @@ class BaAssignmentsList(LoggingConfigurable):
 
             if not data["success"]:
                 response = response + '<p class="ba_response_failure">Failure.</p>\n'
-                response = response + data["error"]
+                response = response + html.escape(data["error"])
             else:
                 response = response + '<p class="ba_response_success">Success.</p>\n'
-                response = response + data["log"]
+                response = response + html.escape(data["log"])
             retvalue["value"] = response + "</section>\n"
         return retvalue
 
@@ -115,11 +116,12 @@ class BaAssignmentsList(LoggingConfigurable):
                 html_fragment = '<section class="ba_response_section">\n'
                 if not data["success"]:
                     html_fragment = html_fragment + f'<p class="ba_response_failure">Failure: {student}</p>\n'
-                    html_fragment = html_fragment + f'<pre>\n{data["log"]}\n</pre>\n'
-                    html_fragment = html_fragment + f'<pre>\n{data["error"]}\n</pre>\n'
+                    text = data["log"]
+                    html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
+                    html_fragment = html_fragment + f'<pre class="ba_response_failure">\n{html.escape(data["error"])}\n</pre>\n'
                 else:
                     html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
-                    html_fragment = html_fragment + f'<pre>\n{data["log"]}\n</pre>\n'
+                    html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
                 html_fragment = html_fragment + "</section>\n"
                 response = response + html_fragment
                 retvalue["value"] = response
