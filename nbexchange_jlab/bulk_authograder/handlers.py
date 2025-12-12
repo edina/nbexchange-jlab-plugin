@@ -73,6 +73,48 @@ class BaAssignmentsList(LoggingConfigurable):
                     data[assignment] = {"exchange": len(history[assignment]), "locally": len(local_submissions)}
         retvalue = {"success": True, "value": data}
         return retvalue
+    
+    def do_collect(self, assignment_code: str = None) -> Dict:
+        from pprint import pprint
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+        if not assignment_code:
+            return {"success": False, "value": "You need to supply an assignment code."}
+        
+        retvalue = {"success": False, "value": 'Unable to correctly configure to do the collect'}
+        data: Dict = {}
+        with self.get_BaAssignment_config() as config:
+            api = NbGraderAPI(config=config)
+            data = api.collect(assignment_code)
+            pprint(data)
+            if not data['success']:
+                retvalue['value'] = data['error']
+            else:
+                retvalue['value'] = data['log']
+        return retvalue
+    
+    def do_autograde(self, assignment_code: str = None) -> Dict:
+        from pprint import pprint
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+        if not assignment_code:
+            return {"success": False, "value": "You need to supply an assignment code."}
+        
+        retvalue = {"success": False, "value": 'Unable to correctly configure to do the collect'}
+        response = ''
+        with self.get_BaAssignment_config() as config:
+            api = NbGraderAPI(config=config)
+            students = api.get_submitted_students(assignment_code)
+            for student in students:
+                data = api.autograde(assignment_code, student)
+                pprint(data)
+                if not data['success']:
+                    response = response + data['error']
+                else:
+                    response = response + data['log']
+        retvalue['value'] = response
+        return retvalue
+
 
 
 class BaseBaAssignmentHandler(JupyterHandler):
