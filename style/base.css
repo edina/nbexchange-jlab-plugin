@@ -80,3 +80,22 @@
 #baautograde-alert-box {
   display: none;
 }
+
+.ba_response_section {
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-dialog-background);
+  border: 1px solid var(--jp-border-color);
+  border-radius: 10px;
+  padding: 0.25em 0.5em;
+  margin-bottom: 1em;
+
+  .ba_response_failure {
+    border-color: var(--jp-failure-color1);
+    background-color: var(--jp-failure-color3);
+  }
+
+  .ba_response_success {
+    border-color: var(--jp-success-color1);
+    background-color: var(--jp-success-color3);
+  }
+}
