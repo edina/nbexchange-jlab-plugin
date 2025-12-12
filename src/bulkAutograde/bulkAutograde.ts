@@ -144,15 +144,9 @@ export class AssignmentsList {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  private async do_collect(assignent_code: string, callback?: Function) {
-    if (callback) {
-      this.callback = callback;
-    }
-    this.clear_list();
-
+  private async do_collect(assignent_code: string) {
     try {
-      const data: IBaAssignmentResponse = await requestAPI<any>(
+      const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
       );
       this.handle_collect_data(data);
@@ -168,14 +162,9 @@ export class AssignmentsList {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  private async do_autograde(assignent_code: string, callback?: Function) {
-    if (callback) {
-      this.callback = callback;
-    }
-    this.clear_list();
-
+  private async do_autograde(assignent_code: string) {
     try {
-      const data: IBaAssignmentResponse = await requestAPI<any>(
+      const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
       );
       this.handle_autograde_data(data);
@@ -196,7 +185,8 @@ export class AssignmentsList {
     disabled: boolean,
     // url: string,
     // eslint-disable-next-line @typescript-eslint/ban-types
-    do_Action: Function
+    do_Action: (params?: any) => void,
+    actionParams?: any
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
@@ -207,7 +197,9 @@ export class AssignmentsList {
     } else {
       button.classList.add('btn-primary');
     }
-    button.onclick = () => do_Action;
+    button.onclick = async () => {
+      await do_Action(actionParams);
+    };
     button.innerText = text;
     return button;
   }
@@ -238,13 +230,15 @@ export class AssignmentsList {
       'assignent_code',
       'collect',
       disable_button,
-      this.do_collect
+      this.do_collect.bind(this),
+      assignent_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
       false,
-      this.do_autograde
+      this.do_autograde.bind(this),
+      assignent_code
     );
     buttons_cell.append(collectButton, autogradeButton);
   }
