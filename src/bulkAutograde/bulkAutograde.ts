@@ -160,6 +160,14 @@ export class AssignmentsList {
       button.classList.add('btn-primary');
     }
     button.onclick = () => {
+      try {
+        const data: any = requestAPI<any>(url);
+        console.log('data:' + data);
+      } catch (reason) {
+        const msg: string = 'Error on GET ' + url + '\n' + reason;
+        console.error(msg);
+        //   this.show_error(msg);
+      }
       alert('This button would call ' + url);
     };
     button.innerText = text;
@@ -192,13 +200,13 @@ export class AssignmentsList {
       'assignent_code',
       'collect',
       disable_button,
-      'doCollect?assignment_code:' + assignent_code
+      'doCollect?assignment_code=' + assignent_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
       false,
-      'doAutograde?assignment_code:' + assignent_code
+      'doAutograde?assignment_code=' + assignent_code
     );
     buttons_cell.append(collectButton, autogradeButton);
   }
