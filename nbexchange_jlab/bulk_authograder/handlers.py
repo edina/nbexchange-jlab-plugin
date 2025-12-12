@@ -90,10 +90,10 @@ class BaAssignmentsList(LoggingConfigurable):
             data = api.collect(assignment_code)
 
             if not data["success"]:
-                response = response + f'<p class="ba_response_failure">Failure.</p>\n'
+                response = response + '<p class="ba_response_failure">Failure.</p>\n'
                 response = response + data["error"]
             else:
-                response = response + f'<p class="ba_response_success">Success.</p>\n'
+                response = response + '<p class="ba_response_success">Success.</p>\n'
                 response = response + data["log"]
             retvalue["value"] = response + "</section>\n"
         return retvalue
