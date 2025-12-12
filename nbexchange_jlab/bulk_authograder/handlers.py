@@ -99,11 +99,18 @@ def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]
+
+    default_handlers = [(r"getAssignment", BaAssignmentsListHandler)]
+    # route_pattern_BaAssignment = url_path_join(base_url, "nbexchange-jlab", "getAssignment")
+    # handlers = [(route_pattern_BaAssignment, BaAssignmentsListHandler)]
+    # web_app.add_handlers(host_pattern, handlers)
+
     # Our hander urls are made up of <base_url>, <namespace>, <endpoint>
     # (this is done to keep things out of the nbgrader & jupyterlab handler paths)
-    route_pattern_BaAssignment = url_path_join(base_url, "nbexchange-jlab", "getAssignment")
-    handlers = [(route_pattern_BaAssignment, BaAssignmentsListHandler)]
-    web_app.add_handlers(host_pattern, handlers)
+    web_app.add_handlers(
+        host_pattern,
+        [(url_path_join(base_url, "nbexchange-jlab", hook), handler) for hook, handler in default_handlers],
+    )
 
 
 def load_jupyter_server_extension(nbapp):
