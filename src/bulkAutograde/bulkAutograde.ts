@@ -174,7 +174,7 @@ export class AssignmentsList {
     const results_area = document.getElementById('results-panel-group');
     if (results_area) {
       this.clear_area(results_area);
-      results_area.append(data.value);
+      results_area.innerHTML = data.value;
 
       // if (data.success) {
       //   const pre_element = document.createElement('pre');

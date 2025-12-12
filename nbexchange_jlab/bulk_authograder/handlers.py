@@ -77,11 +77,11 @@ class BaAssignmentsList(LoggingConfigurable):
     def do_collect(self, assignment_code: str = None) -> Dict:
 
         if not get_current_course():
-            return {"success": False, "value": "You need to have a current course code."}
+            return {"success": False, "value": "<p>You need to have a current course code.<\\p>"}
         if not assignment_code:
-            return {"success": False, "value": "You need to supply an assignment code."}
+            return {"success": False, "value": "<p>You need to supply an assignment code.<\\p>"}
 
-        retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
+        retvalue = {"success": False, "value": "<p>Unable to correctly configure to do the collect.<\\p>"}
         data: Dict = {}
         response = '<section class="ba_response_section">\n'
 
@@ -115,10 +115,10 @@ class BaAssignmentsList(LoggingConfigurable):
                 html_fragment = '<section class="ba_response_section">\n'
                 if not data["success"]:
                     html_fragment = html_fragment + f'<p class="ba_response_failure">Failure: {student}</p>\n'
-                    html_fragment = html_fragment + f"<pre>\n{data["error"]}\n</pre>\n"
+                    html_fragment = html_fragment + f'<pre>\n{data["error"]}\n</pre>\n'
                 else:
                     html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
-                    html_fragment = html_fragment + f"<pre>\n{data["log"]}\n</pre>\n"
+                    html_fragment = html_fragment + f'<pre>\n{data["log"]}\n</pre>\n'
                 html_fragment = html_fragment + "</section>\n"
                 response = response + html_fragment
                 retvalue["value"] = response
