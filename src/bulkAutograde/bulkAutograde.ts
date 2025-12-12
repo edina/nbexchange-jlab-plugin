@@ -145,7 +145,6 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
-    console.log('do_collect');
     try {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
@@ -158,13 +157,7 @@ export class AssignmentsList {
     }
   }
 
-  // private handle_collect_data(data: any): void {
-  //   console.log('collect returned ' + data);
-  // }
-
   private async do_autograde(assignent_code: string) {
-    console.log('do_autograde');
-
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
@@ -179,7 +172,6 @@ export class AssignmentsList {
 
   private handle_response_data(data: any): void {
     const results_area = document.getElementById('results-panel-group');
-    console.log('handle_response_data:' + data);
     if (results_area) {
       this.clear_area(results_area);
 
@@ -193,8 +185,6 @@ export class AssignmentsList {
         results_area.append(error_message);
       }
     }
-    // results-panel-group
-    console.log('autograde returned ' + data);
   }
 
   private clear_area(element: HTMLElement): void {
@@ -245,9 +235,7 @@ export class AssignmentsList {
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
 
     let disable_button = false;
-    console.log('Compare ' + data.exchange + ' and ' + data.locally);
     if (data.exchange === data.locally) {
-      console.log('setting disabl_button true');
       disable_button = true;
     }
     const collectButton: HTMLButtonElement = this.make_button(

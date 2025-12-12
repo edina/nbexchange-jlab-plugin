@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import pytest
 from nbformat.v4 import new_notebook
 from nbgrader.tests import create_grade_cell, create_locked_cell, create_solution_cell
@@ -32,7 +30,6 @@ class TestDeduplicateIds(BaseTestPreprocessor):
         nb.cells.append(cell2)
 
         nb, resources = preprocessor.preprocess(nb, mock_resources)
-        pprint(nb)
 
         assert len(nb.cells) == 1
         assert nb.cells[0].metadata.nbgrader == {
@@ -96,7 +93,6 @@ class TestDeduplicateIds(BaseTestPreprocessor):
         nb.cells.append(cell2)
 
         nb, resources = preprocessor.preprocess(nb, mock_resources)
-        pprint(nb)
 
         assert len(nb.cells) == 2
         assert nb.cells[0].metadata.nbgrader == {

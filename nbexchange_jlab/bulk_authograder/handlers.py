@@ -75,8 +75,6 @@ class BaAssignmentsList(LoggingConfigurable):
         return retvalue
 
     def do_collect(self, assignment_code: str = None) -> Dict:
-        self.log.info(f"do_collect - {assignment_code}")
-        from pprint import pprint
 
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
@@ -85,19 +83,22 @@ class BaAssignmentsList(LoggingConfigurable):
 
         retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
         data: Dict = {}
+        response = '<section class="ba_response_section">\n'
+
         with self.get_BaAssignment_config() as config:
             api = NbGraderAPI(config=config)
             data = api.collect(assignment_code)
-            pprint(data)
+
             if not data["success"]:
-                retvalue["value"] = data["error"]
+                response = response + f'<p class="ba_response_failure">Failure.</p>\n'
+                response = response + data["error"]
             else:
-                retvalue["value"] = data["log"]
+                response = response + f'<p class="ba_response_success">Success.</p>\n'
+                response = response + data["log"]
+            retvalue["value"] = response + "</section>\n"
         return retvalue
 
     def do_autograde(self, assignment_code: str = None) -> Dict:
-        self.log.info(f"do_autograde - {assignment_code}")
-        from pprint import pprint
 
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
@@ -111,12 +112,16 @@ class BaAssignmentsList(LoggingConfigurable):
             students = api.get_submitted_students(assignment_code)
             for student in students:
                 data = api.autograde(assignment_code, student)
-                pprint(data)
+                html_fragment = '<section class="ba_response_section">\n'
                 if not data["success"]:
-                    response = response + data["error"]
+                    html_fragment = html_fragment + f'<p class="ba_response_failure">Failure: {student}</p>\n'
+                    html_fragment = html_fragment + f"<pre>\n{data["error"]}\n</pre>\n"
                 else:
-                    response = response + data["log"]
-        retvalue["value"] = response
+                    html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
+                    html_fragment = html_fragment + f"<pre>\n{data["log"]}\n</pre>\n"
+                html_fragment = html_fragment + "</section>\n"
+                response = response + html_fragment
+                retvalue["value"] = response
         return retvalue
 
 
@@ -137,7 +142,7 @@ class BaAssignmentsListHandler(BaseBaAssignmentHandler):
     @web.authenticated
     def get(self) -> JupyterHandler:
         course_id = self.get_argument("course_id", get_current_course())
-        self.log.info(f"get assignments for course: {course_id}")
+        self.log.debug(f"get assignments for course: {course_id}")
 
         self.finish(json.dumps(self.manager.list_BaAssignment(course_id=course_id)))
 
@@ -153,7 +158,7 @@ class BaCollectAssignmentHandler(BaseBaAssignmentHandler):
         if not assignment_code:
             self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
 
-        self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.log.debug(f"run collect for assignment {assignment_code} course: {course_id}")
         self.finish(json.dumps(self.manager.do_collect(assignment_code=assignment_code)))
 
 
@@ -168,7 +173,7 @@ class BaBulkAutogradeHandler(BaseBaAssignmentHandler):
         if not assignment_code:
             self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
 
-        self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.log.debug(f"run collect for assignment {assignment_code} course: {course_id}")
         self.finish(json.dumps(self.manager.do_autograde(assignment_code=assignment_code)))
 
 
