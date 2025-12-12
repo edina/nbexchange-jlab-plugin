@@ -149,7 +149,7 @@ export class AssignmentsList {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
       );
-      this.handle_collect_data(data);
+      this.handle_response_data(data);
     } catch (reason) {
       const msg: string = 'Error on GET doCollect.\n' + reason;
       console.error(msg);
@@ -157,17 +157,16 @@ export class AssignmentsList {
     }
   }
 
-  private handle_collect_data(data: any): void {
-    console.log('collect returned ' + data);
-  }
+  // private handle_collect_data(data: any): void {
+  //   console.log('collect returned ' + data);
+  // }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   private async do_autograde(assignent_code: string) {
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
       );
-      this.handle_autograde_data(data);
+      this.handle_response_data(data);
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
       console.error(msg);
@@ -175,8 +174,29 @@ export class AssignmentsList {
     }
   }
 
-  private handle_autograde_data(data: any): void {
+  private handle_response_data(data: any): void {
+    const results_area = document.getElementById('results-panel-group');
+    if (results_area) {
+      this.clear_area(results_area);
+
+      if (data.success) {
+        const pre_element = document.createElement('pre');
+        pre_element.innerText = data.value;
+        results_area.append(pre_element);
+      } else {
+        const error_message = document.createElement('p');
+        error_message.innerText = data.value;
+        results_area.append(error_message);
+      }
+    }
+    // results-panel-group
     console.log('autograde returned ' + data);
+  }
+
+  private clear_area(element: HTMLElement): void {
+    if (element!.children.length > 0) {
+      element!.innerHTML = '';
+    }
   }
 
   private make_button(
