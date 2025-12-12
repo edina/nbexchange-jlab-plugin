@@ -144,11 +144,59 @@ export class AssignmentsList {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  private async do_collect(assignent_code: string, callback?: Function) {
+    if (callback) {
+      this.callback = callback;
+    }
+    this.clear_list();
+
+    try {
+      const data: IBaAssignmentResponse = await requestAPI<any>(
+        'doCollect?assignment_code=' + assignent_code
+      );
+      this.handle_collect_data(data);
+    } catch (reason) {
+      const msg: string = 'Error on GET doCollect.\n' + reason;
+      console.error(msg);
+      //   this.show_error(msg);
+    }
+  }
+
+  private handle_collect_data(data: any): void {
+    console.log('collect returned ' + data);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  private async do_autograde(assignent_code: string, callback?: Function) {
+    if (callback) {
+      this.callback = callback;
+    }
+    this.clear_list();
+
+    try {
+      const data: IBaAssignmentResponse = await requestAPI<any>(
+        'doAutograde?assignment_code=' + assignent_code
+      );
+      this.handle_autograde_data(data);
+    } catch (reason) {
+      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
+      console.error(msg);
+      //   this.show_error(msg);
+    }
+  }
+
+  private handle_autograde_data(data: any): void {
+    console.log('autograde returned ' + data);
+  }
+
   private make_button(
     id: string,
     text: string,
     disabled: boolean,
-    url: string
+    // url: string,
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    do_Action: Function
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
@@ -159,17 +207,7 @@ export class AssignmentsList {
     } else {
       button.classList.add('btn-primary');
     }
-    button.onclick = () => {
-      try {
-        const data: any = requestAPI<any>(url);
-        console.log('data:' + data);
-      } catch (reason) {
-        const msg: string = 'Error on GET ' + url + '\n' + reason;
-        console.error(msg);
-        //   this.show_error(msg);
-      }
-      alert('This button would call ' + url);
-    };
+    button.onclick = () => do_Action;
     button.innerText = text;
     return button;
   }
@@ -200,13 +238,13 @@ export class AssignmentsList {
       'assignent_code',
       'collect',
       disable_button,
-      'doCollect?assignment_code=' + assignent_code
+      this.do_collect
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
       false,
-      'doAutograde?assignment_code=' + assignent_code
+      this.do_autograde
     );
     buttons_cell.append(collectButton, autogradeButton);
   }
