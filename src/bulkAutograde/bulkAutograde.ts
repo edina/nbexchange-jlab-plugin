@@ -145,6 +145,7 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
+    console.log('do_collect');
     try {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
@@ -162,6 +163,8 @@ export class AssignmentsList {
   // }
 
   private async do_autograde(assignent_code: string) {
+    console.log('do_autograde');
+
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
@@ -176,6 +179,7 @@ export class AssignmentsList {
 
   private handle_response_data(data: any): void {
     const results_area = document.getElementById('results-panel-group');
+    console.log('handle_response_data:' + data);
     if (results_area) {
       this.clear_area(results_area);
 

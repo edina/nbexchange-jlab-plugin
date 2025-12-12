@@ -73,48 +73,51 @@ class BaAssignmentsList(LoggingConfigurable):
                     data[assignment] = {"exchange": len(history[assignment]), "locally": len(local_submissions)}
         retvalue = {"success": True, "value": data}
         return retvalue
-    
+
     def do_collect(self, assignment_code: str = None) -> Dict:
+        self.log.info(f"do_collect - {assignment_code}")
         from pprint import pprint
+
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
         if not assignment_code:
             return {"success": False, "value": "You need to supply an assignment code."}
-        
-        retvalue = {"success": False, "value": 'Unable to correctly configure to do the collect'}
+
+        retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
         data: Dict = {}
         with self.get_BaAssignment_config() as config:
             api = NbGraderAPI(config=config)
             data = api.collect(assignment_code)
             pprint(data)
-            if not data['success']:
-                retvalue['value'] = data['error']
+            if not data["success"]:
+                retvalue["value"] = data["error"]
             else:
-                retvalue['value'] = data['log']
+                retvalue["value"] = data["log"]
         return retvalue
-    
+
     def do_autograde(self, assignment_code: str = None) -> Dict:
+        self.log.info(f"do_autograde - {assignment_code}")
         from pprint import pprint
+
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
         if not assignment_code:
             return {"success": False, "value": "You need to supply an assignment code."}
-        
-        retvalue = {"success": False, "value": 'Unable to correctly configure to do the collect'}
-        response = ''
+
+        retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
+        response = ""
         with self.get_BaAssignment_config() as config:
             api = NbGraderAPI(config=config)
             students = api.get_submitted_students(assignment_code)
             for student in students:
                 data = api.autograde(assignment_code, student)
                 pprint(data)
-                if not data['success']:
-                    response = response + data['error']
+                if not data["success"]:
+                    response = response + data["error"]
                 else:
-                    response = response + data['log']
-        retvalue['value'] = response
+                    response = response + data["log"]
+        retvalue["value"] = response
         return retvalue
-
 
 
 class BaseBaAssignmentHandler(JupyterHandler):
@@ -151,7 +154,7 @@ class BaCollectAssignmentHandler(BaseBaAssignmentHandler):
             self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
 
         self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
-        self.finish(json.dumps({"success": True, "value": "blah blah"}))
+        self.finish(json.dumps(self.manager.do_collect(assignment_code=assignment_code)))
 
 
 class BaBulkAutogradeHandler(BaseBaAssignmentHandler):
@@ -166,7 +169,7 @@ class BaBulkAutogradeHandler(BaseBaAssignmentHandler):
             self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
 
         self.log.info(f"run collect for assignment {assignment_code} course: {course_id}")
-        self.finish(json.dumps({"success": True, "value": "blah blah"}))
+        self.finish(json.dumps(self.manager.do_autograde(assignment_code=assignment_code)))
 
 
 def setup_handlers(web_app):
