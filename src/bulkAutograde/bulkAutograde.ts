@@ -145,6 +145,8 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
+    this.clear_list();
+    this.default_assignment_element!.innerText = 'Processing....';
     try {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
@@ -158,6 +160,8 @@ export class AssignmentsList {
   }
 
   private async do_autograde(assignent_code: string) {
+    this.clear_list();
+    this.default_assignment_element!.innerText = 'Processing....';
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
