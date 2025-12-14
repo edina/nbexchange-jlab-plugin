@@ -48,7 +48,7 @@ export class AssignmentsList {
   base_url: string;
   assignmentResponseData: IBaAssignmentResponse | null;
   assignment_table_element: HTMLTableElement | null;
-  default_assignment_element: HTMLButtonElement | null;
+  default_assignment_element: HTMLElement | null;
   //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
@@ -72,7 +72,7 @@ export class AssignmentsList {
       .getElementsByTagName('table')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
-    this.default_assignment_element = buttons.namedItem(
+    this.default_assignment_element = document.getElementById(
       default_assignment_selector
     );
     // this.dropdown_element = buttons.namedItem(dropdown_selector);
