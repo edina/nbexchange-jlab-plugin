@@ -151,15 +151,14 @@ export class HistoryList {
         const assignment_level_summary_id =
           'assignment_level_summary_' + assignment_id;
 
-        let summary_text = assignment_code + ' &lt;' + role + '&gt;'
-        if (this_course['isCurrent']) {
-          summary_text = summary_text + ' (current course)';
-        }
         assignment_panel_elem.innerHTML = [
           '      <summary class="panel-heading" id="' +
             assignment_level_summary_id +
             '">' +
-            summary_text,
+            assignment_code +
+            ' &lt;' +
+            role +
+            '&gt;',
           '      </summary>',
           '      <div class="panel-body" id="' + panel_body_id + '">',
           '      </div>'
@@ -205,6 +204,9 @@ export class HistoryList {
 
       // Update the course name string to includes dates
       para_elem.textContent += ' - ' + first_date + ' -> ' + latest_date;
+      if (this_course['isCurrent']) {
+        para_elem.textContent += ' (current course)';
+      }
     }
 
     if (this.callback) {
