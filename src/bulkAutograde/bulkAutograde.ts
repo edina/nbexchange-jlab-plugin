@@ -48,7 +48,7 @@ export class AssignmentsList {
   base_url: string;
   assignmentResponseData: IBaAssignmentResponse | null;
   assignment_table_element: HTMLTableElement | null;
-  default_assignment_element: HTMLElement | null;
+  default_assignment_element: HTMLButtonElement | null;
   //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
@@ -72,7 +72,7 @@ export class AssignmentsList {
       .getElementsByTagName('table')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
-    this.default_assignment_element = document.getElementById(
+    this.default_assignment_element = buttons.namedItem(
       default_assignment_selector
     );
     // this.dropdown_element = buttons.namedItem(dropdown_selector);
@@ -145,12 +145,6 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
-    const results_area = document.getElementById('results-panel-group');
-    if (results_area) {
-      this.clear_area(results_area);
-    }
-    this.default_assignment_element!.innerText =
-      'Processing collect for ' + assignent_code + ' ....';
     try {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
@@ -164,12 +158,6 @@ export class AssignmentsList {
   }
 
   private async do_autograde(assignent_code: string) {
-    const results_area = document.getElementById('results-panel-group');
-    if (results_area) {
-      this.clear_area(results_area);
-    }
-    this.default_assignment_element!.innerText =
-      'Processing collect for ' + assignent_code + ' ....';
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
