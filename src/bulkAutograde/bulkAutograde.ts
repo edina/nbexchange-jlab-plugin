@@ -175,16 +175,6 @@ export class AssignmentsList {
     if (results_area) {
       this.clear_area(results_area);
       results_area.innerHTML = data.value;
-
-      // if (data.success) {
-      //   const pre_element = document.createElement('pre');
-      //   pre_element.innerText = data.value;
-      //   results_area.append(pre_element);
-      // } else {
-      //   const error_message = document.createElement('p');
-      //   error_message.innerText = data.value;
-      //   results_area.append(error_message);
-      // }
     }
   }
 
@@ -198,8 +188,6 @@ export class AssignmentsList {
     id: string,
     text: string,
     disabled: boolean,
-    // url: string,
-    // eslint-disable-next-line @typescript-eslint/ban-types
     do_Action: (params?: any) => void,
     actionParams?: any
   ): HTMLButtonElement {
@@ -280,7 +268,8 @@ export class AssignmentsList {
     }
     // Now toggle the "loading" for the table
     if (this.default_assignment_element) {
-      this.default_assignment_element.style.display = 'None';
+      this.default_assignment_element.innerText =
+        'Select the action you want from the table below';
     }
   }
 }

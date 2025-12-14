@@ -9,6 +9,7 @@
   flex-direction: column;
   padding: 10px 0;
   border-top: var(--jp-inverse-border-color) 1px solid;
+  color: var(--jp-ui-font-color1);
 }
 
 .action-group:last-child {
@@ -63,6 +64,7 @@
 .current_course {
   border-color: var(--jp-success-color1);
   background-color: var(--jp-success-color3);
+  color: var(--md-grey-900);
 }
 
 .panel_radiused {
@@ -90,8 +92,11 @@
   margin-bottom: 1em;
 
   .ba_response_failure {
-    border-color: var(--jp-failure-color1);
-    background-color: var(--jp-failure-color3);
+    border-color: var(--jp-error-color1);
+    background-color: var(--jp-error-color3);
+    color: var(--md-grey-900);
+    border-radius: 2px;
+    padding: 0.25em;
   }
 
   .ba_response_success {

@@ -115,12 +115,16 @@ class BaAssignmentsList(LoggingConfigurable):
                 data = api.autograde(assignment_code, student)
                 html_fragment = '<section class="ba_response_section">\n'
                 if not data["success"]:
-                    html_fragment = html_fragment + f'<p class="ba_response_failure">Failure: {student}</p>\n'
-                    text = data["log"]
+                    html_fragment = (
+                        html_fragment + f'<p class="ba_response_failure">Failure to autograde: {student}</p>\n'
+                    )
                     html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
-                    html_fragment = html_fragment + f'<pre class="ba_response_failure">\n{html.escape(data["error"])}\n</pre>\n'
+                    html_fragment = (
+                        html_fragment + f'<pre class="ba_response_failure">\n{html.escape(data["error"])}\n</pre>\n'
+                    )
                 else:
                     html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
+                    html_fragment = html_fragment + "<p>The following Exception was raised:</p>\n"
                     html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
                 html_fragment = html_fragment + "</section>\n"
                 response = response + html_fragment
