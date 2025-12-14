@@ -145,8 +145,12 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
-    this.clear_list();
-    this.default_assignment_element!.innerText = 'Processing....';
+    const results_area = document.getElementById('results-panel-group');
+    if (results_area) {
+      this.clear_area(results_area);
+    }
+    this.default_assignment_element!.innerText =
+      'Processing collect for ' + assignent_code + ' ....';
     try {
       const data: any = await requestAPI<any>(
         'doCollect?assignment_code=' + assignent_code
@@ -160,8 +164,12 @@ export class AssignmentsList {
   }
 
   private async do_autograde(assignent_code: string) {
-    this.clear_list();
-    this.default_assignment_element!.innerText = 'Processing....';
+    const results_area = document.getElementById('results-panel-group');
+    if (results_area) {
+      this.clear_area(results_area);
+    }
+    this.default_assignment_element!.innerText =
+      'Processing collect for ' + assignent_code + ' ....';
     try {
       const data: any = await requestAPI<any>(
         'doAutograde?assignment_code=' + assignent_code
