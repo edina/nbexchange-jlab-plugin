@@ -148,17 +148,18 @@ export class HistoryList {
         );
         assignment_panel_elem.setAttribute('name', detail_group_name);
         const panel_body_id = 'assignment-panel-body-' + assignment_id;
-        let assignment_level_summary_id =
+        const assignment_level_summary_id =
           'assignment_level_summary_' + assignment_id;
+
+        let summary_text = assignment_code + ' &lt;' + role + '&gt;'
         if (this_course['isCurrent']) {
-          assignment_level_summary_id =
-            assignment_level_summary_id + ' (current course)';
+          summary_text = summary_text + ' (current course)';
         }
         assignment_panel_elem.innerHTML = [
           '      <summary class="panel-heading" id="' +
             assignment_level_summary_id +
-            '">',
-          '        ' + assignment_code + ' &lt;' + role + '&gt;',
+            '">' +
+            summary_text,
           '      </summary>',
           '      <div class="panel-body" id="' + panel_body_id + '">',
           '      </div>'
