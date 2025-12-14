@@ -148,8 +148,12 @@ export class HistoryList {
         );
         assignment_panel_elem.setAttribute('name', detail_group_name);
         const panel_body_id = 'assignment-panel-body-' + assignment_id;
-        const assignment_level_summary_id =
+        let assignment_level_summary_id =
           'assignment_level_summary_' + assignment_id;
+        if (this_course['isCurrent']) {
+          assignment_level_summary_id =
+            assignment_level_summary_id + ' (current course)';
+        }
         assignment_panel_elem.innerHTML = [
           '      <summary class="panel-heading" id="' +
             assignment_level_summary_id +
