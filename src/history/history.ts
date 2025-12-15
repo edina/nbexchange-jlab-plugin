@@ -196,6 +196,7 @@ export class HistoryList {
           new ActionGroup(
             assignment_panel_elem,
             panel_body_id,
+            j,
             actionTypes[j].display,
             groupActions
           );
@@ -377,12 +378,13 @@ class ActionGroup {
   constructor(
     panel_elem: HTMLElement,
     parent: string,
+    index: number,
     title: string,
     actions: Action[]
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
-    this.make_row(element, title, actions);
+    this.make_row(element, index, title, actions);
     const div_elements = panel_elem.getElementsByTagName('div');
     const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
     parent_elem.append(element);
@@ -390,23 +392,31 @@ class ActionGroup {
 
   private make_row(
     element: HTMLDivElement,
+    index: number,
     title: string,
     actions: Action[]
   ): void {
     const row = document.createElement('details');
     const summary = document.createElement('summary');
 
+    const action_count = String(actions.length);
+    const title_attr = 'summary_' + index + '_' + title;
+    const count_attr = 'summary_' + index + '_' + action_count;
+
     const title_span = document.createElement('span');
+    title_span.setAttribute('id', title_attr);
+
     const count_span = document.createElement('span');
+    count_span.setAttribute('id', count_attr);
     count_span.classList.add('action-badge');
 
     title_span.innerText = title;
-    count_span.innerText = String(actions.length);
+    count_span.innerText = action_count;
 
     summary.innerText = title;
     summary.append(count_span);
     row.append(summary);
-
+    row.setAttribute('aria-labelledby', 'title_attr count_attr');
     for (let i = 0; i < actions.length; i++) {
       new Action(row, actions[i]);
     }
