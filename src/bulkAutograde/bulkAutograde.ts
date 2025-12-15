@@ -198,7 +198,7 @@ export class AssignmentsList {
   private loading_statement(element: HTMLElement): void {
     if (element) {
       if (element.children.length > 0) {
-        element.innerHTML = '<p>Loading......</p>';
+        element.innerHTML = '<p class="ba_loader">Loading......</p>';
       }
     }
   }
