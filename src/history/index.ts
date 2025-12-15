@@ -39,6 +39,7 @@ export class HistoryWidget extends Widget {
       '  <div class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
+      '    <span style="width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite;"></span>',
       '  </div>',
       '</div>'
     ].join('\n');
