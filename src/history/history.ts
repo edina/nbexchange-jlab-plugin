@@ -416,7 +416,10 @@ class ActionGroup {
     summary.innerText = title;
     summary.append(count_span);
     row.append(summary);
-    row.setAttribute('aria-labelledby', 'title_attr count_attr');
+    row.setAttribute(
+      'aria-labelledby',
+      '"' + title_attr + ' ' + count_attr + '"'
+    );
     for (let i = 0; i < actions.length; i++) {
       new Action(row, actions[i]);
     }
