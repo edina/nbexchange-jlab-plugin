@@ -111,6 +111,7 @@ export class AssignmentsList {
       this.assignment_table_element!.innerHTML = '';
     }
   }
+
   private bind_events(): void {
     this.refresh_element!.click();
   }
@@ -183,6 +184,7 @@ export class AssignmentsList {
   }
 
   private clear_area(element: HTMLElement): void {
+    console.log('### Checking element ' + element + ' for content');
     if (element!.children.length > 0) {
       element!.innerHTML = '';
     }
