@@ -399,27 +399,22 @@ class ActionGroup {
     title: string,
     actions: Action[]
   ): void {
+    const action_count = String(actions.length);
+
     const row = document.createElement('details');
     const summary = document.createElement('summary');
 
-    const action_count = String(actions.length);
-    const title_attr = assignment_id + index + '_' + title;
-    const count_attr = assignment_id + index + '_' + action_count;
-
-    const title_span = document.createElement('span');
-    title_span.setAttribute('id', title_attr);
-
     const count_span = document.createElement('span');
-    count_span.setAttribute('id', count_attr);
     count_span.classList.add('action-badge');
-
-    title_span.innerText = title;
     count_span.innerText = action_count;
 
     summary.innerText = title;
     summary.append(count_span);
     row.append(summary);
-    row.setAttribute('aria-labelledby', title_attr + ' ' + count_attr);
+    row.setAttribute(
+      'aria-label',
+      assignment_id + '_' + index + '_' + title + '_' + action_count
+    );
     for (let i = 0; i < actions.length; i++) {
       new Action(row, actions[i]);
     }
