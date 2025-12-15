@@ -36,11 +36,11 @@ export class HistoryWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div><span style="width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite;"></span></div>',
+      '  <div><span class="spinner"></span></div>',
       '  <div class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
-      '    <span style="width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite;"></span>',
+      '    <span class="spinner"></span>',
       '  </div>',
       '</div>'
     ].join('\n');
