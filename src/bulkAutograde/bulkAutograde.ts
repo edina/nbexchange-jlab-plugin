@@ -169,9 +169,8 @@ export class AssignmentsList {
   private async do_autograde(assignent_code: string) {
     const results_area = document.getElementById('results-panel-group');
     if (results_area) {
-      this.clear_area(results_area);
+      this.loading_statement(results_area);
       try {
-        this.loading_statement(results_area);
         const data: any = await requestAPI<any>(
           'doAutograde?assignment_code=' + assignent_code
         );
@@ -197,8 +196,10 @@ export class AssignmentsList {
   }
 
   private loading_statement(element: HTMLElement): void {
-    if (element!.children.length > 0) {
-      element!.innerHTML = '<p>Loading......</p>';
+    if (element) {
+      if (element.children.length > 0) {
+        element.innerHTML = '<p>Loading......</p>';
+      }
     }
   }
 
