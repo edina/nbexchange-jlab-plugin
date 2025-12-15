@@ -150,35 +150,41 @@ export class AssignmentsList {
   }
 
   private async do_collect(assignent_code: string) {
-    try {
-      const data: any = await requestAPI<any>(
-        'doCollect?assignment_code=' + assignent_code
-      );
-      this.handle_response_data(data);
-    } catch (reason) {
-      const msg: string = 'Error on GET doCollect.\n' + reason;
-      console.error(msg);
-      //   this.show_error(msg);
+    const results_area = document.getElementById('results-panel-group');
+    if (results_area) {
+      this.clear_area(results_area);
+      try {
+        const data: any = await requestAPI<any>(
+          'doCollect?assignment_code=' + assignent_code
+        );
+        this.handle_response_data(results_area, data);
+      } catch (reason) {
+        const msg: string = 'Error on GET doCollect.\n' + reason;
+        console.error(msg);
+        //   this.show_error(msg);
+      }
     }
   }
 
   private async do_autograde(assignent_code: string) {
-    try {
-      const data: any = await requestAPI<any>(
-        'doAutograde?assignment_code=' + assignent_code
-      );
-      this.handle_response_data(data);
-    } catch (reason) {
-      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      console.error(msg);
-      //   this.show_error(msg);
-    }
-  }
-
-  private handle_response_data(data: any): void {
     const results_area = document.getElementById('results-panel-group');
     if (results_area) {
       this.clear_area(results_area);
+      try {
+        const data: any = await requestAPI<any>(
+          'doAutograde?assignment_code=' + assignent_code
+        );
+        this.handle_response_data(results_area, data);
+      } catch (reason) {
+        const msg: string = 'Error on GET /BaAssignment.\n' + reason;
+        console.error(msg);
+        //   this.show_error(msg);
+      }
+    }
+  }
+
+  private handle_response_data(results_area: HTMLElement, data: any): void {
+    if (results_area) {
       results_area.innerHTML = data.value;
     }
   }
