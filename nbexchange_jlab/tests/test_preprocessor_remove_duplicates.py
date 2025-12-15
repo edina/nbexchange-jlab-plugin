@@ -42,6 +42,7 @@ class TestDeduplicateIds(BaseTestPreprocessor):
             "task": False,
         }
         assert nb.cells[0].source == "hello"
+        assert False
 
     def test_duplicate_solution_cell(self, preprocessor, tmpdir):
         mock_resources["metadata"]["path"] = str(tmpdir.mkdir("preprocessor_testing").realpath())

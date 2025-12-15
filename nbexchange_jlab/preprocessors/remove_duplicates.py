@@ -37,7 +37,7 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         for detail in found_dict["removed_details"]:
             msg.append(f"Cell count: {detail[0]}, cell-id: {detail[1]}")
         msg.append(f"\nThere are {len(found_dict['after'])} remaining after this processor completes")
-        msg.append(" Full report in submission directory")
+        msg.append(" Full report in the submission directory")
         msg_string = "\n".join(msg)
         self.log.warning(msg_string)
 
@@ -45,17 +45,21 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         # from nbgrader.apps import NbGrader, NbGraderAPI
         import os
         from datetime import datetime
+        from pprint import pprint
 
-        # app = NbGrader()
-        # app.load_config_file()
-        # config = app.config
-        # api = NbGraderAPI(config=config)
+        from nbgrader.apps import NbGrader
+
+        app = NbGrader()
+        app.load_config_file()
+        config = app.config
+        self.log.warning("config:")
+        self.log.warning(config)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = os.path.join(
-            resources["metadata"]["path"], f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt"
-        )
-        with open(filename, "w") as f:
-            f.write("\n".join(msg))
+        # filename = os.path.join(
+        #     config["coursedir"]["root"], f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt"
+        # )
+        # with open(filename, "w") as f:
+        #     f.write("\n".join(msg))
 
     def deduplicate_notebook_by_grade_id(
         self, nb: NotebookNode
