@@ -29,7 +29,25 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         counts = Counter(ids)
         return {grade_id: count for grade_id, count in counts.items() if count > 1}
 
-    def write_log(self, found_dict: dict, resources: ResourcesDict):
+    def write_log(self, found_dict: dict, resources: ResourcesDict) -> None:
+        # Preprocessors know nothing of the wider nbgrader ecosystem, so we need get it
+        # from nbgrader
+        import os
+        from datetime import datetime
+
+        from nbgrader.apps import NbGrader, NbGraderAPI
+
+        app = NbGrader()
+        app.load_config_file()
+        config = app.config
+        api = NbGraderAPI(config=config)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = os.path.join(
+            api.coursedir.root,
+            f"autograde_report_{resources['nbgrader']['student']}_{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt",  # noqa E501
+        )
+
         msg = [
             f"Duplicates removed for student {resources['nbgrader']['student']}:",
             f" {len(found_dict['before'])} cells removed:\n",
@@ -37,29 +55,12 @@ class NbExDeduplicateIds(NbGraderPreprocessor):
         for detail in found_dict["removed_details"]:
             msg.append(f"Cell count: {detail[0]}, cell-id: {detail[1]}")
         msg.append(f"\nThere are {len(found_dict['after'])} remaining after this processor completes")
-        msg.append(" Full report in the submission directory")
+        msg.append(f" Report copied to {filename}")
         msg_string = "\n".join(msg)
         self.log.warning(msg_string)
 
-        # Preprocessors know nothing of the wider nbgrader ecosystem, so we need get it
-        # from nbgrader.apps import NbGrader, NbGraderAPI
-        import os
-        from datetime import datetime
-        from pprint import pprint
-
-        from nbgrader.apps import NbGrader
-
-        app = NbGrader()
-        app.load_config_file()
-        config = app.config
-        self.log.warning("config:")
-        self.log.warning(config)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        # filename = os.path.join(
-        #     config["coursedir"]["root"], f"{resources['nbgrader']['notebook']}_deduplicate_{timestamp}.txt"
-        # )
-        # with open(filename, "w") as f:
-        #     f.write("\n".join(msg))
+        with open(filename, "w") as f:
+            f.write("\n".join(msg))
 
     def deduplicate_notebook_by_grade_id(
         self, nb: NotebookNode
