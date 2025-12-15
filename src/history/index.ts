@@ -36,11 +36,9 @@ export class HistoryWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div><span class="spinner"></span></div>',
       '  <div class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
-      '    <span class="spinner"></span>',
       '  </div>',
       '</div>'
     ].join('\n');

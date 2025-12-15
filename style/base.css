@@ -40,17 +40,6 @@
 }
 
 #nbexchange-history-list {
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 5px solid var(--jp-ui-font-color1);
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-  }
-
   .panel-group .panel {
     margin-top: 3px;
     margin-bottom: 1em;
@@ -115,5 +104,16 @@
   .ba_response_success {
     border-color: var(--jp-success-color1);
     background-color: var(--jp-success-color3);
+  }
+
+  .ba_loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid var(--jp-ui-font-color1);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
   }
 }
