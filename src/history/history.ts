@@ -196,8 +196,7 @@ export class HistoryList {
           new ActionGroup(
             assignment_panel_elem,
             panel_body_id,
-            assignment_id,
-            j,
+            assignment_code,
             actionTypes[j].display,
             groupActions
           );
@@ -379,14 +378,13 @@ class ActionGroup {
   constructor(
     panel_elem: HTMLElement,
     parent: string,
-    assignment_id: number,
-    index: number,
+    assignment_code: string,
     title: string,
     actions: Action[]
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
-    this.make_row(element, assignment_id, index, title, actions);
+    this.make_row(element, assignment_code, title, actions);
     const div_elements = panel_elem.getElementsByTagName('div');
     const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
     parent_elem.append(element);
@@ -394,8 +392,7 @@ class ActionGroup {
 
   private make_row(
     element: HTMLDivElement,
-    assignment_id: number,
-    index: number,
+    assignment_code: string,
     title: string,
     actions: Action[]
   ): void {
@@ -413,7 +410,7 @@ class ActionGroup {
     row.append(summary);
     row.setAttribute(
       'aria-label',
-      assignment_id + '_' + index + '_' + title + '_' + action_count
+      assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
       new Action(row, actions[i]);
