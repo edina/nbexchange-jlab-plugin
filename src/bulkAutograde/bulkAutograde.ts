@@ -213,17 +213,18 @@ export class AssignmentsList {
 
   private make_row(
     table_body: HTMLTableSectionElement,
-    assignent_code: string,
+    assignment_code: string,
     data: IAssignmentDetail
   ): void {
     const row = document.createElement('tr');
     table_body.append(row);
+    row.setAttribute('aria-label', assignment_code);
     const assignment_name_cell = document.createElement('td');
     const values_cell = document.createElement('td');
     const buttons_cell = document.createElement('td');
     row.append(assignment_name_cell, values_cell, buttons_cell);
 
-    assignment_name_cell.innerText = assignent_code;
+    assignment_name_cell.innerText = assignment_code;
     values_cell.innerText =
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
 
@@ -236,14 +237,14 @@ export class AssignmentsList {
       'collect',
       disable_button,
       this.do_collect.bind(this),
-      assignent_code
+      assignment_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
       'assignent_code',
       'Bulk Autograde',
       false,
       this.do_autograde.bind(this),
-      assignent_code
+      assignment_code
     );
     buttons_cell.append(collectButton, autogradeButton);
   }
