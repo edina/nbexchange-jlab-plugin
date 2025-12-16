@@ -277,13 +277,13 @@ export class AssignmentsList {
       for (const assignment_code in data) {
         this.make_row(table_body, assignment_code, data[assignment_code]);
       }
-    }
-    // Now toggle the "loading" for the table
-    console.log('change the loading message?');
-    if (this.default_assignment_element) {
-      console.log('yes, change the loading message.');
-      this.default_assignment_element.innerText =
-        'Select the action you want from the table below';
+      // Now toggle the "loading" for the table
+      console.log('change the loading message?');
+      if (this.default_assignment_element) {
+        console.log('yes, change the loading message.');
+        this.default_assignment_element.innerText =
+          'Select the action you want from the table below';
+      }
     }
   }
 
