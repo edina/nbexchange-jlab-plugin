@@ -17,18 +17,8 @@ export class HistoryWidget extends Widget {
     this.node.innerHTML = [
       '<div id="nbexchange-history-list" class="tab-pane">',
       '  <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
-      '  <div id="history-toolbar" class="row list_toolbar" style="display: none">',
+      '  <div id="history-toolbar" class="row list_toolbar">',
       '    <div class="col-sm-8 no-padding"> <!-- -->',
-      '      <span id="history_list_info" class="toolbar_info">Current course:</span>',
-      '      <div class="btn-group btn-group-xs">',
-      '        <button type="button" class="btn btn-default" id="course_list_default">Loading, please wait...</button>',
-      '        <button type="button" class="btn btn-default dropdown-toggle" id="course_list_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">',
-      '          <span class="caret"></span>',
-      '          <span class="sr-only">Toggle Dropdown</span>',
-      '        </button>',
-      '        <ul class="dropdown-menu" id="course_list">',
-      '        </ul>',
-      '      </div>',
       '    </div> <!-- -->',
       '    <div class="col-sm-4 no-padding tree-buttons">',
       '      <span id="history_buttons" class="pull-right toolbar_buttons">',
@@ -39,6 +29,7 @@ export class HistoryWidget extends Widget {
       '  <div class="alert alert-danger version_error">',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
+      '    <p>Loading....</p>',
       '  </div>',
       '</div>'
     ].join('\n');
