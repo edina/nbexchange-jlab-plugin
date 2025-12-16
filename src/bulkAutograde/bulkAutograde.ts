@@ -279,7 +279,9 @@ export class AssignmentsList {
       }
     }
     // Now toggle the "loading" for the table
+    console.log('change the loading message?');
     if (this.default_assignment_element) {
+      console.log('yes, change the loading message.');
       this.default_assignment_element.innerText =
         'Select the action you want from the table below';
     }
