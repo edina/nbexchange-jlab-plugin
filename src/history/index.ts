@@ -22,9 +22,7 @@ export class HistoryWidget extends Widget {
       '      <span id="history_list_info" class="toolbar_info">Current course:</span>',
       '      <div class="btn-group btn-group-xs">',
       '        <button type="button" class="btn btn-default" id="course_list_default">Loading, please wait...</button>',
-      '        <button type="button" class="btn btn-default dropdown-toggle" id="course_list_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">',
-      '          <span class="caret"></span>',
-      '          <span class="sr-only">Toggle Dropdown</span>',
+      '        <button type="button" id="course_list_dropdown">',
       '        </button>',
       '        <ul class="dropdown-menu" id="course_list">',
       '        </ul>',
@@ -52,7 +50,6 @@ export class HistoryWidget extends Widget {
     new CourseList(
       this,
       'course_list',
-      'course_list_default',
       'course_list_dropdown',
       'refresh_history_list',
       history_l,

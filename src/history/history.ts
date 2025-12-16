@@ -249,7 +249,6 @@ export class HistoryList {
 
 export class CourseList {
   course_list_selector: string;
-  default_course_selector: string;
   dropdown_selector: string;
   refresh_selector: string;
   history: HistoryList;
@@ -258,28 +257,24 @@ export class CourseList {
   base_url: string;
   data: string[];
   course_list_element: HTMLUListElement | null;
-  default_course_element: HTMLButtonElement | null;
   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
   constructor(
     widget: Widget,
     course_list_selector: string,
-    default_course_selector: string,
     dropdown_selector: string,
     refresh_selector: string,
     history: HistoryList,
     options: Map<string, string>
   ) {
     this.course_list_selector = course_list_selector;
-    this.default_course_selector = default_course_selector;
     this.dropdown_selector = dropdown_selector;
     this.refresh_selector = refresh_selector;
     this.course_list_element = widget.node
       .getElementsByTagName('ul')
       .namedItem(course_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
-    this.default_course_element = buttons.namedItem(default_course_selector);
     this.dropdown_element = buttons.namedItem(dropdown_selector);
     this.refresh_element = buttons.namedItem(refresh_selector);
 
@@ -317,10 +312,6 @@ export class CourseList {
     this.bind_events();
   }
 
-  private enable_list(): void {
-    this.dropdown_element!.removeAttribute('disabled');
-  }
-
   private disable_list(): void {
     this.dropdown_element!.setAttribute('disabled', 'disabled');
   }
@@ -354,8 +345,6 @@ export class CourseList {
     if (data.success) {
       this.load_list_success(data.value);
     } else {
-      this.default_course_element!.innerText = 'Error fetching courses!';
-      this.enable_list();
       this.show_error('HistoryList.handle_load_list() failed' + this.data);
     }
   }
