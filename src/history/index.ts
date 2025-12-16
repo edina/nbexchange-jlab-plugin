@@ -50,7 +50,6 @@ export class HistoryWidget extends Widget {
     new CourseList(
       this,
       'course_list',
-      'course_list_dropdown',
       'refresh_history_list',
       history_l,
       options

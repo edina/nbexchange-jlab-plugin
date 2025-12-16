@@ -249,7 +249,6 @@ export class HistoryList {
 
 export class CourseList {
   course_list_selector: string;
-  dropdown_selector: string;
   refresh_selector: string;
   history: HistoryList;
   current_course: string | null;
@@ -257,25 +256,21 @@ export class CourseList {
   base_url: string;
   data: string[];
   course_list_element: HTMLUListElement | null;
-  dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
   constructor(
     widget: Widget,
     course_list_selector: string,
-    dropdown_selector: string,
     refresh_selector: string,
     history: HistoryList,
     options: Map<string, string>
   ) {
     this.course_list_selector = course_list_selector;
-    this.dropdown_selector = dropdown_selector;
     this.refresh_selector = refresh_selector;
     this.course_list_element = widget.node
       .getElementsByTagName('ul')
       .namedItem(course_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
-    this.dropdown_element = buttons.namedItem(dropdown_selector);
     this.refresh_element = buttons.namedItem(refresh_selector);
 
     this.history = history;
@@ -289,31 +284,11 @@ export class CourseList {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
-    /* Open the dropdown course_list when clicking on dropdown toggle button */
-    if (this.dropdown_element) {
-      this.dropdown_element.onclick = function () {
-        that.course_list_element!.classList.toggle('open');
-      };
-    }
-
-    /* Close the dropdown course_list if clicking anywhere else */
-    document.onclick = function (event) {
-      if (
-        (<HTMLElement>event.target).closest('button') !== that.dropdown_element
-      ) {
-        that.course_list_element!.classList.remove('open');
-      }
-    };
-
     this.refresh_element!.onclick = function () {
       that.load_list();
     };
 
     this.bind_events();
-  }
-
-  private disable_list(): void {
-    this.dropdown_element!.setAttribute('disabled', 'disabled');
   }
 
   public clear_list(): void {
@@ -328,7 +303,6 @@ export class CourseList {
   }
 
   private async load_list() {
-    this.disable_list();
     this.clear_list();
 
     try {
@@ -351,7 +325,6 @@ export class CourseList {
 
   private load_list_success(data: string[]): void {
     this.data = data;
-    this.disable_list();
     this.clear_list();
 
     // Bypass all the junk about known courses & stuff
