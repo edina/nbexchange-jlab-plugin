@@ -42,7 +42,7 @@
 #nbexchange-history-list {
   .panel-group .panel {
     margin-top: 3px;
-    margin-bottom: 1em;
+    margin: 1em;
   }
 
   .version_error {

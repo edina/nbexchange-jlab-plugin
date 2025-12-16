@@ -15,7 +15,7 @@ export class HistoryWidget extends Widget {
     this.app = app;
 
     this.node.innerHTML = [
-      '  <h2 id="bulkautograder_h2">NbExchange Bulk Autograder</h2>',
+      '  <h2 id="bulkautograder_h2">NbExchange Interaction History</h2>',
       '  <div id="history-toolbar" class="row list_toolbar" >',
       '    <div class="col-sm-8 no-padding">',
       '      <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
