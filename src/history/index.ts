@@ -15,7 +15,7 @@ export class HistoryWidget extends Widget {
     this.app = app;
 
     this.node.innerHTML = [
-      '<div id="nbexchange-history-list" class="tab-pane">',
+      '  <h2 id="bulkautograder_h2">NbExchange Bulk Autograder</h2>',
       '  <div id="history-toolbar" class="row list_toolbar" >',
       '    <div class="col-sm-8 no-padding">',
       '      <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
@@ -27,8 +27,7 @@ export class HistoryWidget extends Widget {
       '    </div>',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
-      '  </div>',
-      '</div>'
+      '  </div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 

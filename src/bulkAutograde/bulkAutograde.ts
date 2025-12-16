@@ -100,6 +100,11 @@ export class AssignmentsList {
     if (this.assignment_table_element!.children.length > 0) {
       this.assignment_table_element!.innerHTML = '';
     }
+    // and reset the "loading" line
+    const message_element = document.getElementById('assignment_list_default');
+    if (message_element) {
+      message_element.innerHTML = '<p>Querying to get assignment details</p>';
+    }
   }
 
   private bind_events(): void {
@@ -278,12 +283,10 @@ export class AssignmentsList {
         this.make_row(table_body, assignment_code, data[assignment_code]);
       }
       // Now toggle the "loading" for the table
-      console.log('change the loading message?');
       const message_element = document.getElementById(
         'assignment_list_default'
       );
       if (message_element) {
-        console.log('yes, change the loading message.');
         message_element.innerHTML =
           '<p>This table lists all assignments for the current course<br /\n' +
           '<p>For each assignment, it shows the number of students who have submitted work to the exchange' +

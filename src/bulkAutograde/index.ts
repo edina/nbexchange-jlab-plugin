@@ -5,7 +5,6 @@ import { Widget } from '@lumino/widgets';
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import { BaAssignmentsList, AssignmentsList } from './bulkAutograde';
-// import { HistoryList, CourseList } from './history';
 
 export class BulkAutogradeWidget extends Widget {
   app: JupyterFrontEnd;
@@ -19,15 +18,15 @@ export class BulkAutogradeWidget extends Widget {
       '<div id="assignments-toolbar" class="row list_toolbar">',
       '  <div class="col-sm-8 no-padding"> <!-- -->',
       '    <div>',
-      '      <p id="assignment_list_default">Querying to get assignment details</p>',
+      '      <div id="assignment_list_default"><p>Querying to get assignment details</p></div>',
       '      <table id="assignment-table" border="0">',
       '      </table>',
       '    </div>',
       '  </div> <!-- -->',
       '  <div class="col-sm-4 no-padding tree-buttons">',
       '    <span id="history_buttons" class="pull-right toolbar_buttons">',
-      '    <button id="refresh_assignment_list" title="Refresh history list" class="btn btn-default btn-xs" ',
-      '            aria-label="Refresh history list"><i class="fa fa-refresh"></i></button>',
+      '    <button id="refresh_assignment_list" class="btn btn-default btn-xs" ',
+      '            aria-label="Refresh table of assignments"><i class="fa fa-refresh"></i></button>',
       '    </span>',
       '  </div>',
       '</div>',
