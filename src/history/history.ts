@@ -275,44 +275,45 @@ export class CourseList {
     this.data = [];
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-
-    this.refresh_element!.onclick = function () {
-      that.load_list();
-    };
-
-    this.bind_events();
-  }
-
-  private bind_events(): void {
-    this.refresh_element!.click();
-  }
-
-  private async load_list() {
-    try {
-      const data = await requestAPI<any>('courses', '');
-      this.handle_load_list(data);
-    } catch (reason) {
-      const msg: string = 'Error on GET /courses.\n' + reason;
-      console.error(msg);
-      this.show_error(msg);
-    }
-  }
-
-  private handle_load_list(data: { success: any; value: any }): void {
-    if (data.success) {
-      this.load_list_success(data.value);
-    } else {
-      this.show_error('HistoryList.handle_load_list() failed' + this.data);
-    }
-  }
-
-  private load_list_success(data: string[]): void {
-    this.data = data;
-
-    // Bypass all the junk about known courses & stuff
+    // const that = this;
     this.history.load_list('moot');
+
+    // this.refresh_element!.onclick = function () {
+    //   that.load_list();
+    // };
+
+    // this.bind_events();
   }
+
+  // private bind_events(): void {
+  //   this.refresh_element!.click();
+  // }
+
+  // private async load_list() {
+  //   try {
+  //     const data = await requestAPI<any>('courses', '');
+  //     this.handle_load_list(data);
+  //   } catch (reason) {
+  //     const msg: string = 'Error on GET /courses.\n' + reason;
+  //     console.error(msg);
+  //     this.show_error(msg);
+  //   }
+  // }
+
+  // private handle_load_list(data: { success: any; value: any }): void {
+  //   if (data.success) {
+  //     this.load_list_success(data.value);
+  //   } else {
+  //     this.show_error('HistoryList.handle_load_list() failed' + this.data);
+  //   }
+  // }
+
+  // private load_list_success(data: string[]): void {
+  //   this.data = data;
+
+  //   // Bypass all the junk about known courses & stuff
+  //   this.history.load_list('moot');
+  // }
 
   public show_error(error: string): void {
     Notification.emit(error, 'error', { autoClose: false });
