@@ -47,13 +47,7 @@ export class HistoryWidget extends Widget {
     options.set('base_url', base_url);
     const history_l = new HistoryList(this, 'actions-panel-group');
 
-    new CourseList(
-      this,
-      'course_list',
-      'refresh_history_list',
-      history_l,
-      options
-    );
+    new CourseList(this, 'refresh_history_list', history_l, options);
 
     this.checkNbGraderVersion();
   }

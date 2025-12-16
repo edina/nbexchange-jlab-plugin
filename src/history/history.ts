@@ -248,28 +248,21 @@ export class HistoryList {
 }
 
 export class CourseList {
-  course_list_selector: string;
   refresh_selector: string;
   history: HistoryList;
   current_course: string | null;
   options = new Map();
   base_url: string;
   data: string[];
-  course_list_element: HTMLUListElement | null;
   refresh_element: HTMLButtonElement | null;
 
   constructor(
     widget: Widget,
-    course_list_selector: string,
     refresh_selector: string,
     history: HistoryList,
     options: Map<string, string>
   ) {
-    this.course_list_selector = course_list_selector;
     this.refresh_selector = refresh_selector;
-    this.course_list_element = widget.node
-      .getElementsByTagName('ul')
-      .namedItem(course_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
     this.refresh_element = buttons.namedItem(refresh_selector);
 
@@ -291,20 +284,11 @@ export class CourseList {
     this.bind_events();
   }
 
-  public clear_list(): void {
-    // remove list items
-    if (this.course_list_element!.children.length > 0) {
-      this.course_list_element!.innerHTML = '';
-    }
-  }
-
   private bind_events(): void {
     this.refresh_element!.click();
   }
 
   private async load_list() {
-    this.clear_list();
-
     try {
       const data = await requestAPI<any>('courses', '');
       this.handle_load_list(data);
@@ -325,7 +309,6 @@ export class CourseList {
 
   private load_list_success(data: string[]): void {
     this.data = data;
-    this.clear_list();
 
     // Bypass all the junk about known courses & stuff
     this.history.load_list('moot');
