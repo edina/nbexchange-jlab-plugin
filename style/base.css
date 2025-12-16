@@ -79,12 +79,13 @@
 
   th,
   td {
-    border: 1px solid var(--jp-border-color);
+    border: 1px solid var(--jp-border-color2);
   }
 
   th {
     background-color: var(--jp-dialog-background);
   }
+
   td {
     text-align: center;
   }
