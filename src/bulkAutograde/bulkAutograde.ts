@@ -285,7 +285,7 @@ export class AssignmentsList {
       if (message_element) {
         console.log('yes, change the loading message.');
         message_element.innerHTML =
-          '<p>This table lists all assignments for the current course</p>\n' +
+          '<p>This table lists all assignments for the current course<br /\n' +
           '<p>For each assignment, it shows the number of students who have submitted work to the exchange' +
           ' and the number of submissions held locally.</p>\n' +
           '<p>Select the action you want from the table below:</p>\n';

@@ -75,7 +75,16 @@
 
 #assignment-table {
   width: 75%;
+  border-collapse: collapse;
 
+  th,
+  td {
+    border: 1px solid var(--jp-border-color);
+  }
+
+  th {
+    background-color: var(--jp-dialog-background);
+  }
   td {
     text-align: center;
   }
