@@ -40,17 +40,13 @@ export class BaAssignmentsList {
 export class AssignmentsList {
   assignment_list_selector: string;
   default_assignment_selector: string;
-  //   dropdown_selector: string;
   refresh_selector: string;
   assignment_list: BaAssignmentsList;
-  //   current_course: string | null;
   options = new Map();
   base_url: string;
   assignmentResponseData: IBaAssignmentResponse | null;
   assignment_table_element: HTMLTableElement | null;
-  // default_assignment_element: HTMLButtonElement | null;
   default_assignment_element: HTMLElement | null;
-  //   dropdown_element: HTMLButtonElement | null;
   refresh_element: HTMLButtonElement | null;
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -60,30 +56,24 @@ export class AssignmentsList {
     widget: Widget,
     assignment_list_selector: string, // where checkboxes go
     default_assignment_selector: string, // the "loading...." message
-    // dropdown_selector: string,
     refresh_selector: string, // refresh the page
     assignment_list: BaAssignmentsList, // big list of assignments
     options: Map<string, string> // a map
   ) {
     this.assignment_list_selector = assignment_list_selector;
     this.default_assignment_selector = default_assignment_selector;
-    // this.dropdown_selector = dropdown_selector;
     this.refresh_selector = refresh_selector;
     this.assignment_table_element = widget.node
       .getElementsByTagName('table')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
-    // this.default_assignment_element = buttons.namedItem(
-    //   default_assignment_selector
-    // );
+
     this.default_assignment_element = document.getElementById(
       default_assignment_selector
     );
-    // this.dropdown_element = buttons.namedItem(dropdown_selector);
     this.refresh_element = buttons.namedItem(refresh_selector);
 
     this.assignment_list = assignment_list;
-    // this.current_course = 'select a course';
 
     this.options = options;
     this.base_url = options.get('base_url') || PageConfig.getBaseUrl();
@@ -130,7 +120,7 @@ export class AssignmentsList {
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
       console.error(msg);
-      //   this.show_error(msg);
+      this.show_error('<p>' + msg + '</p>');
     }
   }
 
@@ -145,7 +135,9 @@ export class AssignmentsList {
     } else {
       this.default_assignment_element!.innerText =
         'Error fetching gradable assignments!';
-      //   this.show_error('HistoryList.handle_load_list() failed' + this.data);
+      this.show_error(
+        '<p>HistoryList.handle_load_list() failed:</p>\n<pre>' + data + '</pre>'
+      );
     }
   }
 
@@ -161,7 +153,7 @@ export class AssignmentsList {
       } catch (reason) {
         const msg: string = 'Error on GET doCollect.\n' + reason;
         console.error(msg);
-        //   this.show_error(msg);
+        this.show_error('<p>' + msg + '</p>');
       }
     }
   }
@@ -178,7 +170,7 @@ export class AssignmentsList {
       } catch (reason) {
         const msg: string = 'Error on GET /BaAssignment.\n' + reason;
         console.error(msg);
-        //   this.show_error(msg);
+        this.show_error('<p>' + msg + '</p>');
       }
     }
   }
@@ -290,6 +282,13 @@ export class AssignmentsList {
     if (this.default_assignment_element) {
       this.default_assignment_element.innerText =
         'Select the action you want from the table below';
+    }
+  }
+
+  public show_error(message: string): void {
+    const element = document.getElementById('baautograde-alert-box');
+    if (element) {
+      element.innerHTML = message;
     }
   }
 }

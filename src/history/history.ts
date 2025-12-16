@@ -237,7 +237,6 @@ export class HistoryList {
     }
   }
 
-  // {"success": False, "value": <text>}
   public show_error(message: string): void {
     Notification.emit(message, 'error', { autoClose: false });
   }
@@ -290,23 +289,14 @@ export class CourseList {
   }
 
   private async load_list() {
-    this.history.load_list('moot');
+    try {
+      this.history.load_list('moot');
+    } catch (reason) {
+      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
+      console.error(msg);
+      this.show_error(msg);
+    }
   }
-
-  // private handle_load_list(data: { success: any; value: any }): void {
-  //   if (data.success) {
-  //     this.load_list_success(data.value);
-  //   } else {
-  //     this.show_error('HistoryList.handle_load_list() failed' + this.data);
-  //   }
-  // }
-
-  // private load_list_success(data: string[]): void {
-  //   this.data = data;
-
-  //   // Bypass all the junk about known courses & stuff
-  //   this.history.load_list('moot');
-  // }
 
   public show_error(error: string): void {
     Notification.emit(error, 'error', { autoClose: false });

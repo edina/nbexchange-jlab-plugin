@@ -17,7 +17,7 @@ export class HistoryWidget extends Widget {
     this.node.innerHTML = [
       '<div id="nbexchange-history-list" class="tab-pane">',
       '  <div id="history-toolbar" class="row list_toolbar" >',
-      '    <div class="col-sm-8 no-padding"> <!-- -->',
+      '    <div class="col-sm-8 no-padding">',
       '      <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
       '    </div>',
       '    <div class="col-sm-4 no-padding tree-buttons">',

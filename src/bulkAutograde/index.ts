@@ -15,29 +15,27 @@ export class BulkAutogradeWidget extends Widget {
     this.app = app;
 
     this.node.innerHTML = [
-      '<section id="bulkautograder" class="tab-pane" aria-labelledby="bulkautograder_h2">',
-      '  <h2 id="bulkautograder_h2">NbExchange Bulk Autograder</h2>',
-      '  <div id="assignments-toolbar" class="row list_toolbar">',
-      '    <div class="col-sm-8 no-padding"> <!-- -->',
-      '      <div>',
-      '        <p id="assignment_list_default">Querying to get assignment details</p>',
-      '        <table id="assignment-table" border="0">',
-      '        </table>',
-      '      </div>',
-      '    </div> <!-- -->',
-      '    <div class="col-sm-4 no-padding tree-buttons">',
-      '      <span id="history_buttons" class="pull-right toolbar_buttons">',
-      '      <button id="refresh_assignment_list" title="Refresh history list" class="btn btn-default btn-xs" ',
-      '              aria-label="Refresh history list"><i class="fa fa-refresh"></i></button>',
-      '      </span>',
+      '<h2 id="bulkautograder_h2">NbExchange Bulk Autograder</h2>',
+      '<div id="assignments-toolbar" class="row list_toolbar">',
+      '  <div class="col-sm-8 no-padding"> <!-- -->',
+      '    <div>',
+      '      <p id="assignment_list_default">Querying to get assignment details</p>',
+      '      <table id="assignment-table" border="0">',
+      '      </table>',
       '    </div>',
+      '  </div> <!-- -->',
+      '  <div class="col-sm-4 no-padding tree-buttons">',
+      '    <span id="history_buttons" class="pull-right toolbar_buttons">',
+      '    <button id="refresh_assignment_list" title="Refresh history list" class="btn btn-default btn-xs" ',
+      '            aria-label="Refresh history list"><i class="fa fa-refresh"></i></button>',
+      '    </span>',
       '  </div>',
-      '  <div id="baautograde-alert-box" role="alert" class="alert alert-danger version_error">',
-      '  </div>',
-      '  <div><span class="ba_loader"></span></div>',
-      '  <div class="panel-group" id="results-panel-group">',
-      '  <div>',
-      '</section>'
+      '</div>',
+      '<div id="baautograde-alert-box" role="alert" class="alert alert-danger version_error">',
+      '</div>',
+      '<div><span class="ba_loader"></span></div>',
+      '<div class="panel-group" id="results-panel-group">',
+      '<div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 
