@@ -42,7 +42,6 @@
 #nbexchange-history-list {
   .panel-group .panel {
     margin-top: 3px;
-    margin: 1em;
   }
 
   .version_error {
@@ -60,7 +59,7 @@
   border: 1px solid var(--jp-border-color);
   border-radius: 10px;
   padding: 0.25em 0.5em;
-  margin-bottom: 1em;
+  margin: 1em;
 }
 
 .current_course {
