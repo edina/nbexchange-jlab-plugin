@@ -432,6 +432,7 @@ class Action {
     row.append(timestamp_span);
     row.append(user_span);
     buttons_span.append(downloadButton);
+    row.append(buttons_span);
 
     element.append(row);
   }
