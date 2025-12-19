@@ -114,6 +114,10 @@ export class HistoryList {
         continue;
       }
 
+      let isCurrent = false;
+      if (this_course['isCurrent']) {
+        isCurrent = true;
+      }
       let first_date: string = this.formatDate(new Date()); // today
       let latest_date: string = this.formatDate(new Date(2000, 1, 1)); // yonks back
       const role = this_course['isInstructor'] ? 'Instructor' : 'Student';
@@ -124,7 +128,7 @@ export class HistoryList {
 
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
-      if (this_course['isCurrent']) {
+      if (isCurrent) {
         course_panel_elem.classList.add('current_course');
       }
       const top_level_summary_id = 'course_id_' + this_course['course_id'];
@@ -199,6 +203,7 @@ export class HistoryList {
           new ActionGroup(
             assignment_panel_elem,
             panel_body_id,
+            isCurrent,
             assignment_code,
             actionTypes[j].display,
             groupActions
@@ -310,13 +315,14 @@ class ActionGroup {
   constructor(
     panel_elem: HTMLElement,
     parent: string,
+    isCurrent: boolean,
     assignment_code: string,
     title: string,
     actions: IActionData[]
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
-    this.make_row(element, assignment_code, title, actions);
+    this.make_row(element, isCurrent, assignment_code, title, actions);
     const div_elements = panel_elem.getElementsByTagName('div');
     const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
     parent_elem.append(element);
@@ -324,6 +330,7 @@ class ActionGroup {
 
   private make_row(
     element: HTMLDivElement,
+    isCurrent: boolean,
     assignment_code: string,
     title: string,
     actions: IActionData[]
@@ -345,7 +352,7 @@ class ActionGroup {
       assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
-      new Action(row, title, actions[i]);
+      new Action(row, isCurrent, title, actions[i]);
     }
 
     element.append(row);
@@ -353,16 +360,21 @@ class ActionGroup {
 }
 
 class Action {
-  constructor(parent_elem: HTMLElement, title: string, data: IActionData) {
+  constructor(
+    parent_elem: HTMLElement,
+    isCurrent: boolean,
+    title: string,
+    data: IActionData
+  ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
-    this.make_row(element, title, data);
+    this.make_row(element, isCurrent, title, data);
     parent_elem.append(element);
   }
 
-  // private async do_collect(assignent_code: string) {
-  //   // Placeholder for future action
-  // }
+  private async do_collect(assignent_code: string) {
+    // Placeholder for future action
+  }
   private async do_download(assignent_code: string) {
     // Placeholder for future action
   }
@@ -392,6 +404,7 @@ class Action {
 
   private make_row(
     element: HTMLDivElement,
+    isCurrent: boolean,
     title: string,
     data: IActionData
   ): void {
@@ -404,7 +417,7 @@ class Action {
     user_span.classList.add('col-sm-4');
     const buttons_span = document.createElement('span');
     buttons_span.classList.add('col-sm-4');
-    buttons_span.classList.add('action-badge');
+    buttons_span.classList.add('action_buttons');
 
     const date = new Date(data['timestamp']);
     timestamp_span.innerText =
@@ -414,13 +427,24 @@ class Action {
     // disable_button = false;
 
     // client-side code needs course_code, assignment_id, student, path
-
     const fetch_params = {
       course_code: '',
       assignment_code: title,
-      student: '',
+      student: data['user'],
       path: data['path']
     };
+
+    if (isCurrent) {
+      const collectButton: HTMLButtonElement = this.make_button(
+        title,
+        'collect',
+        false,
+        this.do_collect.bind(this),
+        fetch_params
+      );
+      buttons_span.append(collectButton);
+    }
+
     const downloadButton: HTMLButtonElement = this.make_button(
       title,
       'download',
@@ -428,10 +452,10 @@ class Action {
       this.do_download.bind(this),
       fetch_params
     );
+    buttons_span.append(downloadButton);
 
     row.append(timestamp_span);
     row.append(user_span);
-    buttons_span.append(downloadButton);
     row.append(buttons_span);
 
     element.append(row);

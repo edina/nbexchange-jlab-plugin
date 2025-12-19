@@ -25,6 +25,10 @@
 .action-row:first-of-type {
   margin-top: 10px;
 }
+.action_buttons {
+  float: right;
+  text-align: right;
+}
 
 .action-badge {
   /* display: inline-block; */
