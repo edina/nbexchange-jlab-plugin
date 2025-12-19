@@ -1,4 +1,5 @@
 import { Widget } from '@lumino/widgets';
+// import { JupyterFrontEnd } from '@jupyterlab/application';
 
 import { PageConfig } from '@jupyterlab/coreutils';
 // import { Notification } from '@jupyterlab/apputils';
@@ -22,12 +23,15 @@ interface IBaAssignmentResponse {
 export class BaAssignmentsList {
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
+  widget: Widget;
+
   // eslint-disable-next-line @typescript-eslint/ban-types
   callback: Function | null = null;
 
   constructor(widget: Widget, panel_group_selector: string) {
     this.panel_group_selector = panel_group_selector;
     this.callback = null;
+    this.widget = widget;
 
     const div_elements = widget.node.getElementsByTagName('div');
     this.panel_group_element = <HTMLDivElement>(
@@ -38,6 +42,7 @@ export class BaAssignmentsList {
 
 // This is the list of assignments known for this course
 export class AssignmentsList {
+  widget: Widget;
   assignment_list_selector: string;
   default_assignment_selector: string;
   refresh_selector: string;
@@ -67,6 +72,7 @@ export class AssignmentsList {
       .getElementsByTagName('table')
       .namedItem(assignment_list_selector);
     const buttons = widget.node.getElementsByTagName('button');
+    this.widget = widget;
 
     this.default_assignment_element = document.getElementById(
       default_assignment_selector
@@ -122,24 +128,46 @@ export class AssignmentsList {
       const data: IBaAssignmentResponse =
         await requestAPI<any>('getAssignment');
       this.handle_load_list(data);
-    } catch (reason) {
-      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      console.error(msg);
+    } catch (reason: Error | any) {
+      console.log('load_list caught error:', reason);
+      let msg: string = 'Error on GET /BaAssignment.\n';
+      if (reason) {
+        if (typeof reason === 'object' && 'message' in reason) {
+          msg += reason.message;
+        } else {
+          msg += reason.toString();
+        }
+      }
+      msg += '';
       this.show_error('<p>' + msg + '</p>');
     }
   }
 
   private handle_load_list(data: IBaAssignmentResponse): void {
+    if (!data) {
+      throw new Error('No data returned from GET /BaAssignment');
+    }
+    console.log('handle_load_list - html fragment:', document.body.outerHTML);
+    const message_element = document.getElementById('assignment_list_default');
+    console.log(
+      'handle_load_list - message_element',
+      message_element?.outerHTML,
+      ', data:',
+      data
+    );
     if (data.success) {
+      console.log('data.success is true');
       if (typeof data.value === 'string') {
-        this.default_assignment_element!.innerText =
-          'Error fetching gradable assignments:' + data.value;
+        this.show_error(
+          '<p>Error fetching gradable assignments:' + data.value + '</p>'
+        );
       } else {
+        console.log('data.value is an object:', data.value);
         this.load_list_success(data.value);
       }
     } else {
-      this.default_assignment_element!.innerText =
-        'Error fetching gradable assignments!';
+      console.log('data.success is false');
+      message_element!.innerText = 'Error fetching gradable assignments!';
       this.show_error(
         '<p>HistoryList.handle_load_list() failed:</p>\n<pre>' + data + '</pre>'
       );
@@ -157,7 +185,6 @@ export class AssignmentsList {
         this.handle_response_data(results_area, data);
       } catch (reason) {
         const msg: string = 'Error on GET doCollect.\n' + reason;
-        console.error(msg);
         this.show_error('<p>' + msg + '</p>');
       }
     }
@@ -174,7 +201,6 @@ export class AssignmentsList {
         this.handle_response_data(results_area, data);
       } catch (reason) {
         const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-        console.error(msg);
         this.show_error('<p>' + msg + '</p>');
       }
     }
@@ -277,11 +303,14 @@ export class AssignmentsList {
     // build the list of items lin the list
     const table = this.assignment_table_element;
     if (table) {
+      console.log('load_list_success - make the table heading');
       this.make_table_heading(table);
       const table_body = table.createTBody();
+      console.log('load_list_success - make the table rows');
       for (const assignment_code in data) {
         this.make_row(table_body, assignment_code, data[assignment_code]);
       }
+      console.log('load_list_success - made all the table rows');
       // Now toggle the "loading" for the table
       const message_element = document.getElementById(
         'assignment_list_default'
@@ -297,9 +326,12 @@ export class AssignmentsList {
   }
 
   public show_error(message: string): void {
-    const element = document.getElementById('baautograde-alert-box');
+    const element = this.widget.node.getElementsByClassName('alert-danger')[0];
     if (element) {
       element.innerHTML = message;
+    } else {
+      console.log('show_error element not found');
+      // Notification.emit(message, 'error', { autoClose: false });
     }
   }
 }

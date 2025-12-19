@@ -21,6 +21,7 @@ const actionTypes: IActionType[] = [
 
 interface IActionData {
   action: string;
+  path: string;
   timestamp: string;
   user: string;
 }
@@ -34,12 +35,14 @@ interface IActionSummaryData {
   feedback_released?: number;
   feedback_fetched?: number;
 }
+
 interface IAssignmentData {
   assignment_id: number;
   assignment_code: string;
   actions: IActionData[];
   action_summary: IActionSummaryData;
 }
+
 interface ICourseData {
   role: { Instructor?: number; Student?: number };
   user_id: any;
@@ -309,7 +312,7 @@ class ActionGroup {
     parent: string,
     assignment_code: string,
     title: string,
-    actions: Action[]
+    actions: IActionData[]
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
@@ -323,7 +326,7 @@ class ActionGroup {
     element: HTMLDivElement,
     assignment_code: string,
     title: string,
-    actions: Action[]
+    actions: IActionData[]
   ): void {
     const action_count = String(actions.length);
 
@@ -342,7 +345,7 @@ class ActionGroup {
       assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
-      new Action(row, actions[i]);
+      new Action(row, title, actions[i]);
     }
 
     element.append(row);
@@ -350,14 +353,48 @@ class ActionGroup {
 }
 
 class Action {
-  constructor(parent_elem: HTMLElement, data: any) {
+  constructor(parent_elem: HTMLElement, title: string, data: IActionData) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
-    this.make_row(element, data);
+    this.make_row(element, title, data);
     parent_elem.append(element);
   }
 
-  private make_row(element: HTMLDivElement, data: any): void {
+  // private async do_collect(assignent_code: string) {
+  //   // Placeholder for future action
+  // }
+  private async do_download(assignent_code: string) {
+    // Placeholder for future action
+  }
+
+  private make_button(
+    id: string,
+    text: string,
+    disabled: boolean,
+    do_Action: (params?: any) => void,
+    actionParams?: any
+  ): HTMLButtonElement {
+    const button: HTMLButtonElement = document.createElement('button');
+    button.classList.add('btn');
+    button.setAttribute('id', id + '_' + text);
+    button.style.margin = '0 1em';
+    if (disabled) {
+      button.disabled = true;
+    } else {
+      button.classList.add('btn-primary');
+    }
+    button.onclick = async () => {
+      await do_Action(actionParams);
+    };
+    button.innerText = text;
+    return button;
+  }
+
+  private make_row(
+    element: HTMLDivElement,
+    title: string,
+    data: IActionData
+  ): void {
     const row = document.createElement('div');
     row.classList.add('col-md-12');
 
@@ -365,14 +402,36 @@ class Action {
     timestamp_span.classList.add('col-sm-4');
     const user_span = document.createElement('span');
     user_span.classList.add('col-sm-4');
+    const buttons_span = document.createElement('span');
+    buttons_span.classList.add('col-sm-4');
+    buttons_span.classList.add('action-badge');
 
     const date = new Date(data['timestamp']);
     timestamp_span.innerText =
       date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     user_span.innerText = data['user'];
 
+    // disable_button = false;
+
+    // client-side code needs course_code, assignment_id, student, path
+
+    const fetch_params = {
+      course_code: '',
+      assignment_code: title,
+      student: '',
+      path: data['path']
+    };
+    const downloadButton: HTMLButtonElement = this.make_button(
+      title,
+      'download',
+      false,
+      this.do_download.bind(this),
+      fetch_params
+    );
+
     row.append(timestamp_span);
     row.append(user_span);
+    buttons_span.append(downloadButton);
 
     element.append(row);
   }
