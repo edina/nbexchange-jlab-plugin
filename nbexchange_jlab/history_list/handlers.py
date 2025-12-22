@@ -7,17 +7,20 @@ import traceback
 from urllib.parse import quote_plus
 
 import requests
-from jupyter_core.paths import jupyter_config_path
+
+# from jupyter_core.paths import jupyter_config_path
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.utils import url_path_join
-from nbgrader.apps import NbGrader
+
+# from nbgrader.apps import NbGrader
 from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
 from tornado import web
-from traitlets.config import LoggingConfigurable
 
 from nbexchange_jlab.plugins import Exchange, ExchangeError
-from nbexchange_jlab.utils import get_current_course
+from nbexchange_jlab.utils import BaseListerClass, get_current_course
+
+# from traitlets.config import LoggingConfigurable
 
 
 @contextlib.contextmanager
@@ -32,7 +35,7 @@ class HistoryError(Exception):
     pass
 
 
-class HistoryList(LoggingConfigurable):
+class HistoryList(BaseListerClass):
     SUPPORTED_METHODS = ("GET", "HEAD")
 
     # This gives us all the exchange config details & functions
@@ -46,18 +49,26 @@ class HistoryList(LoggingConfigurable):
     def root_dir(self, directory):
         self._root_dir = directory
 
-    def load_config(self):
-        paths = jupyter_config_path()
-        paths.insert(0, os.getcwd())
-        app = NbGrader()
-        app.config_file_paths.append(paths)
-        app.load_config_file()
+    # def load_config(self):
+    #     paths = jupyter_config_path()
+    #     paths.insert(0, os.getcwd())
+    #     app = NbGrader()
+    #     app.config_file_paths.append(paths)
+    #     app.load_config_file()
 
-        return app.config
+    #     return app.config
 
-    @contextlib.contextmanager
-    def get_history_config(self):
-        yield self.load_config()
+    # @contextlib.contextmanager
+    # def get_history_config(self):
+    #     yield self.load_config()
+
+    # def check_enabled(self):
+    #     """Returns whether or not the History list should be enabled in the UI.
+    #     """
+    #     with self.get_history_config() as config:
+    #         if config.course_directory.db_url is not None:
+    #             return True
+    #     return False
 
     def query_exchange(self):
         """
@@ -192,6 +203,7 @@ def setup_handlers(web_app):
 
 
 def load_jupyter_server_extension(nbapp):
+
     web_app = nbapp.web_app
     web_app.settings["history_list_manager"] = HistoryList(parent=nbapp)
     web_app.settings["history_list_manager"].root_dir = nbapp.root_dir

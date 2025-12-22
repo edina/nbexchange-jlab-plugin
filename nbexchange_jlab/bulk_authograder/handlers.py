@@ -1,40 +1,45 @@
 """Tornado handlers for nbgrader course list web service."""
 
-import contextlib
+# import contextlib
 import html
 import json
 import os
 from typing import Dict, Set
 
-from jupyter_core.paths import jupyter_config_path
+# from jupyter_core.paths import jupyter_config_path
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.utils import url_path_join
-from nbgrader.apps import NbGrader, NbGraderAPI
+from nbgrader.apps import NbGraderAPI  # NbGrader,
 from tornado import web
-from traitlets.config import LoggingConfigurable
 
 from nbexchange_jlab.history_list import HistoryList
-from nbexchange_jlab.utils import get_current_course
+from nbexchange_jlab.utils import BaseListerClass, get_current_course
+
+# from traitlets.config import LoggingConfigurable
+
 
 # import traceback
 
 
-class BaAssignmentsList(LoggingConfigurable):
+class BaAssignmentsList(BaseListerClass):
 
     SUPPORTED_METHODS = ("GET", "HEAD")
 
-    def load_config(self) -> LoggingConfigurable:
-        paths = jupyter_config_path()
-        paths.insert(0, os.getcwd())
-        app = NbGrader()
-        app.config_file_paths.append(paths)
-        app.load_config_file()
+    def __init__(self, **kwargs):
+        pass
 
-        return app.config
+    # def load_config(self) -> LoggingConfigurable:
+    #     paths = jupyter_config_path()
+    #     paths.insert(0, os.getcwd())
+    #     app = NbGrader()
+    #     app.config_file_paths.append(paths)
+    #     app.load_config_file()
 
-    @contextlib.contextmanager
-    def get_BaAssignment_config(self):
-        yield self.load_config()
+    #     return app.config
+
+    # @contextlib.contextmanager
+    # def get_BaAssignment_config(self):
+    #     yield self.load_config()
 
     # Takes in a full course record, returns a dict of assignment_code: set-of-submitted-users
     def _parse_course_data(self, course: dict = None) -> Dict:
@@ -59,8 +64,8 @@ class BaAssignmentsList(LoggingConfigurable):
         return None
 
     def list_BaAssignment(self, course_id: str = None) -> Dict:
-        if not get_current_course():
-            return {"success": False, "value": "You need to have a current course code."}
+        if not self.check_enabled():
+            return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
 
         data: Dict = {}
         with self.get_BaAssignment_config() as config:
@@ -77,8 +82,11 @@ class BaAssignmentsList(LoggingConfigurable):
 
     def do_collect(self, assignment_code: str = None) -> Dict:
 
-        if not get_current_course():
-            return {"success": False, "value": "<p>You need to have a current course code.<\\p>"}
+        if not self.check_enabled():
+            return {
+                "success": False,
+                "value": "<p>You need to be an Instructor on this course to use this feature.<\\p>",
+            }
         if not assignment_code:
             return {"success": False, "value": "<p>You need to supply an assignment code.<\\p>"}
 
