@@ -28,6 +28,8 @@ class BaseListerClass(LoggingConfigurable):
     def check_enabled(self):
         """Returns whether or not the History list should be enabled in the UI."""
         with self.get_history_config() as config:
+            import pprint
+            pprint.pprint(config)
             NbGraderAPI(config=config)
 
             if config.course_directory.db_url is not None:
