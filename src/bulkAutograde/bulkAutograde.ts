@@ -89,11 +89,6 @@ export class AssignmentsList {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
-    const alert_box = document.getElementById('baautograde-alert-box');
-    if (alert_box) {
-      alert_box.style.display = 'hidden';
-    }
-
     this.refresh_element!.onclick = function () {
       that.load_list();
     };
@@ -102,15 +97,8 @@ export class AssignmentsList {
   }
 
   public clear_list(): void {
-    // remove list items
-    if (this.assignment_table_element!.children.length > 0) {
-      this.assignment_table_element!.innerHTML = '';
-    }
-    // and reset the "loading" line
-    const message_element = document.getElementById('assignment_list_default');
-    if (message_element) {
-      message_element.innerHTML = '<p>Querying to get assignment details</p>';
-    }
+    this.assignment_table_element!.innerHTML =
+      '<tr><td>Querying to get assignment details</td></tr>';
   }
 
   private bind_events(): void {
@@ -118,90 +106,83 @@ export class AssignmentsList {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  private async load_list(course?: string, callback?: Function) {
-    if (callback) {
-      this.callback = callback;
-    }
+  private async load_list(course?: string) {
     this.clear_list();
+    let data: IBaAssignmentResponse = { success: '', value: '' };
 
     try {
-      const data: IBaAssignmentResponse =
-        await requestAPI<any>('getAssignment');
-      this.handle_load_list(data);
+      data = await requestAPI<any>('getAssignment');
     } catch (reason: Error | any) {
-      console.log('load_list caught error:', reason);
-      let msg: string = 'Error on GET /BaAssignment.\n';
-      if (reason) {
-        if (typeof reason === 'object' && 'message' in reason) {
-          msg += reason.message;
-        } else {
-          msg += reason.toString();
-        }
-      }
-      msg += '';
+      console.error('load_list caught error:', reason);
+      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
       this.show_error('<p>' + msg + '</p>');
+      return;
     }
-  }
 
-  private handle_load_list(data: IBaAssignmentResponse): void {
-    if (!data) {
-      throw new Error('No data returned from GET /BaAssignment');
-    }
-    console.log('handle_load_list - html fragment:', document.body.outerHTML);
-    const message_element = document.getElementById('assignment_list_default');
-    console.log(
-      'handle_load_list - message_element',
-      message_element?.outerHTML,
-      ', data:',
-      data
-    );
-    if (data.success) {
-      console.log('data.success is true');
-      if (typeof data.value === 'string') {
-        this.show_error(
-          '<p>Error fetching gradable assignments:' + data.value + '</p>'
-        );
-      } else {
-        console.log('data.value is an object:', data.value);
-        this.load_list_success(data.value);
-      }
+    if (data.success === 'true' && typeof data.value === 'object') {
+      this.handle_load_list(data);
     } else {
-      console.log('data.success is false');
-      message_element!.innerText = 'Error fetching gradable assignments!';
+      console.log('load_list failed:', data);
       this.show_error(
-        '<p>HistoryList.handle_load_list() failed:</p>\n<pre>' + data + '</pre>'
+        '<p>AssignmentsList.load_list() failed:</p>\n<pre>' +
+          data.value +
+          '</pre>'
       );
     }
   }
 
+  private handle_load_list(data: IBaAssignmentResponse): void {
+    if (typeof data.value === 'string') {
+      this.show_error(
+        '<p>Error fetching gradable assignments:' + data.value + '</p>'
+      );
+    } else {
+      this.load_list_success(data.value);
+    }
+  }
+
   private async do_collect(assignent_code: string) {
-    const results_area = document.getElementById('results-panel-group');
+    const results_area = this.widget.node.querySelector(
+      '#results-panel-group'
+    ) as HTMLElement;
     if (results_area) {
       this.clear_area(results_area);
+      let data: any = null;
       try {
-        const data: any = await requestAPI<any>(
+        data = await requestAPI<any>(
           'doCollect?assignment_code=' + assignent_code
         );
-        this.handle_response_data(results_area, data);
       } catch (reason) {
+        console.error('do_collect caught error:', reason);
         const msg: string = 'Error on GET doCollect.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
+      }
+
+      if (data) {
+        this.handle_response_data(results_area, data);
       }
     }
   }
 
   private async do_autograde(assignent_code: string) {
-    const results_area = document.getElementById('results-panel-group');
+    const results_area = this.widget.node.querySelector(
+      '#results-panel-group'
+    ) as HTMLElement;
     if (results_area) {
       this.loading_statement(results_area);
+      let data: any = null;
       try {
-        const data: any = await requestAPI<any>(
+        data = await requestAPI<any>(
           'doAutograde?assignment_code=' + assignent_code
         );
-        this.handle_response_data(results_area, data);
       } catch (reason) {
-        const msg: string = 'Error on GET /BaAssignment.\n' + reason;
+        console.error('do_autograde caught error:', reason);
+        const msg: string = 'Error on GET doAutograde.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
+      }
+
+      if (data) {
+        this.handle_response_data(results_area, data);
       }
     }
   }
@@ -235,7 +216,7 @@ export class AssignmentsList {
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
-    button.setAttribute('id', id + '_' + text);
+    button.setAttribute('id', id + '_' + text.replace(' ', '_'));
     button.style.margin = '0 1em';
     if (disabled) {
       button.disabled = true;
@@ -245,7 +226,7 @@ export class AssignmentsList {
     button.onclick = async () => {
       await do_Action(actionParams);
     };
-    button.innerText = text;
+    button.textContent = text;
     return button;
   }
 
@@ -271,14 +252,14 @@ export class AssignmentsList {
       disable_button = true;
     }
     const collectButton: HTMLButtonElement = this.make_button(
-      'assignent_code',
+      assignment_code,
       'collect',
       disable_button,
       this.do_collect.bind(this),
       assignment_code
     );
     const autogradeButton: HTMLButtonElement = this.make_button(
-      'assignent_code',
+      assignment_code,
       'Bulk Autograde',
       false,
       this.do_autograde.bind(this),
@@ -303,14 +284,11 @@ export class AssignmentsList {
     // build the list of items lin the list
     const table = this.assignment_table_element;
     if (table) {
-      console.log('load_list_success - make the table heading');
       this.make_table_heading(table);
       const table_body = table.createTBody();
-      console.log('load_list_success - make the table rows');
       for (const assignment_code in data) {
         this.make_row(table_body, assignment_code, data[assignment_code]);
       }
-      console.log('load_list_success - made all the table rows');
       // Now toggle the "loading" for the table
       const message_element = document.getElementById(
         'assignment_list_default'

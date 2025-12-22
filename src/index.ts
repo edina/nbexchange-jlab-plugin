@@ -97,13 +97,16 @@ const historyListExtension: JupyterFrontEndPlugin<void> = {
 
     app.commands.addCommand(commandIDs.openHistory, {
       label: 'History',
+      isEnabled: () => {
+        return true;
+      },
       execute: () => {
         if (!widget || widget.isDisposed) {
           const content = new HistoryWidget(app);
           widget = new MainAreaWidget({ content });
           widget.id = 'nbexchange-history';
           widget.addClass('nbgrader-mainarea-widget');
-          widget.title.label = 'History';
+          widget.title.label = 'Exchange History';
           widget.title.closable = true;
         }
         if (!tracker.has(widget)) {
@@ -161,6 +164,9 @@ const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
 
     app.commands.addCommand(commandIDs.openBulkAutograde, {
       label: 'Bulk Autograding',
+      isEnabled: () => {
+        return true;
+      },
       execute: () => {
         if (!widget || widget.isDisposed) {
           const content = new BulkAutogradeWidget(app);

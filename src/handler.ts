@@ -20,6 +20,7 @@ export async function requestAPI<T>(
   const requestUrl = URLExt.join(settings.baseUrl, namespace, endPoint);
 
   let response: Response;
+  console.log('Requesting API url:', requestUrl);
   try {
     response = await ServerConnection.makeRequest(requestUrl, init, settings);
   } catch (error) {
@@ -41,4 +42,10 @@ export async function requestAPI<T>(
   }
 
   return data;
+}
+
+export function isInstructor(): boolean {
+  // Placeholder logic for determining if the user is an instructor
+  // Will actually query server-side code in a real implementation
+  return true; // Assume all users are instructors for this example
 }

@@ -372,10 +372,12 @@ class Action {
     parent_elem.append(element);
   }
 
-  private async do_collect(assignent_code: string) {
+  // `Download` pulls the tarball down and saves _as the tarball_ in the home directory
+  // `collect` actually triggers an nbgrader collect on the server side, replacing any existing files
+  private async do_download(assignent_code: string) {
     // Placeholder for future action
   }
-  private async do_download(assignent_code: string) {
+  private async do_collect(assignent_code: string) {
     // Placeholder for future action
   }
 
