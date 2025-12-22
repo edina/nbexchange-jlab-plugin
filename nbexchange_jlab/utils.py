@@ -26,7 +26,8 @@ class BaseListerClass(LoggingConfigurable):
 
     def check_enabled(self):
         """Returns whether or not the History list should be enabled in the UI."""
-        with self.get_history_config() as config:
-            if config.get("CourseDirectory").get("db_url") is not None:
-                return True
+        config = self.load_config()
+        self.log.info(f"Loaded config: {config}")
+        if config.get("CourseDirectory").get("db_url") is not None:
+            return True
         return False
