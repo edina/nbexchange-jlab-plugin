@@ -2,7 +2,7 @@ import contextlib
 import os
 
 from jupyter_core.paths import jupyter_config_path
-from nbgrader.apps import NbGrader
+from nbgrader.apps import NbGrader, NbGraderAPI
 from traitlets.config import LoggingConfigurable
 
 
@@ -28,6 +28,8 @@ class BaseListerClass(LoggingConfigurable):
     def check_enabled(self):
         """Returns whether or not the History list should be enabled in the UI."""
         with self.get_history_config() as config:
+            NbGraderAPI(config=config)
+
             if config.course_directory.db_url is not None:
                 return True
         return False
