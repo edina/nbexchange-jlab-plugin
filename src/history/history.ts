@@ -231,7 +231,7 @@ export class HistoryList {
       return;
     }
     console.log('HistoryList.load_list data:', data);
-    if (data.success && data.success === 'true') {
+    if (data.success) {
       console.log('HistoryList.load_list success value:', data.value);
       this.load_list_success(<any[]>data.value);
     } else {
