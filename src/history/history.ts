@@ -225,27 +225,35 @@ export class HistoryList {
     try {
       data = await requestAPI<any>('history?course_id=' + course);
     } catch (reason) {
+      console.error('load_list caught error:', reason);
       const msg: string = `Error on GET /history.\n${reason}`;
-      console.error(msg);
-      this.show_error(msg);
+      this.show_error('<p>' + msg + '</p>');
       return;
     }
+    console.log('HistoryList.load_list data:', data);
     if (data.success && data.success === 'true') {
+      console.log('HistoryList.load_list success value:', data.value);
       this.load_list_success(<any[]>data.value);
     } else {
+      console.log('HistoryList.load_list failed: ', typeof data);
       if (typeof data === 'string') {
         this.show_error(
-          '<p>HistoryList.load_list() failed:</p>\n<pre>' + data + '</pre>'
+          '<p>HistoryList.load_list() failed with string:</p>\n<pre>' +
+            data +
+            '</pre>'
         );
         return;
       }
       this.show_error(
-        '<p>HistoryList.load_list() failed:</p>\n<pre>' + data.value + '</pre>'
+        '<p>HistoryList.load_list() failed with success not true :</p>\n<pre>' +
+          data.value +
+          '</pre>'
       );
     }
   }
 
   public show_error(message: string): void {
+    console.log('show_error message:', message);
     const element = this.widget.node.getElementsByClassName(
       'alert-danger'
     )[0] as HTMLElement;
