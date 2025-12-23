@@ -48,6 +48,9 @@ class BaAssignmentsList(BaseListerClass):
         return None
 
     def list_BaAssignment(self, course_id: str = None) -> Dict:
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+
         if not self.check_enabled():
             return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
 

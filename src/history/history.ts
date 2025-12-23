@@ -194,10 +194,6 @@ export class HistoryList {
             a => a.action === actionTypes[j].id
           );
 
-          if (groupActions.length <= 0) {
-            console.log("Didn't find any actions for: " + actionTypes[j].id);
-          }
-
           // Add group in panel_body_id
           new ActionGroup(
             assignment_panel_elem,
@@ -230,12 +226,9 @@ export class HistoryList {
       this.show_error('<p>' + msg + '</p>');
       return;
     }
-    console.log('HistoryList.load_list data:', data);
     if (data.success) {
-      console.log('HistoryList.load_list success value:', data.value);
       this.load_list_success(<any[]>data.value);
     } else {
-      console.log('HistoryList.load_list failed: ', typeof data);
       if (typeof data === 'string') {
         this.show_error(
           '<p>HistoryList.load_list() failed with string:</p>\n<pre>' +
@@ -253,7 +246,6 @@ export class HistoryList {
   }
 
   public show_error(message: string): void {
-    console.log('show_error message:', message);
     const element = this.widget.node.getElementsByClassName(
       'alert-danger'
     )[0] as HTMLElement;
@@ -329,7 +321,6 @@ export class CourseList {
       this.history.load_list('moot');
     } catch (reason) {
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      console.error(msg);
       this.show_error(msg);
     }
   }
@@ -456,34 +447,35 @@ class Action {
 
     // disable_button = false;
 
-    // client-side code needs course_code, assignment_id, student, path
-    const fetch_params = {
-      course_code: '',
-      assignment_code: title,
-      student: data['user'],
-      path: data['path']
-    };
+    if (title === 'Submitted') {
+      // client-side code needs course_code, assignment_id, student, path
+      const fetch_params = {
+        course_code: '',
+        assignment_code: title,
+        student: data['user'],
+        path: data['path']
+      };
 
-    if (isCurrent) {
-      const collectButton: HTMLButtonElement = this.make_button(
+      if (isCurrent) {
+        const collectButton: HTMLButtonElement = this.make_button(
+          title,
+          'collect',
+          false,
+          this.do_collect.bind(this),
+          fetch_params
+        );
+        buttons_span.append(collectButton);
+      }
+
+      const downloadButton: HTMLButtonElement = this.make_button(
         title,
-        'collect',
+        'download',
         false,
-        this.do_collect.bind(this),
+        this.do_download.bind(this),
         fetch_params
       );
-      buttons_span.append(collectButton);
+      buttons_span.append(downloadButton);
     }
-
-    const downloadButton: HTMLButtonElement = this.make_button(
-      title,
-      'download',
-      false,
-      this.do_download.bind(this),
-      fetch_params
-    );
-    buttons_span.append(downloadButton);
-
     row.append(timestamp_span);
     row.append(user_span);
     row.append(buttons_span);
