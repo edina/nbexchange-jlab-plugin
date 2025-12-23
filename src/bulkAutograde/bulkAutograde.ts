@@ -118,8 +118,8 @@ export class AssignmentsList {
       this.show_error('<p>' + msg + '</p>');
       return;
     }
-
-    if (data.success === 'true' && typeof data.value === 'object') {
+    console.log('load_list data:', data, typeof data.success, data.value);
+    if (data.success && typeof data.value === 'object') {
       this.handle_load_list(data);
     } else {
       console.log('load_list failed:', data);
@@ -304,9 +304,12 @@ export class AssignmentsList {
   }
 
   public show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName('alert-danger')[0];
+    const element = this.widget.node.getElementsByClassName(
+      'alert-danger'
+    )[0] as HTMLElement;
     if (element) {
       element.innerHTML = message;
+      element.style.display = 'block';
     } else {
       console.log('show_error element not found');
       // Notification.emit(message, 'error', { autoClose: false });
