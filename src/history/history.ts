@@ -199,6 +199,7 @@ export class HistoryList {
             assignment_panel_elem,
             panel_body_id,
             isCurrent,
+            role,
             assignment_code,
             actionTypes[j].display,
             groupActions
@@ -335,13 +336,14 @@ class ActionGroup {
     panel_elem: HTMLElement,
     parent: string,
     isCurrent: boolean,
+    role: string,
     assignment_code: string,
     title: string,
     actions: IActionData[]
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
-    this.make_row(element, isCurrent, assignment_code, title, actions);
+    this.make_row(element, isCurrent, role, assignment_code, title, actions);
     const div_elements = panel_elem.getElementsByTagName('div');
     const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
     parent_elem.append(element);
@@ -350,6 +352,7 @@ class ActionGroup {
   private make_row(
     element: HTMLDivElement,
     isCurrent: boolean,
+    role: string,
     assignment_code: string,
     title: string,
     actions: IActionData[]
@@ -371,7 +374,7 @@ class ActionGroup {
       assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
-      new Action(row, isCurrent, title, actions[i]);
+      new Action(row, isCurrent, role, title, actions[i]);
     }
 
     element.append(row);
@@ -382,12 +385,13 @@ class Action {
   constructor(
     parent_elem: HTMLElement,
     isCurrent: boolean,
+    role: string,
     title: string,
     data: IActionData
   ) {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
-    this.make_row(element, isCurrent, title, data);
+    this.make_row(element, isCurrent, role, title, data);
     parent_elem.append(element);
   }
 
@@ -426,6 +430,7 @@ class Action {
   private make_row(
     element: HTMLDivElement,
     isCurrent: boolean,
+    role: string,
     title: string,
     data: IActionData
   ): void {
@@ -456,7 +461,7 @@ class Action {
         path: data['path']
       };
 
-      if (isCurrent) {
+      if (isCurrent && role === 'Instructor') {
         const collectButton: HTMLButtonElement = this.make_button(
           title,
           'collect',
