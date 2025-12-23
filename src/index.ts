@@ -96,7 +96,7 @@ const historyListExtension: JupyterFrontEndPlugin<void> = {
     });
 
     app.commands.addCommand(commandIDs.openHistory, {
-      label: 'History',
+      label: 'Exchange History',
       isEnabled: () => {
         return true;
       },

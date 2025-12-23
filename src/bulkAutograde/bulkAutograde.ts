@@ -1,6 +1,4 @@
 import { Widget } from '@lumino/widgets';
-// import { JupyterFrontEnd } from '@jupyterlab/application';
-
 import { PageConfig } from '@jupyterlab/coreutils';
 // import { Notification } from '@jupyterlab/apputils';
 
@@ -97,8 +95,7 @@ export class AssignmentsList {
   }
 
   public clear_list(): void {
-    this.assignment_table_element!.innerHTML =
-      '<tr><td>Querying to get assignment details</td></tr>';
+    this.assignment_table_element!.innerHTML = '';
   }
 
   private bind_events(): void {
@@ -118,11 +115,9 @@ export class AssignmentsList {
       this.show_error('<p>' + msg + '</p>');
       return;
     }
-    console.log('load_list data:', data, typeof data.success, data.value);
-    if (data.success && typeof data.value === 'object') {
+    if (data.success && data.success === 'true') {
       this.handle_load_list(data);
     } else {
-      console.log('load_list failed:', data);
       this.show_error(
         '<p>AssignmentsList.load_list() failed:</p>\n<pre>' +
           data.value +
@@ -134,7 +129,7 @@ export class AssignmentsList {
   private handle_load_list(data: IBaAssignmentResponse): void {
     if (typeof data.value === 'string') {
       this.show_error(
-        '<p>Error fetching gradable assignments:' + data.value + '</p>'
+        '<p>Error fetching gradable assignments: ' + data.value + '</p>'
       );
     } else {
       this.load_list_success(data.value);
@@ -311,7 +306,7 @@ export class AssignmentsList {
       element.innerHTML = message;
       element.style.display = 'block';
     } else {
-      console.log('show_error element not found');
+      console.error('show_error element not found');
       // Notification.emit(message, 'error', { autoClose: false });
     }
   }

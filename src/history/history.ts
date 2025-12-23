@@ -1,7 +1,7 @@
 import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
-import { Notification } from '@jupyterlab/apputils';
+// import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -55,14 +55,13 @@ interface ICourseData {
 }
 
 export class HistoryList {
+  widget: Widget;
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  callback: Function | null = null;
 
   constructor(widget: Widget, panel_group_selector: string) {
     this.panel_group_selector = panel_group_selector;
-    this.callback = null;
+    this.widget = widget;
 
     const div_elements = widget.node.getElementsByTagName('div');
     this.panel_group_element = <HTMLDivElement>(
@@ -217,40 +216,61 @@ export class HistoryList {
         para_elem.textContent += ' (current course)';
       }
     }
-
-    if (this.callback) {
-      this.callback();
-      this.callback = null;
-    }
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public async load_list(course?: string, callback?: Function) {
-    if (callback) {
-      this.callback = callback;
-    }
+  public async load_list(course?: string) {
     this.clear_list();
-
+    let data: any = null;
     try {
-      const data = await requestAPI<any>('history?course_id=' + course);
-      if (data.success) {
-        this.load_list_success(<any[]>data.value);
-      } else {
-        this.show_error(<string>data.value);
-      }
+      data = await requestAPI<any>('history?course_id=' + course);
     } catch (reason) {
       const msg: string = `Error on GET /history.\n${reason}`;
       console.error(msg);
       this.show_error(msg);
+      return;
+    }
+    if (data.success && data.success === 'true') {
+      this.load_list_success(<any[]>data.value);
+    } else {
+      if (typeof data === 'string') {
+        this.show_error(
+          '<p>HistoryList.load_list() failed:</p>\n<pre>' + data + '</pre>'
+        );
+        return;
+      }
+      this.show_error(
+        '<p>HistoryList.load_list() failed:</p>\n<pre>' + data.value + '</pre>'
+      );
     }
   }
 
   public show_error(message: string): void {
-    Notification.emit(message, 'error', { autoClose: false });
+    const element = this.widget.node.getElementsByClassName(
+      'alert-danger'
+    )[0] as HTMLElement;
+    if (element) {
+      element.innerHTML = message;
+      element.style.display = 'block';
+    } else {
+      console.error('show_error element not found');
+      // Notification.emit(message, 'error', { autoClose: false });
+    }
+    // Notification.emit(message, 'error', { autoClose: false });
   }
 
   public show_info(message: string): void {
-    Notification.emit(message, 'info', { autoClose: false });
+    const element = this.widget.node.getElementsByClassName(
+      'history-activity'
+    )[0] as HTMLElement;
+    if (element) {
+      element.innerHTML = message;
+      element.style.display = 'block';
+    } else {
+      console.log('show_error element not found');
+      // Notification.emit(message, 'error', { autoClose: false });
+    }
+    // Notification.emit(message, 'info', { autoClose: false });
   }
 }
 
@@ -307,7 +327,7 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
-    Notification.emit(error, 'error', { autoClose: false });
+    // Notification.emit(error, 'error', { autoClose: false });
   }
 }
 

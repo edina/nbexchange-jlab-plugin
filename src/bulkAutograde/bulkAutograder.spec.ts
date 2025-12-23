@@ -55,7 +55,6 @@ describe('bulkAutograde instanciation', () => {
 });
 
 describe('BulkAutogradeWidget integration', () => {
-  // let ba: BulkAutogradeWidget;
   beforeEach(() => {
     // ensure a clean DOM for each test
     document.body.innerHTML = '';
@@ -121,11 +120,11 @@ describe('BulkAutogradeWidget integration', () => {
       '#baautograde-alert-box'
     ) as HTMLElement;
     expect(msgEl.innerHTML).toContain(
-      '<p>AssignmentsList.load_list() failed:</p>\n<pre>no assignments</pre>'
+      '<p>Error fetching gradable assignments: no assignments</p>'
     );
   });
 
-  it.only('builds table on success and buttons show as expected', async () => {
+  it('builds table on success and buttons show as expected', async () => {
     (requestAPI as jest.Mock).mockImplementation((endpoint: string) => {
       if (endpoint === 'getAssignment') {
         return Promise.resolve({
@@ -150,9 +149,8 @@ describe('BulkAutogradeWidget integration', () => {
     const msgEl = ba.node.querySelector(
       '#assignment_list_default'
     ) as HTMLElement;
-    console.log('msgEl.outerHTML:', msgEl.outerHTML);
     expect(msgEl.innerHTML).toContain(
-      '<p>This table lists all assignments for the current course'
+      '<p>Querying to get assignment details</p>'
     );
     const table = ba.node.querySelector(
       '#assignment-table'
