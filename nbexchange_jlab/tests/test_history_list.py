@@ -90,11 +90,11 @@ def test_load_config():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
 @pytest.mark.gen_test
-def test_load_history_config():
+def test_yield_config():
 
     plugin = HistoryList()
 
-    with plugin.get_history_config() as config:
+    with plugin.yield_config() as config:
         assert config["Exchange"]["path_includes_course"] is True or isinstance(
             config["Exchange"]["path_includes_course"], LazyConfigValue
         )

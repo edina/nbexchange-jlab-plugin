@@ -25,22 +25,6 @@ class BaAssignmentsList(BaseListerClass):
 
     SUPPORTED_METHODS = ("GET", "HEAD")
 
-    def __init__(self, **kwargs):
-        pass
-
-    # def load_config(self) -> LoggingConfigurable:
-    #     paths = jupyter_config_path()
-    #     paths.insert(0, os.getcwd())
-    #     app = NbGrader()
-    #     app.config_file_paths.append(paths)
-    #     app.load_config_file()
-
-    #     return app.config
-
-    # @contextlib.contextmanager
-    # def get_BaAssignment_config(self):
-    #     yield self.load_config()
-
     # Takes in a full course record, returns a dict of assignment_code: set-of-submitted-users
     def _parse_course_data(self, course: dict = None) -> Dict:
         if not course:
@@ -68,7 +52,7 @@ class BaAssignmentsList(BaseListerClass):
             return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
 
         data: Dict = {}
-        with self.get_BaAssignment_config() as config:
+        with self.yield_config() as config:
             api = NbGraderAPI(config=config)
 
             history = self._get_history_data(course_id=get_current_course())
@@ -81,12 +65,9 @@ class BaAssignmentsList(BaseListerClass):
         return retvalue
 
     def do_collect(self, assignment_code: str = None) -> Dict:
-
         if not self.check_enabled():
-            return {
-                "success": False,
-                "value": "<p>You need to be an Instructor on this course to use this feature.<\\p>",
-            }
+            return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
+
         if not assignment_code:
             return {"success": False, "value": "<p>You need to supply an assignment code.<\\p>"}
 
@@ -94,7 +75,7 @@ class BaAssignmentsList(BaseListerClass):
         data: Dict = {}
         response = '<section class="ba_response_section">\n'
 
-        with self.get_BaAssignment_config() as config:
+        with self.yield_config() as config:
             api = NbGraderAPI(config=config)
             data = api.collect(assignment_code)
 
@@ -116,7 +97,7 @@ class BaAssignmentsList(BaseListerClass):
 
         retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
         response = ""
-        with self.get_BaAssignment_config() as config:
+        with self.yield_config() as config:
             api = NbGraderAPI(config=config)
             students = api.get_submitted_students(assignment_code)
             for student in students:

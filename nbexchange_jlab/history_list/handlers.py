@@ -7,20 +7,14 @@ import traceback
 from urllib.parse import quote_plus
 
 import requests
-
-# from jupyter_core.paths import jupyter_config_path
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.utils import url_path_join
-
-# from nbgrader.apps import NbGrader
 from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
 from tornado import web
 
 from nbexchange_jlab.plugins import Exchange, ExchangeError
 from nbexchange_jlab.utils import BaseListerClass, get_current_course
-
-# from traitlets.config import LoggingConfigurable
 
 
 @contextlib.contextmanager
@@ -48,27 +42,6 @@ class HistoryList(BaseListerClass):
     @root_dir.setter
     def root_dir(self, directory):
         self._root_dir = directory
-
-    # def load_config(self):
-    #     paths = jupyter_config_path()
-    #     paths.insert(0, os.getcwd())
-    #     app = NbGrader()
-    #     app.config_file_paths.append(paths)
-    #     app.load_config_file()
-
-    #     return app.config
-
-    # @contextlib.contextmanager
-    # def get_history_config(self):
-    #     yield self.load_config()
-
-    # def check_enabled(self):
-    #     """Returns whether or not the History list should be enabled in the UI.
-    #     """
-    #     with self.get_history_config() as config:
-    #         if config.course_directory.db_url is not None:
-    #             return True
-    #     return False
 
     def query_exchange(self):
         """
@@ -133,7 +106,7 @@ class HistoryList(BaseListerClass):
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
-        with self.get_history_config() as config:
+        with self.yield_config() as config:
 
             try:
                 if course_id:

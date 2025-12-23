@@ -21,7 +21,7 @@ class BaseListerClass(LoggingConfigurable):
         return app.config
 
     @contextlib.contextmanager
-    def get_history_config(self):
+    def yield_config(self):
         yield self.load_config()
 
     def check_enabled(self):
