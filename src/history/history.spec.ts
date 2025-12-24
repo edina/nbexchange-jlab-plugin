@@ -64,7 +64,7 @@ describe('HistoryWidget', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed:</p>\n<pre>Non-JSON Response</pre>'
+      '<p>HistoryList.load_list() failed with string:</p>\n<pre>Non-JSON Response</pre>'
     );
   });
 
@@ -84,7 +84,7 @@ describe('HistoryWidget', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed:</p>\n<pre>Some error occurred</pre>'
+      '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>Some error occurred</pre>'
     );
   });
 
@@ -199,4 +199,36 @@ describe('HistoryWidget', () => {
 
     // there is only 1 button: submitted_download
   });
+
+  it('loads history list identifies valid data with no assignments', async () => {
+    const mockData = [
+      {
+        role: { Instructor: 1 },
+        user_id: { '13': 1 },
+        assignments: [],
+        isInstructor: true,
+        course_id: 35,
+        course_code: 'my_course_code',
+        course_title: 'my_course_code'
+      }
+    ];
+    // mock get_current course to return course code
+    (requestAPI as jest.Mock).mockResolvedValue({
+      success: 'true',
+      value: mockData
+    });
+    const app = {} as JupyterFrontEnd;
+    const ba = new HistoryWidget(app);
+    const error_box = ba.node.querySelector('.history-activity') as HTMLElement;
+    // wait for the asynchronous load_list invoked by the widget
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(error_box.innerHTML).toContain(
+      '<p>There is no History to show you</p>'
+    );
+  });
+
+  // if data is true, but null
+  // formatDate test
+  //
 });

@@ -82,7 +82,17 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      this.show_info('There is no history available from the Exchange service');
+      this.show_info(
+        '<p>There is no history available from the Exchange service</p>'
+      );
+      return;
+    }
+    if (typeof data !== 'object') {
+      this.show_error(
+        '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>' +
+          String(data) +
+          '</pre>'
+      );
       return;
     }
     if (data.length === 0) {
@@ -95,14 +105,12 @@ export class HistoryList {
       for (const key in data) {
         const this_course = data[key];
         const assignments: IAssignmentData[] = this_course['assignments'];
-
         if (assignments.length === 0) {
-          this.show_info('There is no History to show you');
+          this.show_info('<p>There is no History to show you</p>');
           return;
         }
       }
     }
-
     this.clear_list();
 
     for (const key in data.reverse()) {
@@ -239,7 +247,7 @@ export class HistoryList {
         return;
       }
       this.show_error(
-        '<p>HistoryList.load_list() failed with success not true :</p>\n<pre>' +
+        '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>' +
           data.value +
           '</pre>'
       );

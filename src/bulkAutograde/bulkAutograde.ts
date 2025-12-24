@@ -115,7 +115,8 @@ export class AssignmentsList {
       this.show_error('<p>' + msg + '</p>');
       return;
     }
-    if (data.success) {
+
+    if (data.success && data.success === 'true') {
       this.handle_load_list(data);
     } else {
       this.show_error(
@@ -129,7 +130,9 @@ export class AssignmentsList {
   private handle_load_list(data: IBaAssignmentResponse): void {
     if (typeof data.value === 'string') {
       this.show_error(
-        '<p>Error fetching gradable assignments: ' + data.value + '</p>'
+        '<p>Error fetching gradable assignments:</p>\n<pre>' +
+          data.value +
+          '</pre>'
       );
     } else {
       this.load_list_success(data.value);
