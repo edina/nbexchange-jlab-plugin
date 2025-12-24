@@ -116,7 +116,7 @@ export class AssignmentsList {
       return;
     }
 
-    if (data.success && data.success === 'true') {
+    if (data.success) {
       this.handle_load_list(data);
     } else {
       this.show_error(

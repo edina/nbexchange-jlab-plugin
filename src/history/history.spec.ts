@@ -230,5 +230,5 @@ describe('HistoryWidget', () => {
 
   // if data is true, but null
   // formatDate test
-  // 
+  //
 });

@@ -101,7 +101,7 @@ describe('BulkAutogradeWidget integration', () => {
       '#baautograde-alert-box'
     ) as HTMLElement;
     expect(msgEl.innerHTML).toContain(
-      '<p>AssignmentsList.load_list() failed:</p>\n<pre>no assignments</pre>'
+      '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
     );
   });
 
