@@ -148,11 +148,11 @@ export class AssignmentsList {
       let data: any = null;
       try {
         data = await requestAPI<any>(
-          'doCollect?assignment_code=' + assignent_code
+          'baCollect?assignment_code=' + assignent_code
         );
       } catch (reason) {
         console.error('do_collect caught error:', reason);
-        const msg: string = 'Error on GET doCollect.\n' + reason;
+        const msg: string = 'Error on GET baCollect.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
 
@@ -171,11 +171,11 @@ export class AssignmentsList {
       let data: any = null;
       try {
         data = await requestAPI<any>(
-          'doAutograde?assignment_code=' + assignent_code
+          'baAutograde?assignment_code=' + assignent_code
         );
       } catch (reason) {
-        console.error('do_autograde caught error:', reason);
-        const msg: string = 'Error on GET doAutograde.\n' + reason;
+        console.error('do_utograde caught error:', reason);
+        const msg: string = 'Error on GET baAutograde.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
 

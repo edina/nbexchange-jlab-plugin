@@ -183,8 +183,8 @@ def setup_handlers(web_app):
 
     default_handlers = [
         (r"getAssignment", BaAssignmentsListHandler),
-        (r"doCollect", BaCollectAssignmentHandler),
-        (r"doAutograde", BaBulkAutogradeHandler),
+        (r"baCollect", BaCollectAssignmentHandler),
+        (r"baAutograde", BaBulkAutogradeHandler),
     ]
     # route_pattern_BaAssignment = url_path_join(base_url, "nbexchange-jlab", "getAssignment")
     # handlers = [(route_pattern_BaAssignment, BaAssignmentsListHandler)]

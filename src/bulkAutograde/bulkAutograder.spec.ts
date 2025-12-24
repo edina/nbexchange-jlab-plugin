@@ -135,7 +135,7 @@ describe('BulkAutogradeWidget integration', () => {
           }
         });
       }
-      if ((endpoint as string).startsWith('doCollect?')) {
+      if ((endpoint as string).startsWith('baCollect?')) {
         return Promise.resolve({ value: '<div>collected</div>' });
       }
       return Promise.resolve({});
@@ -198,7 +198,7 @@ describe('BulkAutogradeWidget integration', () => {
           }
         });
       }
-      if ((endpoint as string).startsWith('doCollect?')) {
+      if ((endpoint as string).startsWith('baCollect?')) {
         return Promise.resolve({
           success: true,
           value: '<div>collected</div>'
@@ -238,7 +238,7 @@ describe('BulkAutogradeWidget integration', () => {
           }
         });
       }
-      if ((endpoint as string).startsWith('doCollect?')) {
+      if ((endpoint as string).startsWith('baCollect?')) {
         return Promise.resolve({
           success: true,
           value: '<div>collected</div>'
@@ -279,7 +279,7 @@ describe('BulkAutogradeWidget integration', () => {
         });
       }
 
-      if ((endpoint as string).startsWith('doAutograde?')) {
+      if ((endpoint as string).startsWith('baAutograde?')) {
         return Promise.resolve({ value: '<div>autograded</div>' });
       }
       return Promise.resolve({});
@@ -342,7 +342,7 @@ describe('BulkAutogradeWidget integration', () => {
     const alert = ba.node.querySelector(
       '#baautograde-alert-box'
     ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET doCollect');
+    expect(alert.innerHTML).toContain('Error on GET baCollect');
 
     errorSpy.mockRestore();
   });
@@ -377,7 +377,7 @@ describe('BulkAutogradeWidget integration', () => {
     const alert = ba.node.querySelector(
       '#baautograde-alert-box'
     ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET doAutograde');
+    expect(alert.innerHTML).toContain('Error on GET baAutograde');
 
     errorSpy.mockRestore();
   });
