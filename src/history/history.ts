@@ -494,7 +494,9 @@ class Action {
       }
 
       if (data) {
-        this.handle_response_data(results_area, data);
+        results_area.innerHTML = data.value;
+
+        // this.handle_response_data(results_area, data);
       }
     }
   }
