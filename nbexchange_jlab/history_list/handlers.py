@@ -174,11 +174,11 @@ class HistoryList(BaseListerClass):
                     student,
                     nbc.coursedir.assignment_id,
                 )
-                # if not os.path.exists(os.path.dirname(local_dest_path)):
-                #     os.makedirs(os.path.dirname(local_dest_path))
+                if not os.path.exists(os.path.dirname(local_dest_path)):
+                    os.makedirs(os.path.dirname(local_dest_path))
                 if os.path.isdir(local_dest_path):
                     shutil.rmtree(local_dest_path)
-                os.makedirs(os.path.dirname(local_dest_path))
+                # os.makedirs(os.path.dirname(local_dest_path))
                 self.log.info(f"local_dest: {local_dest_path} - {os.path.isdir(local_dest_path)}")
 
                 # # Fake up a submission dict for download
