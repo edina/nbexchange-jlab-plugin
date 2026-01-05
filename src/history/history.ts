@@ -452,9 +452,9 @@ class Action {
 
         // I *think* URLExt.join in requestAPI escapes params for us
         data = await requestAPI<any>(
-          'hisDownload?course_id=' +
+          'hisDownload?course_code=' +
             course_code +
-            '&assignment_id=' +
+            '&assignment_code=' +
             assignent_code +
             '&student=' +
             student +
