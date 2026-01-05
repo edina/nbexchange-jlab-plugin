@@ -1,4 +1,4 @@
-import { encode } from 'html-entities';
+// import { encode } from 'html-entities';
 
 import { Widget } from '@lumino/widgets';
 
@@ -469,20 +469,20 @@ class Action {
       try {
         console.log('calling hisDownload backend api');
 
-        const cc = encode(course_code);
-        const ac = encode(assignent_code);
-        const st = encode(student);
-        const pa = encode(path);
+        const cc = encodeURIComponent(course_code);
+        const ac = encodeURIComponent(assignent_code);
+        const st = encodeURIComponent(student);
+        const pa = encodeURIComponent(path);
 
         let url =
           'hisDownload?course_code=' +
-          encode(course_code) +
+          encodeURIComponent(course_code) +
           '&assignment_code=' +
-          encode(assignent_code) +
+          encodeURIComponent(assignent_code) +
           '&student=' +
-          encode(student) +
+          encodeURIComponent(student) +
           '&path=' +
-          encode(path);
+          encodeURIComponent(path);
         console.log('first url: ' + url);
 
         url =
