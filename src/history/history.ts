@@ -353,7 +353,7 @@ class ActionGroup {
     isCurrent: boolean,
     role: string,
     assignment_code: string,
-    title: string,
+    action_type: string,
     actions: IActionData[]
   ) {
     this.widget = widget;
@@ -365,7 +365,7 @@ class ActionGroup {
       isCurrent,
       role,
       assignment_code,
-      title,
+      action_type,
       actions
     );
     const div_elements = panel_elem.getElementsByTagName('div');
@@ -379,7 +379,7 @@ class ActionGroup {
     isCurrent: boolean,
     role: string,
     assignment_code: string,
-    title: string,
+    action_type: string,
     actions: IActionData[]
   ): void {
     const action_count = String(actions.length);
@@ -391,12 +391,12 @@ class ActionGroup {
     count_span.classList.add('action-badge');
     count_span.innerText = action_count;
 
-    summary.innerText = title;
+    summary.innerText = action_type;
     summary.append(count_span);
     row.append(summary);
     row.setAttribute(
       'aria-label',
-      assignment_code + ' ' + title + ' ' + action_count
+      assignment_code + ' ' + action_type + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
       new Action(
@@ -404,8 +404,9 @@ class ActionGroup {
         row,
         course_code,
         isCurrent,
+        assignment_code,
         role,
-        title,
+        action_type,
         actions[i]
       );
     }
@@ -422,15 +423,24 @@ class Action {
     parent_elem: HTMLElement,
     course_code: string,
     isCurrent: boolean,
+    assignment_code: string,
     role: string,
-    title: string,
+    action_type: string,
     data: IActionData
   ) {
     console.log('Action constructor called. Widget:' + widget);
     this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
-    this.make_row(element, course_code, isCurrent, role, title, data);
+    this.make_row(
+      element,
+      course_code,
+      isCurrent,
+      assignment_code,
+      role,
+      action_type,
+      data
+    );
     parent_elem.append(element);
   }
 
@@ -442,7 +452,16 @@ class Action {
     student: string,
     path: string
   ) {
-    console.log('do_download called');
+    console.log(
+      'do_download called:' +
+        course_code +
+        ', ' +
+        assignent_code +
+        ', ' +
+        student +
+        ', ' +
+        path
+    );
     const results_area = document.querySelector('.alert-danger') as HTMLElement;
     if (results_area) {
       console.log('do_download has alert-box');
@@ -538,8 +557,9 @@ class Action {
     element: HTMLDivElement,
     course_code: string,
     isCurrent: boolean,
+    assignment_code: string,
     role: string,
-    title: string,
+    action_type: string,
     data: IActionData
   ): void {
     const row = document.createElement('div');
@@ -558,11 +578,11 @@ class Action {
       date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     user_span.innerText = data['user'];
 
-    if (title === 'Submitted') {
+    if (action_type === 'Submitted') {
       // client-side code needs course_code, assignment_id, student, path
       const fetch_params = {
         course_code: course_code,
-        assignment_code: title,
+        assignment_code: assignment_code,
         student: data['user'],
         path: data['path']
       };
@@ -570,7 +590,7 @@ class Action {
       if (role === 'Instructor') {
         if (isCurrent) {
           const collectButton: HTMLButtonElement = this.make_button(
-            title,
+            action_type,
             'collect',
             false,
             this.do_collect.bind(this),
@@ -579,11 +599,18 @@ class Action {
           buttons_span.append(collectButton);
         }
 
+        console.log('Make download button');
         const downloadButton: HTMLButtonElement = this.make_button(
-          title,
+          action_type,
           'download',
           false,
-          this.do_download.bind(course_code, title, data['user'], data['path'])
+          this.do_download.bind(
+            this,
+            course_code,
+            assignment_code,
+            data['user'],
+            data['path']
+          )
         );
         buttons_span.append(downloadButton);
       }
