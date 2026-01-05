@@ -470,7 +470,9 @@ class Action {
 
       if (data) {
         console.log('do stuff with data');
-        this.handle_response_data(results_area, data);
+        results_area.innerHTML = data.value;
+
+        // this.handle_response_data(results_area, data);
       }
     } else {
       console.log('alert box not found');
@@ -501,11 +503,11 @@ class Action {
     }
   }
 
-  private handle_response_data(results_area: HTMLElement, data: any): void {
-    if (results_area) {
-      results_area.innerHTML = data.value;
-    }
-  }
+  // private handle_response_data(results_area: HTMLElement, data: any): void {
+  //   if (results_area) {
+  //     results_area.innerHTML = data.value;
+  //   }
+  // }
 
   private make_button(
     id: string,
