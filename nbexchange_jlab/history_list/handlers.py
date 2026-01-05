@@ -15,8 +15,7 @@ from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
 from tornado import web
 
-from nbexchange_jlab.plugins import Exchange, ExchangeError
-from nbexchange_jlab.plugins.exchange import ExchangeCollect as NBExchangeCollect
+from nbexchange_jlab.plugins import Exchange, ExchangeCollect, ExchangeError
 from nbexchange_jlab.utils import BaseListerClass, get_current_course
 
 
@@ -159,7 +158,7 @@ class HistoryList(BaseListerClass):
 
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)
-                nbc = NBExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
+                nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
                 local_dest_path = self.coursedir.format_path(
                     self.coursedir.submitted_directory,
                     student,
