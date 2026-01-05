@@ -428,7 +428,6 @@ class Action {
     action_type: string,
     data: IActionData
   ) {
-    console.log('Action constructor called. Widget:' + widget);
     this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
@@ -452,23 +451,10 @@ class Action {
     student: string,
     path: string
   ) {
-    console.log(
-      'do_download called:' +
-        course_code +
-        ', ' +
-        assignent_code +
-        ', ' +
-        student +
-        ', ' +
-        path
-    );
     const results_area = document.querySelector('.alert-danger') as HTMLElement;
     if (results_area) {
-      console.log('do_download has alert-box');
       let data: any = null;
       try {
-        console.log('calling hisDownload backend api');
-
         const url =
           'hisDownload?course_code=' +
           encodeURIComponent(course_code) +
@@ -478,7 +464,6 @@ class Action {
           encodeURIComponent(student) +
           '&path=' +
           encodeURIComponent(path);
-        console.log('first url: ' + url);
 
         data = await requestAPI<any>(url);
       } catch (reason) {
@@ -486,11 +471,10 @@ class Action {
         const msg: string = 'Error on GET hisDownload.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
-      console.log('calling hisDownload did not error' + data);
 
       if (data) {
-        console.log('do stuff with data');
         results_area.innerHTML = data.value;
+        results_area.style.display = 'block';
 
         // this.handle_response_data(results_area, data);
       }
@@ -536,8 +520,6 @@ class Action {
     do_Action: (params?: any) => void,
     actionParams?: any
   ): HTMLButtonElement {
-    console.log('do_Action params:' + do_Action);
-    console.log('actionParams:' + actionParams);
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
     button.setAttribute('id', id + '_' + text);
@@ -600,7 +582,6 @@ class Action {
           buttons_span.append(collectButton);
         }
 
-        console.log('Make download button');
         const downloadButton: HTMLButtonElement = this.make_button(
           action_type,
           'download',

@@ -153,7 +153,6 @@ class HistoryList(BaseListerClass):
         local_dest_path = "home"
 
         with self.yield_config() as config:
-            self.log.info(f"config as {config}")
 
             try:
                 if course_code:
@@ -181,9 +180,12 @@ class HistoryList(BaseListerClass):
                 # os.makedirs(os.path.dirname(local_dest_path))
                 self.log.info(f"local_dest: {local_dest_path} - {os.path.isdir(local_dest_path)}")
 
-                # # Fake up a submission dict for download
-                # submission = {"path": path}
-                # nbc.download(submission, local_dest_path)
+                # Fake up a submission dict for download
+                submission = {"path": path}
+                self.log.info("do actual collect.download")
+
+                nbc.download(submission, local_dest_path)
+                self.log.info("actual collect.download done")
 
             except HistoryError as e:
                 retvalue = {"success": False, "value": str(e)}
