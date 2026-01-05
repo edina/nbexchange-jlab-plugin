@@ -144,62 +144,64 @@ class HistoryList(BaseListerClass):
     def do_download(
         self, course_code: str = None, assignment_code: str = None, student: str = None, path: str = None
     ) -> Dict:
-        
+
         self.log.info(f"do_download called with {course_code}, {assignment_code}, {student}, {path}")
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
         retvalue = {"success": True, "value": "No reason given"}
-        # local_dest_path = "home"
+        local_dest_path = "home"
 
-        # with self.yield_config() as config:
+        with self.yield_config() as config:
 
-        #     try:
-        #         if course_code:
-        #             config.CourseDirectory.course_id = course_code
+            try:
+                if course_code:
+                    config.CourseDirectory.course_id = course_code
 
-        #         coursedir = CourseDirectory(config=config)
-        #         authenticator = Authenticator(config=config)
-        #         nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
+                coursedir = CourseDirectory(config=config)
+                authenticator = Authenticator(config=config)
+                nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
 
-        #         # These need set up for collect.download
-        #         nbc.coursedir.course_id = course_code
-        #         nbc.coursedir.assignment_id = assignment_code
-        #         nbc.coursedir.student_id = student
+                # These need set up for collect.download
+                nbc.coursedir.course_id = course_code
+                nbc.coursedir.assignment_id = assignment_code
+                nbc.coursedir.student_id = student
 
-        #         local_dest_path = nbc.coursedir.format_path(
-        #             nbc.coursedir.submitted_directory,
-        #             student,
-        #             nbc.coursedir.assignment_id,
-        #         )
-        #         if not os.path.exists(os.path.dirname(local_dest_path)):
-        #             os.makedirs(os.path.dirname(local_dest_path))
-        #         if os.path.isdir(local_dest_path):
-        #             shutil.rmtree(local_dest_path)
+                local_dest_path = os.path.join(
+                    "Downloads",
+                    nbc.coursedir.course_id,
+                    student,
+                    nbc.coursedir.assignment_id,
+                )
+                # if not os.path.exists(os.path.dirname(local_dest_path)):
+                #     os.makedirs(os.path.dirname(local_dest_path))
+                if os.path.isdir(local_dest_path):
+                    shutil.rmtree(local_dest_path)
+                os.makedirs(os.path.dirname(local_dest_path))
 
-        #         # Fake up a submission dict for download
-        #         submission = {"path": path}
-        #         nbc.download(submission, local_dest_path)
+                # # Fake up a submission dict for download
+                # submission = {"path": path}
+                # nbc.download(submission, local_dest_path)
 
-        #     except HistoryError as e:
-        #         retvalue = {"success": False, "value": str(e)}
-        #     except Exception as e:
-        #         self.log.error(traceback.format_exc())
-        #         if isinstance(e, ExchangeError):
-        #             retvalue = {
-        #                 "success": False,
-        #                 "value": (
-        #                     "The exchange directory does not exist and could",
-        #                     "not be created. The 'release' and 'collect' functionality will not be available.",
-        #                     "Please see the documentation on",
-        #                     "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
-        #                     "for instructions.",
-        #                 ),
-        #             }
-        #         else:
-        #             retvalue = {"success": False, "value": traceback.format_exc()}
-        #     else:
-        #         retvalue = {"success": True, "value": f"Downloaded into {local_dest_path}"}
+            except HistoryError as e:
+                retvalue = {"success": False, "value": str(e)}
+            except Exception as e:
+                self.log.error(traceback.format_exc())
+                if isinstance(e, ExchangeError):
+                    retvalue = {
+                        "success": False,
+                        "value": (
+                            "The exchange directory does not exist and could",
+                            "not be created. The 'release' and 'collect' functionality will not be available.",
+                            "Please see the documentation on",
+                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
+                            "for instructions.",
+                        ),
+                    }
+                else:
+                    retvalue = {"success": False, "value": traceback.format_exc()}
+            else:
+                retvalue = {"success": True, "value": f"Downloaded into {local_dest_path}"}
 
         return retvalue
 
