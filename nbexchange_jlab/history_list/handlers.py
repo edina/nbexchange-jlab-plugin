@@ -159,6 +159,12 @@ class HistoryList(BaseListerClass):
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)
                 nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
+
+                # These need set up for collect.download
+                nbc.coursedir.course_id = course_code
+                nbc.coursedir.assignment_id = assignment_code
+                nbc.coursedir.student_id = student
+
                 local_dest_path = nbc.coursedir.format_path(
                     nbc.coursedir.submitted_directory,
                     student,

@@ -28,6 +28,9 @@ class ExchangeCollect(ABCExchangeCollect, NBExchange):
     def download(self, submission, dest_path):
         self.log.debug(f"ExchangeCollect.download - record {submission} to {dest_path}")
         try:
+            self.log.info(
+                f"collection?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}&path={quote_plus(submission['path'])}"  # noqa: E501
+            )
             r = self.api_request(
                 f"collection?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}&path={quote_plus(submission['path'])}"  # noqa: E501
             )

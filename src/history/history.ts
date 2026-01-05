@@ -469,12 +469,7 @@ class Action {
       try {
         console.log('calling hisDownload backend api');
 
-        const cc = encodeURIComponent(course_code);
-        const ac = encodeURIComponent(assignent_code);
-        const st = encodeURIComponent(student);
-        const pa = encodeURIComponent(path);
-
-        let url =
+        const url =
           'hisDownload?course_code=' +
           encodeURIComponent(course_code) +
           '&assignment_code=' +
@@ -484,17 +479,6 @@ class Action {
           '&path=' +
           encodeURIComponent(path);
         console.log('first url: ' + url);
-
-        url =
-          'hisDownload?course_code=' +
-          cc +
-          '&assignment_code=' +
-          ac +
-          '&student=' +
-          st +
-          '&path=' +
-          pa;
-        console.log('second url: ' + url);
 
         data = await requestAPI<any>(url);
       } catch (reason) {
