@@ -426,10 +426,11 @@ class Action {
     title: string,
     data: IActionData
   ) {
+    console.log('Action constructor called. Widget:' + widget);
     this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
-    this.make_row(element, isCurrent, role, title, data);
+    this.make_row(element, course_code, isCurrent, role, title, data);
     parent_elem.append(element);
   }
 
@@ -442,6 +443,7 @@ class Action {
     path: string
   ) {
     console.log('do_download called');
+    console.log('do_download widget:' + this.widget);
     const results_area = this.widget.node.querySelector(
       '.alert-danger'
     ) as HTMLElement;
@@ -511,6 +513,8 @@ class Action {
     do_Action: (params?: any) => void,
     actionParams?: any
   ): HTMLButtonElement {
+    console.log('do_Action params:' + do_Action);
+    console.log('actionParams:' + actionParams);
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
     button.setAttribute('id', id + '_' + text);
@@ -529,6 +533,7 @@ class Action {
 
   private make_row(
     element: HTMLDivElement,
+    course_code: string,
     isCurrent: boolean,
     role: string,
     title: string,
@@ -553,7 +558,7 @@ class Action {
     if (title === 'Submitted') {
       // client-side code needs course_code, assignment_id, student, path
       const fetch_params = {
-        course_code: '',
+        course_code: course_code,
         assignment_code: title,
         student: data['user'],
         path: data['path']
@@ -575,7 +580,7 @@ class Action {
           title,
           'download',
           false,
-          this.do_download.bind('', title, data['user'], data['path'])
+          this.do_download.bind(course_code, title, data['user'], data['path'])
         );
         buttons_span.append(downloadButton);
       }
@@ -588,6 +593,7 @@ class Action {
   }
 
   private show_error(message: string): void {
+    console.log('show error called:' + message);
     const element = this.widget.node.getElementsByClassName(
       'alert-danger'
     )[0] as HTMLElement;
