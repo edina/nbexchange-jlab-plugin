@@ -1,3 +1,5 @@
+// import {encode} from 'html-entities';
+
 import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
@@ -207,6 +209,7 @@ export class HistoryList {
             this.widget,
             assignment_panel_elem,
             panel_body_id,
+            this_course['course_code'],
             isCurrent,
             role,
             assignment_code,
@@ -346,6 +349,7 @@ class ActionGroup {
     widget: Widget,
     panel_elem: HTMLElement,
     parent: string,
+    course_code: string,
     isCurrent: boolean,
     role: string,
     assignment_code: string,
@@ -355,7 +359,15 @@ class ActionGroup {
     this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
-    this.make_row(element, isCurrent, role, assignment_code, title, actions);
+    this.make_row(
+      element,
+      course_code,
+      isCurrent,
+      role,
+      assignment_code,
+      title,
+      actions
+    );
     const div_elements = panel_elem.getElementsByTagName('div');
     const parent_elem = <HTMLDivElement>div_elements.namedItem(parent);
     parent_elem.append(element);
@@ -363,6 +375,7 @@ class ActionGroup {
 
   private make_row(
     element: HTMLDivElement,
+    course_code: string,
     isCurrent: boolean,
     role: string,
     assignment_code: string,
@@ -386,7 +399,15 @@ class ActionGroup {
       assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
-      new Action(this.widget, row, isCurrent, role, title, actions[i]);
+      new Action(
+        this.widget,
+        row,
+        course_code,
+        isCurrent,
+        role,
+        title,
+        actions[i]
+      );
     }
 
     element.append(row);
@@ -399,6 +420,7 @@ class Action {
   constructor(
     widget: Widget,
     parent_elem: HTMLElement,
+    course_code: string,
     isCurrent: boolean,
     role: string,
     title: string,
@@ -413,23 +435,42 @@ class Action {
 
   // `Download` pulls the tarball down and saves _as the tarball_ in the home directory
   // `collect` actually triggers an nbgrader collect on the server side, replacing any existing files
-  private async do_download(assignent_code: string) {
+  private async do_download(
+    course_code: string,
+    assignent_code: string,
+    student: string,
+    path: string
+  ) {
+    console.log('do_download called');
     const results_area = this.widget.node.querySelector(
-      '#results-panel-group'
+      '.alert-danger'
     ) as HTMLElement;
     if (results_area) {
+      console.log('do_download has alert-box');
       let data: any = null;
       try {
+        console.log('calling hisDownload backend api');
+
+        // I *think* URLExt.join in requestAPI escapes params for us
         data = await requestAPI<any>(
-          'hisDownload?assignment_code=' + assignent_code
+          'hisDownload?course_id=' +
+            course_code +
+            '&assignment_id=' +
+            assignent_code +
+            '&student=' +
+            student +
+            '&path=' +
+            path
         );
       } catch (reason) {
         console.error('Action do_download caught error:', reason);
         const msg: string = 'Error on GET hisDownload.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
+      console.log('calling hisDownload did not error' + data);
 
       if (data) {
+        console.log('do stuff with data');
         this.handle_response_data(results_area, data);
       }
     }
@@ -534,8 +575,7 @@ class Action {
           title,
           'download',
           false,
-          this.do_download.bind(this),
-          fetch_params
+          this.do_download.bind('', title, data['user'], data['path'])
         );
         buttons_span.append(downloadButton);
       }

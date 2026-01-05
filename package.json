@@ -64,7 +64,8 @@
         "@jupyterlab/launcher": "^4.4.2",
         "@jupyterlab/mainmenu": "^4.4.5",
         "@jupyterlab/services": "^7.4.2",
-        "@lumino/widgets": "^2.7.1"
+        "@lumino/widgets": "^2.7.1",
+        "html-entities": "^2.6.0"
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
