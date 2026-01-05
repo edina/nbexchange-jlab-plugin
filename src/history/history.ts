@@ -204,6 +204,7 @@ export class HistoryList {
 
           // Add group in panel_body_id
           new ActionGroup(
+            this.widget,
             assignment_panel_elem,
             panel_body_id,
             isCurrent,
@@ -340,7 +341,9 @@ export class CourseList {
 }
 
 class ActionGroup {
+  widget: Widget;
   constructor(
+    widget: Widget,
     panel_elem: HTMLElement,
     parent: string,
     isCurrent: boolean,
@@ -349,6 +352,7 @@ class ActionGroup {
     title: string,
     actions: IActionData[]
   ) {
+    this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-group');
     this.make_row(element, isCurrent, role, assignment_code, title, actions);
@@ -382,7 +386,7 @@ class ActionGroup {
       assignment_code + ' ' + title + ' ' + action_count
     );
     for (let i = 0; i < actions.length; i++) {
-      new Action(row, isCurrent, role, title, actions[i]);
+      new Action(this.widget, row, isCurrent, role, title, actions[i]);
     }
 
     element.append(row);
@@ -390,13 +394,17 @@ class ActionGroup {
 }
 
 class Action {
+  widget: Widget;
+
   constructor(
+    widget: Widget,
     parent_elem: HTMLElement,
     isCurrent: boolean,
     role: string,
     title: string,
     data: IActionData
   ) {
+    this.widget = widget;
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('action-row');
     this.make_row(element, isCurrent, role, title, data);
@@ -406,10 +414,53 @@ class Action {
   // `Download` pulls the tarball down and saves _as the tarball_ in the home directory
   // `collect` actually triggers an nbgrader collect on the server side, replacing any existing files
   private async do_download(assignent_code: string) {
-    // Placeholder for future action
+    const results_area = this.widget.node.querySelector(
+      '#results-panel-group'
+    ) as HTMLElement;
+    if (results_area) {
+      let data: any = null;
+      try {
+        data = await requestAPI<any>(
+          'hisDownload?assignment_code=' + assignent_code
+        );
+      } catch (reason) {
+        console.error('Action do_download caught error:', reason);
+        const msg: string = 'Error on GET hisDownload.\n' + reason;
+        this.show_error('<p>' + msg + '</p>');
+      }
+
+      if (data) {
+        this.handle_response_data(results_area, data);
+      }
+    }
   }
+
   private async do_collect(assignent_code: string) {
-    // Placeholder for future action
+    const results_area = this.widget.node.querySelector(
+      '#results-panel-group'
+    ) as HTMLElement;
+    if (results_area) {
+      let data: any = null;
+      try {
+        data = await requestAPI<any>(
+          'hisCollect?assignment_code=' + assignent_code
+        );
+      } catch (reason) {
+        console.error('Action do_collect caught error:', reason);
+        const msg: string = 'Error on GET hisCollect.\n' + reason;
+        this.show_error('<p>' + msg + '</p>');
+      }
+
+      if (data) {
+        this.handle_response_data(results_area, data);
+      }
+    }
+  }
+
+  private handle_response_data(results_area: HTMLElement, data: any): void {
+    if (results_area) {
+      results_area.innerHTML = data.value;
+    }
   }
 
   private make_button(
@@ -458,8 +509,6 @@ class Action {
       date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     user_span.innerText = data['user'];
 
-    // disable_button = false;
-
     if (title === 'Submitted') {
       // client-side code needs course_code, assignment_id, student, path
       const fetch_params = {
@@ -469,30 +518,46 @@ class Action {
         path: data['path']
       };
 
-      if (isCurrent && role === 'Instructor') {
-        const collectButton: HTMLButtonElement = this.make_button(
+      if (role === 'Instructor') {
+        if (isCurrent) {
+          const collectButton: HTMLButtonElement = this.make_button(
+            title,
+            'collect',
+            false,
+            this.do_collect.bind(this),
+            fetch_params
+          );
+          buttons_span.append(collectButton);
+        }
+
+        const downloadButton: HTMLButtonElement = this.make_button(
           title,
-          'collect',
+          'download',
           false,
-          this.do_collect.bind(this),
+          this.do_download.bind(this),
           fetch_params
         );
-        buttons_span.append(collectButton);
+        buttons_span.append(downloadButton);
       }
-
-      const downloadButton: HTMLButtonElement = this.make_button(
-        title,
-        'download',
-        false,
-        this.do_download.bind(this),
-        fetch_params
-      );
-      buttons_span.append(downloadButton);
     }
     row.append(timestamp_span);
     row.append(user_span);
     row.append(buttons_span);
 
     element.append(row);
+  }
+
+  private show_error(message: string): void {
+    const element = this.widget.node.getElementsByClassName(
+      'alert-danger'
+    )[0] as HTMLElement;
+    if (element) {
+      element.innerHTML = message;
+      element.style.display = 'block';
+    } else {
+      console.error('show_error element not found');
+      // Notification.emit(message, 'error', { autoClose: false });
+    }
+    // Notification.emit(message, 'error', { autoClose: false });
   }
 }
