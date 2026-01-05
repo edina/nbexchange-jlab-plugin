@@ -469,17 +469,34 @@ class Action {
       try {
         console.log('calling hisDownload backend api');
 
-        // I *think* URLExt.join in requestAPI escapes params for us
-        data = await requestAPI<any>(
+        const cc = encode(course_code);
+        const ac = encode(assignent_code);
+        const st = encode(student);
+        const pa = encode(path);
+
+        let url =
           'hisDownload?course_code=' +
-            encode(course_code) +
-            '&assignment_code=' +
-            encode(assignent_code) +
-            '&student=' +
-            encode(student) +
-            '&path=' +
-            encode(path)
-        );
+          encode(course_code) +
+          '&assignment_code=' +
+          encode(assignent_code) +
+          '&student=' +
+          encode(student) +
+          '&path=' +
+          encode(path);
+        console.log('first url: ' + url);
+
+        url =
+          'hisDownload?course_code=' +
+          cc +
+          '&assignment_code=' +
+          ac +
+          '&student=' +
+          st +
+          '&path=' +
+          pa;
+        console.log('second url: ' + url);
+
+        data = await requestAPI<any>(url);
       } catch (reason) {
         console.error('Action do_download caught error:', reason);
         const msg: string = 'Error on GET hisDownload.\n' + reason;
