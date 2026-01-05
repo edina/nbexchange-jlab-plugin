@@ -443,10 +443,7 @@ class Action {
     path: string
   ) {
     console.log('do_download called');
-    console.log('do_download widget:' + this.widget);
-    const results_area = this.widget.node.querySelector(
-      '.alert-danger'
-    ) as HTMLElement;
+    const results_area = document.querySelector('.alert-danger') as HTMLElement;
     if (results_area) {
       console.log('do_download has alert-box');
       let data: any = null;
@@ -475,6 +472,8 @@ class Action {
         console.log('do stuff with data');
         this.handle_response_data(results_area, data);
       }
+    } else {
+      console.log('alert box not found');
     }
   }
 
