@@ -1,4 +1,4 @@
-// import {encode} from 'html-entities';
+import { encode } from 'html-entities';
 
 import { Widget } from '@lumino/widgets';
 
@@ -472,13 +472,13 @@ class Action {
         // I *think* URLExt.join in requestAPI escapes params for us
         data = await requestAPI<any>(
           'hisDownload?course_code=' +
-            course_code +
+            encode(course_code) +
             '&assignment_code=' +
-            assignent_code +
+            encode(assignent_code) +
             '&student=' +
-            student +
+            encode(student) +
             '&path=' +
-            path
+            encode(path)
         );
       } catch (reason) {
         console.error('Action do_download caught error:', reason);
