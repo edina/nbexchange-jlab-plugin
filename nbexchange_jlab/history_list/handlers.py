@@ -159,10 +159,10 @@ class HistoryList(BaseListerClass):
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)
                 nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
-                local_dest_path = self.coursedir.format_path(
-                    self.coursedir.submitted_directory,
+                local_dest_path = nbc.coursedir.format_path(
+                    nbc.coursedir.submitted_directory,
                     student,
-                    self.coursedir.assignment_id,
+                    nbc.coursedir.assignment_id,
                 )
                 if not os.path.exists(os.path.dirname(local_dest_path)):
                     os.makedirs(os.path.dirname(local_dest_path))
