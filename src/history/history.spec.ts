@@ -4,6 +4,23 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 import { requestAPI } from '../handler';
 jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
 
+/* Tests still to write */
+// if data is true, but null
+// formatDate test
+// clear_list clears both alert boxes
+// history successfully returns 0 records
+// `current_course` class added to current course details element
+// ... and the summary text
+// load_history gets success: False
+// show_error gets widget with missing 'alert-danger' class
+// show_info gets widget with missing 'alert-info' class
+// ? Can we get rid of the whole `CourseList` class ?
+// ? Does history even have a "disabled button" concept ?
+// that the download button only appears if you are an instructor on the course
+//   .... even if your _current_ role is student
+// that the collect button only appears in you are an instructor on the current course
+// test Actions show_error
+
 describe('HistoryWidget', () => {
   beforeEach(() => {
     // ensure a clean DOM for each test
@@ -27,8 +44,11 @@ describe('HistoryWidget', () => {
     const widget = new HistoryWidget(app);
     expect(widget.node.querySelector('#history_h2')).not.toBeNull();
     expect(widget.node.querySelector('#history-toolbar')).not.toBeNull();
+    expect(
+      widget.node.querySelector('#baautograde-alert-danger')
+    ).not.toBeNull();
+    expect(widget.node.querySelector('#baautograde-alert-info')).not.toBeNull();
     expect(widget.node.querySelector('#actions-panel-group')).not.toBeNull();
-    console.log('History: ', widget.node.outerHTML);
   });
 
   // test load-list gets network error
@@ -40,8 +60,9 @@ describe('HistoryWidget', () => {
     const ba = new HistoryWidget(app);
 
     const error_box = ba.node.querySelector(
-      '#baautograde-alert-box'
+      '#baautograde-alert-danger'
     ) as HTMLElement;
+
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(errorSpy).toHaveBeenCalled();
@@ -58,7 +79,7 @@ describe('HistoryWidget', () => {
     const ba = new HistoryWidget(app);
 
     const error_box = ba.node.querySelector(
-      '#baautograde-alert-box'
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -78,7 +99,7 @@ describe('HistoryWidget', () => {
     const ba = new HistoryWidget(app);
 
     const error_box = ba.node.querySelector(
-      '#baautograde-alert-box'
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -219,7 +240,8 @@ describe('HistoryWidget', () => {
     });
     const app = {} as JupyterFrontEnd;
     const ba = new HistoryWidget(app);
-    const error_box = ba.node.querySelector('.history-activity') as HTMLElement;
+    const error_box = ba.node.querySelector('.alert-info') as HTMLElement;
+
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
@@ -227,8 +249,4 @@ describe('HistoryWidget', () => {
       '<p>There is no History to show you</p>'
     );
   });
-
-  // if data is true, but null
-  // formatDate test
-  //
 });

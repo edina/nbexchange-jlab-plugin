@@ -73,6 +73,16 @@ export class HistoryList {
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
+    let alert_area = document.querySelector('.alert-danger') as HTMLElement;
+    if (alert_area) {
+      alert_area.innerHTML = '';
+      alert_area.style.display = 'None';
+    }
+    alert_area = document.querySelector('.alert-info') as HTMLElement;
+    if (alert_area) {
+      alert_area.innerHTML = '';
+      alert_area.style.display = 'None';
+    }
   }
 
   private formatDate(date: Date): string {
@@ -274,13 +284,13 @@ export class HistoryList {
 
   public show_info(message: string): void {
     const element = this.widget.node.getElementsByClassName(
-      'history-activity'
+      'alert-info'
     )[0] as HTMLElement;
     if (element) {
       element.innerHTML = message;
       element.style.display = 'block';
     } else {
-      console.log('show_error element not found');
+      console.log('show_info element not found');
       // Notification.emit(message, 'error', { autoClose: false });
     }
     // Notification.emit(message, 'info', { autoClose: false });
@@ -451,8 +461,8 @@ class Action {
     student: string,
     path: string
   ) {
-    const results_area = document.querySelector('.alert-danger') as HTMLElement;
-    if (results_area) {
+    const alert_area = document.querySelector('.alert-danger') as HTMLElement;
+    if (alert_area) {
       let data: any = null;
       try {
         const url =
@@ -473,26 +483,35 @@ class Action {
       }
 
       if (data) {
-        results_area.innerHTML = data.value;
-        results_area.style.display = 'block';
-
-        // this.handle_response_data(results_area, data);
+        alert_area.innerHTML = data.value;
+        alert_area.style.display = 'block';
       }
     } else {
       console.log('alert box not found');
     }
   }
 
-  private async do_collect(assignent_code: string) {
-    const results_area = this.widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-    if (results_area) {
+  private async do_collect(
+    course_code: string,
+    assignent_code: string,
+    student: string,
+    path: string
+  ) {
+    const alert_area = document.querySelector('.alert-danger') as HTMLElement;
+    if (alert_area) {
       let data: any = null;
       try {
-        data = await requestAPI<any>(
-          'hisCollect?assignment_code=' + assignent_code
-        );
+        const url =
+          'hisCollect?course_code=' +
+          encodeURIComponent(course_code) +
+          '&assignment_code=' +
+          encodeURIComponent(assignent_code) +
+          '&student=' +
+          encodeURIComponent(student) +
+          '&path=' +
+          encodeURIComponent(path);
+
+        data = await requestAPI<any>(url);
       } catch (reason) {
         console.error('Action do_collect caught error:', reason);
         const msg: string = 'Error on GET hisCollect.\n' + reason;
@@ -500,10 +519,11 @@ class Action {
       }
 
       if (data) {
-        results_area.innerHTML = data.value;
-
-        // this.handle_response_data(results_area, data);
+        alert_area.innerHTML = data.value;
+        alert_area.style.display = 'block';
       }
+    } else {
+      console.log('alert box not found');
     }
   }
 
@@ -576,7 +596,13 @@ class Action {
             action_type,
             'collect',
             false,
-            this.do_collect.bind(this),
+            this.do_collect.bind(
+              this,
+              course_code,
+              assignment_code,
+              data['user'],
+              data['path']
+            ),
             fetch_params
           );
           buttons_span.append(collectButton);
@@ -605,7 +631,6 @@ class Action {
   }
 
   private show_error(message: string): void {
-    console.log('show error called:' + message);
     const element = this.widget.node.getElementsByClassName(
       'alert-danger'
     )[0] as HTMLElement;

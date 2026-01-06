@@ -145,14 +145,13 @@ class HistoryList(BaseListerClass):
         self, course_code: str = None, assignment_code: str = None, student: str = None, path: str = None
     ) -> Dict:
 
-        self.log.info(f"do_download called with {course_code}, {assignment_code}, {student}, {path}")
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
-        retvalue = {"success": True, "value": "No reason given"}
-        local_dest_path = "home"
+        retvalue = {"success": False, "value": "No reason given"}
 
         with self.yield_config() as config:
+            local_dest_path = "home"
 
             try:
                 if course_code:
@@ -163,7 +162,6 @@ class HistoryList(BaseListerClass):
                 nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
 
                 # These need set up for collect.download
-                nbc.coursedir.course_id = course_code
                 nbc.coursedir.assignment_id = assignment_code
                 nbc.coursedir.student_id = student
 
@@ -177,15 +175,10 @@ class HistoryList(BaseListerClass):
                     os.makedirs(os.path.dirname(local_dest_path))
                 if os.path.isdir(local_dest_path):
                     shutil.rmtree(local_dest_path)
-                # os.makedirs(os.path.dirname(local_dest_path))
-                self.log.info(f"local_dest: {local_dest_path} - {os.path.isdir(local_dest_path)}")
 
                 # Fake up a submission dict for download
                 submission = {"path": path}
-                self.log.info("do actual collect.download")
-
                 nbc.download(submission, local_dest_path)
-                self.log.info("actual collect.download done")
 
             except HistoryError as e:
                 retvalue = {"success": False, "value": str(e)}
@@ -213,7 +206,61 @@ class HistoryList(BaseListerClass):
         self, course_code: str = None, assignment_code: str = None, student: str = None, path: str = None
     ) -> Dict:
 
-        return {"success": False, "value": "Not implemented yet."}
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+
+        retvalue = {"success": False, "value": "No reason given"}
+
+        with self.yield_config() as config:
+            local_dest_path = "home"
+
+            try:
+                if course_code:
+                    config.CourseDirectory.course_id = course_code
+
+                coursedir = CourseDirectory(config=config)
+                authenticator = Authenticator(config=config)
+                nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
+
+                # These need set up for collect.download
+                nbc.coursedir.assignment_id = assignment_code
+                nbc.coursedir.student_id = student
+
+                local_dest_path = self.coursedir.format_path(
+                    self.coursedir.submitted_directory,
+                    student,
+                    self.coursedir.assignment_id,
+                )
+                if not os.path.exists(os.path.dirname(local_dest_path)):
+                    os.makedirs(os.path.dirname(local_dest_path))
+                if os.path.isdir(local_dest_path):
+                    shutil.rmtree(local_dest_path)
+
+                # Fake up a submission dict for download
+                submission = {"path": path}
+                nbc.download(submission, local_dest_path)
+
+            except HistoryError as e:
+                retvalue = {"success": False, "value": str(e)}
+            except Exception as e:
+                self.log.error(traceback.format_exc())
+                if isinstance(e, ExchangeError):
+                    retvalue = {
+                        "success": False,
+                        "value": (
+                            "The exchange directory does not exist and could",
+                            "not be created. The 'release' and 'collect' functionality will not be available.",
+                            "Please see the documentation on",
+                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
+                            "for instructions.",
+                        ),
+                    }
+                else:
+                    retvalue = {"success": False, "value": traceback.format_exc()}
+            else:
+                retvalue = {"success": True, "value": f"Downloaded into {local_dest_path}"}
+
+        return retvalue
 
     def get(self):
         self.log.info(f"Called get on {self.__class__.__name__}")
@@ -237,7 +284,6 @@ class HistoryListHandler(BaseHistoryHandler):
     @web.authenticated
     def get(self):
         course_id = self.get_argument("course_id")
-        self.log.info(f"get HISTORY for course: {course_id}")
         self.finish(json.dumps(self.manager.list_history(course_id=course_id)))
 
 
@@ -249,8 +295,6 @@ class HiCollectAssignmentHandler(BaseHistoryHandler):
         assignment_code = self.get_argument("assignment_code")
         student = self.get_argument("student")
         path = self.get_argument("path")
-
-        self.log.info(f"Collect assignment as NbGrader would:\n{course_code}, {assignment_code}, {student}, {path}")
 
         self.finish(
             json.dumps(
@@ -270,8 +314,6 @@ class HiDownloadHandler(BaseHistoryHandler):
         student = self.get_argument("student")
         path = self.get_argument("path")
 
-        self.log.info(f"Download assignment into $HOME:\n{course_code}, {assignment_code}, {student}, {path}")
-
         self.finish(
             json.dumps(
                 self.manager.do_download(
@@ -290,9 +332,6 @@ def setup_handlers(web_app):
         (r"hisCollect", HiCollectAssignmentHandler),
         (r"hisDownload", HiDownloadHandler),
     ]
-    # route_pattern_history = url_path_join(base_url, "nbexchange-jlab", "history")
-    # handlers = [(route_pattern_history, HistoryListHandler)]
-    # web_app.add_handlers(host_pattern, handlers)
 
     # Our hander urls are made up of <base_url>, <namespace>, <endpoint>
     # (this is done to keep things out of the nbgrader & jupyterlab handler paths)

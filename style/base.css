@@ -4,6 +4,18 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
+.alert-info {
+  color: var(--jp-info-color0);
+  background-color: var(--jp-info-color3);
+  border-color: var(--jp-info-color2);
+}
+
+.alert-warning {
+  color: var(--jp-warn-color0);
+  background-color: var(--jp-warn-color3);
+  border-color: var(--jp-warn-color2);
+}
+
 .action-group {
   display: flex;
   flex-direction: column;
@@ -25,6 +37,7 @@
 .action-row:first-of-type {
   margin-top: 10px;
 }
+
 .action_buttons {
   float: right;
   text-align: right;

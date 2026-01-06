@@ -32,11 +32,11 @@ export class HistoryWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div id="baautograde-alert-box" role="alert" class="alert alert-danger version_error">',
+      '  <div id="baautograde-alert-danger" role="alert" class="alert alert-danger">',
+      '  </div>',
+      '  <div id="baautograde-alert-info" role="alert" class="alert alert-info">',
       '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
-      '  </div>',
-      '  <div id="history-response-box" role="alert" class="alert alert-info version_error">',
       '  </div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';

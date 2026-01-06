@@ -10,6 +10,11 @@ jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
 
 import { BaAssignmentsList, AssignmentsList } from './bulkAutograde';
 
+/* tests still to write */
+// load list returns data.success false
+// load_list_success adds the blurb of text
+// show_error gets widget with missing 'alert-danger' class
+
 describe('bulkAutograde instanciation', () => {
   beforeEach(() => {
     // ensure a clean DOM for each test
@@ -26,14 +31,21 @@ describe('bulkAutograde instanciation', () => {
     (requestAPI as jest.Mock).mockResolvedValue({ success: 'true', value: {} });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
-    expect(ba.node.querySelector('#bulkautograder_h2')).not.toBeNull();
-    expect(ba.node.querySelector('#assignment-table')).not.toBeNull();
-    expect(ba.node.querySelector('#assignment_list_default')).not.toBeNull();
-    expect(ba.node.querySelector('#refresh_assignment_list')).not.toBeNull();
-    expect(ba.node.querySelector('#baautograde-alert-box')).not.toBeNull();
-    expect(ba.node.querySelector('#results-panel-group')).not.toBeNull();
+    expect(widget.node.querySelector('#bulkautograder_h2')).not.toBeNull();
+    expect(widget.node.querySelector('#assignment-table')).not.toBeNull();
+    expect(
+      widget.node.querySelector('#assignment_list_default')
+    ).not.toBeNull();
+    expect(
+      widget.node.querySelector('#refresh_assignment_list')
+    ).not.toBeNull();
+    expect(
+      widget.node.querySelector('#baautograde-alert-danger')
+    ).not.toBeNull();
+    expect(widget.node.querySelector('#baautograde-alert-info')).not.toBeNull();
+    expect(widget.node.querySelector('#results-panel-group')).not.toBeNull();
   });
 
   it('creates an AssignmentsList instance', async () => {
@@ -73,10 +85,10 @@ describe('BulkAutogradeWidget integration', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
-    const error_box = ba.node.querySelector(
-      '#baautograde-alert-box'
+    const error_box = widget.node.querySelector(
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -93,12 +105,12 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = ba.node.querySelector(
-      '#baautograde-alert-box'
+    const msgEl = widget.node.querySelector(
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     expect(msgEl.innerHTML).toContain(
       '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
@@ -112,12 +124,12 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = ba.node.querySelector(
-      '#baautograde-alert-box'
+    const msgEl = widget.node.querySelector(
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     expect(msgEl.innerHTML).toContain(
       '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
@@ -142,17 +154,17 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = ba.node.querySelector(
+    const msgEl = widget.node.querySelector(
       '#assignment_list_default'
     ) as HTMLElement;
     expect(msgEl.innerHTML).toContain(
       '<p>Querying to get assignment details</p>'
     );
-    const table = ba.node.querySelector(
+    const table = widget.node.querySelector(
       '#assignment-table'
     ) as HTMLTableElement;
     expect(table.querySelector('thead th')!.textContent).toContain(
@@ -165,10 +177,10 @@ describe('BulkAutogradeWidget integration', () => {
     ) as HTMLTableRowElement;
     expect(assignRow).not.toBeNull();
 
-    let collectBtn = ba.node.querySelector(
+    let collectBtn = widget.node.querySelector(
       '#assign1_collect'
     ) as HTMLButtonElement;
-    const autogradeBtn = ba.node.querySelector(
+    const autogradeBtn = widget.node.querySelector(
       '#assign1_Bulk_Autograde'
     ) as HTMLButtonElement;
 
@@ -181,10 +193,25 @@ describe('BulkAutogradeWidget integration', () => {
       'tr[aria-label="assign2"]'
     ) as HTMLTableRowElement;
     expect(assignRow).not.toBeNull();
-    collectBtn = ba.node.querySelector('#assign2_collect') as HTMLButtonElement;
+    collectBtn = widget.node.querySelector(
+      '#assign2_collect'
+    ) as HTMLButtonElement;
 
     expect(collectBtn).not.toBeNull();
     expect(collectBtn.disabled).toBe(true);
+  });
+});
+
+describe('BulkAutogradeWidget collect functionality', () => {
+  beforeEach(() => {
+    // ensure a clean DOM for each test
+    document.body.innerHTML = '';
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.restoreAllMocks();
+    document.body.innerHTML = '';
   });
 
   it('The collect button works correctly', async () => {
@@ -208,18 +235,18 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const collectBtn = ba.node.querySelector(
+    const collectBtn = widget.node.querySelector(
       '#assign1_collect'
     ) as HTMLButtonElement;
 
     // click collect
     collectBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = ba.node.querySelector(
+    const results = widget.node.querySelector(
       '#results-panel-group'
     ) as HTMLElement;
 
@@ -249,22 +276,70 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const collectBtn = ba.node.querySelector(
+    const collectBtn = widget.node.querySelector(
       '#assign2_collect'
     ) as HTMLButtonElement;
 
     // click collect
     collectBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = ba.node.querySelector(
+    const results = widget.node.querySelector(
       '#results-panel-group'
     ) as HTMLElement;
 
     expect(results.innerHTML).not.toContain('collected');
+  });
+
+  it('handles collect api failure gracefully', async () => {
+    (requestAPI as jest.Mock).mockImplementation((endpoint: string) => {
+      if (endpoint === 'getAssignment') {
+        return Promise.resolve({
+          success: 'true',
+          value: {
+            assign1: { exchange: 1, locally: 0 }
+          }
+        });
+      }
+      return Promise.reject('bad');
+    });
+
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const app = {} as JupyterFrontEnd;
+    const widget = new BulkAutogradeWidget(app);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const collectBtn = widget.node.querySelector(
+      '#assign1_collect'
+    ) as HTMLButtonElement;
+    collectBtn.click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(errorSpy).toHaveBeenCalled();
+    const alert = widget.node.querySelector(
+      '#baautograde-alert-danger'
+    ) as HTMLElement;
+    expect(alert.innerHTML).toContain('Error on GET baCollect');
+
+    errorSpy.mockRestore();
+  });
+});
+
+describe('BulkAutogradeWidget autograde functionality', () => {
+  beforeEach(() => {
+    // ensure a clean DOM for each test
+    document.body.innerHTML = '';
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.restoreAllMocks();
+    document.body.innerHTML = '';
   });
 
   it('The autograde button works correctly', async () => {
@@ -286,23 +361,23 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const table = ba.node.querySelector(
+    const table = widget.node.querySelector(
       '#assignment-table'
     ) as HTMLTableElement;
     expect(table.querySelector('thead th')!.textContent).toContain(
       'Assignment Name'
     );
 
-    const autogradeBtn = ba.node.querySelector(
+    const autogradeBtn = widget.node.querySelector(
       '#assign1_Bulk_Autograde'
     ) as HTMLButtonElement;
 
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = ba.node.querySelector(
+    const results = widget.node.querySelector(
       '#results-panel-group'
     ) as HTMLElement;
 
@@ -310,41 +385,6 @@ describe('BulkAutogradeWidget integration', () => {
     autogradeBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(results.innerHTML).toContain('autograded');
-  });
-
-  it('handles collect api failure gracefully', async () => {
-    (requestAPI as jest.Mock).mockImplementation((endpoint: string) => {
-      if (endpoint === 'getAssignment') {
-        return Promise.resolve({
-          success: 'true',
-          value: {
-            assign1: { exchange: 1, locally: 0 }
-          }
-        });
-      }
-      return Promise.reject('bad');
-    });
-
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
-
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    const collectBtn = ba.node.querySelector(
-      '#assign1_collect'
-    ) as HTMLButtonElement;
-    collectBtn.click();
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    expect(errorSpy).toHaveBeenCalled();
-    const alert = ba.node.querySelector(
-      '#baautograde-alert-box'
-    ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET baCollect');
-
-    errorSpy.mockRestore();
   });
 
   it('handles autograde api failure gracefully', async () => {
@@ -363,19 +403,19 @@ describe('BulkAutogradeWidget integration', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const app = {} as JupyterFrontEnd;
-    const ba = new BulkAutogradeWidget(app);
+    const widget = new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const autogradeBtn = ba.node.querySelector(
+    const autogradeBtn = widget.node.querySelector(
       '#assign1_Bulk_Autograde'
     ) as HTMLButtonElement;
     autogradeBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(errorSpy).toHaveBeenCalled();
-    const alert = ba.node.querySelector(
-      '#baautograde-alert-box'
+    const alert = widget.node.querySelector(
+      '#baautograde-alert-danger'
     ) as HTMLElement;
     expect(alert.innerHTML).toContain('Error on GET baAutograde');
 
