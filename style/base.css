@@ -4,6 +4,10 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
+.alert {
+  display: none;
+}
+
 .alert-info {
   color: var(--jp-info-color0);
   background-color: var(--jp-info-color3);
