@@ -6,11 +6,47 @@ It is composed of a Python package named `nbexchange_jlab` for the server extens
 
 ## Additional Functionality
 
-In addition to the usual suite of plugins for exchanging files, the plugin provides a `History` option to the Nbgrader menu - this is a visual render of NbExchanges `history` endpoint:
+In addition to the usual suite of plugins for exchanging files, the plugin provides a new autograde pre-processor and two additional commands options to the Nbgrader menu: `Exchange History` and `Bulk Autograding`.
 
-![A screenshot of the History page](history_screenshot.png)
+![The new nbgrader menu options](new_menu_options.png)
 
-The current course is shown in green, and each course indicates the first and last date of any activity _for the whole course_
+### new autograde pre-processor
+
+The new autograde preprocessor replaces the nbgrader `deduplicate` pre-processor. This one _deletes_ any 2nd & subsequent cells that duplicate any nbgrader _metadata_ [this has been a noticable issue seen in the Noteable service.]
+
+### Exchange History
+
+This provides a visual render of NbExchanges `history` endpoint:
+
+![A screenshot of the History page](history_screenshot_closed.png)
+
+The current course is shown in green, and each course indicates the first and last date of any activity _for the whole course_.
+
+For each course, a summary of the actions is provided, and then (within each action) all actions are listed in time-order:
+
+![A screenshot of ](history_screenshot_details.png)
+
+You will notice that _submissions_ have some buttons:
+
+If you are an instructor on a course, you have some additional features:
+
+- A "Download" button is provided to download a specific submission into your home directory.
+- For the current course, a "Collect" button will do an NbGrader Collect operation, replacing whatever is already there.
+
+### Bulk Autograde
+
+This provides an interface to assist in autograding. The page starts with all the assignments for the current course:
+
+![A screenshot of the Bulk Autograder table of assignments](ba_table.png)
+
+For each assignment, there's
+
+- a column listing the number of available submissions in the exchange &amp; the number of submissions that have been _collected_
+- are two buttons: `Collect` and `Bulk Autograde`. The `Collect` button is disabled if there are no submissions <em>to</em> collect
+
+Outputs from the actions of the buttons are displayed below the table
+
+![A screenshot of a successful ](ba_autograde_autograde.png)
 
 ## Requirements
 

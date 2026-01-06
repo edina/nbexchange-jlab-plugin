@@ -73,15 +73,19 @@ export class HistoryList {
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
-    let alert_area = document.querySelector('.alert-danger') as HTMLElement;
-    if (alert_area) {
-      alert_area.innerHTML = '';
-      alert_area.style.display = 'None';
+    let elem = document.querySelector('.alert-danger') as HTMLElement;
+    if (elem) {
+      elem.innerHTML = '';
+      elem.style.display = 'None';
     }
-    alert_area = document.querySelector('.alert-info') as HTMLElement;
-    if (alert_area) {
-      alert_area.innerHTML = '';
-      alert_area.style.display = 'None';
+    elem = document.querySelector('.alert-info') as HTMLElement;
+    if (elem) {
+      elem.innerHTML = '';
+      elem.style.display = 'None';
+    }
+    elem = document.querySelector('#results-panel-group') as HTMLElement;
+    if (elem) {
+      elem.innerHTML = '';
     }
   }
 
