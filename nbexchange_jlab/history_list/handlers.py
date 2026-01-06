@@ -218,13 +218,13 @@ class HistoryList(BaseListerClass):
             try:
                 if course_code:
                     config.CourseDirectory.course_id = course_code
-                self.log.info(f"do_collect config: {config}")
+                self.log.info(f"do_download config: {config}")
+
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)
                 nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
 
                 # These need set up for collect.download
-                nbc.coursedir.course_id = course_code
                 nbc.coursedir.assignment_id = assignment_code
                 nbc.coursedir.student_id = student
 
