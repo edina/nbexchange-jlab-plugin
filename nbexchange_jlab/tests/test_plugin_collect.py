@@ -89,7 +89,7 @@ def test_collect_methods(plugin_config, tmpdir):
         dest_path = f"{plugin_config.CourseDirectory.submitted_directory}/123/{ass_1_3}"
         with pytest.raises(
             Exception,
-            match=rf"Error unpacking download for {ass_1_3} on course {course_id}: file could not be opened successfully",  # noqa: E501
+            match=rf"Error downloading content from exchange path /submitted/{course_id}/{ass_1_3}/1/ - zero data returned",  # noqa: E501
         ):
             plugin.download(submission, dest_path)
 

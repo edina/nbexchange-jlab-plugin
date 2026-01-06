@@ -46,7 +46,10 @@ class ExchangeCollect(ABCExchangeCollect, NBExchange):
 
         if r.headers["content-type"] == "application/gzip":
             tgz = r.content
-
+            if not tgz:
+                self.fail(
+                    f"Error downloading content from exchange path {submission['path']} - zero data returned"  # noqa: E501
+                )
             try:
                 tar_file = io.BytesIO(tgz)
                 with tarfile.open(fileobj=tar_file) as handle:
