@@ -147,7 +147,8 @@ class HistoryList(BaseListerClass):
 
         if not (config and course_code and assignment_code and student):
             raise ValueError(
-                f"Failed to define one of config [{config}], [course_code {course_code}]", f"assignment_code [{assignment_code}], or student [{student}]"
+                f"Failed to define one of config [{config}], [course_code {course_code}]",
+                f"assignment_code [{assignment_code}], or student [{student}]",
             )
 
         if course_code:
@@ -192,6 +193,7 @@ class HistoryList(BaseListerClass):
                 )
 
                 local_dest_path = os.path.join(
+                    os.environ.get("HOME", "."),
                     "Downloads",
                     nbc.coursedir.course_id,
                     student,
@@ -234,30 +236,15 @@ class HistoryList(BaseListerClass):
             local_dest_path = "home"
 
             try:
-                if course_code:
-                    config.CourseDirectory.course_id = course_code
-
-                coursedir = CourseDirectory(config=config)
-                authenticator = Authenticator(config=config)
-                nbc = ExchangeCollect(coursedir=coursedir, authenticator=authenticator, config=config)
-
-                # These need set up for collect.download
-                nbc.coursedir.assignment_id = assignment_code
-                nbc.coursedir.student_id = student
-
+                nbc = self._setup_download(
+                    config=config, course_code=course_code, assignment_code=assignment_code, student=student
+                )
                 local_dest_path = nbc.coursedir.format_path(
                     nbc.coursedir.submitted_directory,
                     student,
                     nbc.coursedir.assignment_id,
                 )
-                if not os.path.exists(os.path.dirname(local_dest_path)):
-                    os.makedirs(os.path.dirname(local_dest_path))
-                if os.path.isdir(local_dest_path):
-                    shutil.rmtree(local_dest_path)
-
-                # Fake up a submission dict for download
-                submission = {"path": path}
-                nbc.download(submission, local_dest_path)
+                self._do_download(nbc, local_dest_path, path)
 
             except HistoryError as e:
                 retvalue = {"success": False, "value": str(e)}
