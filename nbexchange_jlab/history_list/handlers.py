@@ -208,13 +208,7 @@ class HistoryList(BaseListerClass):
                 if isinstance(e, ExchangeError):
                     retvalue = {
                         "success": False,
-                        "value": (
-                            "The exchange directory does not exist and could",
-                            "not be created. The 'release' and 'collect' functionality will not be available.",
-                            "Please see the documentation on",
-                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
-                            "for instructions.",
-                        ),
+                        "value": (f"History download had an ExchangeError: {str(e)}"),
                     }
                 else:
                     retvalue = {"success": False, "value": traceback.format_exc()}
@@ -249,17 +243,11 @@ class HistoryList(BaseListerClass):
             except HistoryError as e:
                 retvalue = {"success": False, "value": str(e)}
             except Exception as e:
-                self.log.error(traceback.format_exc())
+                self.log.error(f"do_collect has an exception: {traceback.format_exc()}")
                 if isinstance(e, ExchangeError):
                     retvalue = {
                         "success": False,
-                        "value": (
-                            "The exchange directory does not exist and could",
-                            "not be created. The 'release' and 'collect' functionality will not be available.",
-                            "Please see the documentation on",
-                            "http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange",  # noqa E501
-                            "for instructions.",
-                        ),
+                        "value": (f"History collect had an ExchangeError: {str(e)}"),
                     }
                 else:
                     retvalue = {"success": False, "value": traceback.format_exc()}
