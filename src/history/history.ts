@@ -465,7 +465,7 @@ class Action {
     student: string,
     path: string
   ) {
-    const alert_area = document.querySelector('.alert-danger') as HTMLElement;
+    const alert_area = document.querySelector('.alert-info') as HTMLElement;
     if (alert_area) {
       let data: any = null;
       try {
@@ -485,7 +485,7 @@ class Action {
         const msg: string = 'Error on GET hisDownload.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
-
+      console.log('do_download has data: ' + data);
       if (data) {
         alert_area.innerHTML = data.value;
         alert_area.style.display = 'block';
@@ -501,7 +501,7 @@ class Action {
     student: string,
     path: string
   ) {
-    const alert_area = document.querySelector('.alert-danger') as HTMLElement;
+    const alert_area = document.querySelector('.alert-info') as HTMLElement;
     if (alert_area) {
       let data: any = null;
       try {
@@ -521,6 +521,7 @@ class Action {
         const msg: string = 'Error on GET hisCollect.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
+      console.log('do_collect has data: ' + data);
 
       if (data) {
         alert_area.innerHTML = data.value;
