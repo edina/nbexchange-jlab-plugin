@@ -36,6 +36,8 @@ assignment_id1 = "assign_1_1"
 assignment_id2 = "assign_1_2"
 assignment_id3 = "assign_1_3"
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
 
 @pytest.mark.gen_test
 def test_submit_methods(plugin_config, tmpdir, caplog):
@@ -1909,6 +1911,7 @@ def test_release_105MB_not_blocked(plugin_config, tmpdir):
 
 
 # @pytest.mark.gen_test
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped long test in GitHub")
 def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
     try:
         plugin_config.CourseDirectory.course_id = course_id
