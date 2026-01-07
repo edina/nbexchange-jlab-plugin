@@ -568,7 +568,7 @@ class Action {
         ', Student: ' +
         actionParams['student'] +
         ' (' +
-        row_index +
+        (row_index + 1) +
         ')'
     );
     button.style.margin = '0 1em';
