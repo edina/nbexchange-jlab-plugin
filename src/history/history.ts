@@ -429,6 +429,7 @@ class ActionGroup {
         assignment_code,
         role,
         action_type,
+        i,
         actions[i]
       );
     }
@@ -448,6 +449,7 @@ class Action {
     assignment_code: string,
     role: string,
     action_type: string,
+    row_index: number,
     data: IActionData
   ) {
     this.widget = widget;
@@ -460,6 +462,7 @@ class Action {
       assignment_code,
       role,
       action_type,
+      row_index,
       data
     );
     parent_elem.append(element);
@@ -547,7 +550,7 @@ class Action {
   // }
 
   private make_button(
-    id: string,
+    row_index: number,
     text: string,
     disabled: boolean,
     do_Action: (params: any) => void,
@@ -563,7 +566,10 @@ class Action {
         ', Assignment: ' +
         actionParams['assignment_code'] +
         ', Student: ' +
-        actionParams['student']
+        actionParams['student'] +
+        ' (' +
+        row_index +
+        ')'
     );
     button.style.margin = '0 1em';
     if (disabled) {
@@ -585,6 +591,7 @@ class Action {
     assignment_code: string,
     role: string,
     action_type: string,
+    row_index: number,
     data: IActionData
   ): void {
     const row = document.createElement('div');
@@ -615,7 +622,7 @@ class Action {
       if (role === 'Instructor') {
         if (isCurrent) {
           const collectButton: HTMLButtonElement = this.make_button(
-            action_type,
+            row_index,
             'collect',
             false,
             this.do_collect.bind(
@@ -631,7 +638,7 @@ class Action {
         }
 
         const downloadButton: HTMLButtonElement = this.make_button(
-          action_type,
+          row_index,
           'download',
           false,
           this.do_download.bind(
