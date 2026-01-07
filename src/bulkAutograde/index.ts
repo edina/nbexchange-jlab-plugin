@@ -19,7 +19,7 @@ export class BulkAutogradeWidget extends Widget {
       '  <div class="col-sm-8 no-padding"> <!-- -->',
       '    <div>',
       '      <div id="assignment_list_default"><p>Querying to get assignment details</p></div>',
-      '      <table id="assignment-table" border="0">',
+      '      <table id="assignment-table" border="0" aria-label="Table of assignments and their details">',
       '      </table>',
       '    </div>',
       '  </div> <!-- -->',

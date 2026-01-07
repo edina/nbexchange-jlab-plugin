@@ -206,7 +206,7 @@ export class AssignmentsList {
   }
 
   private make_button(
-    id: string,
+    assignment_code: string,
     text: string,
     disabled: boolean,
     do_Action: (params?: any) => void,
@@ -214,7 +214,10 @@ export class AssignmentsList {
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
-    button.setAttribute('id', id + '_' + text.replace(' ', '_'));
+    button.setAttribute(
+      'aria-label',
+      text + ' for Assignment ' + assignment_code
+    );
     button.style.margin = '0 1em';
     if (disabled) {
       button.disabled = true;
@@ -242,16 +245,26 @@ export class AssignmentsList {
     row.append(assignment_name_cell, values_cell, buttons_cell);
 
     assignment_name_cell.innerText = assignment_code;
+
+    values_cell.style.padding = '0 1em';
     values_cell.innerText =
       'Exchange:' + data.exchange + ', Locally:' + data.locally;
-
+    values_cell.setAttribute(
+      'aria-label',
+      'Counts for Assignment: ' +
+        assignment_code +
+        ', Exchange count:' +
+        data.exchange +
+        ', Local count:' +
+        data.locally
+    );
     let disable_button = false;
     if (data.exchange === data.locally) {
       disable_button = true;
     }
     const collectButton: HTMLButtonElement = this.make_button(
       assignment_code,
-      'collect',
+      'Collect',
       disable_button,
       this.do_collect.bind(this),
       assignment_code
@@ -264,6 +277,10 @@ export class AssignmentsList {
       assignment_code
     );
     buttons_cell.append(collectButton, autogradeButton);
+    buttons_cell.setAttribute(
+      'aria-label',
+      'Action buttons for Assignment: ' + assignment_code
+    );
   }
 
   private make_table_heading(table: HTMLTableElement): void {

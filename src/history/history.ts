@@ -410,7 +410,15 @@ class ActionGroup {
     row.append(summary);
     row.setAttribute(
       'aria-label',
-      assignment_code + ' ' + action_type + ' ' + action_count
+      'Course: ' +
+        course_code +
+        ', Assignment: ' +
+        assignment_code +
+        ', Action: ' +
+        action_type +
+        ', Count: ' +
+        action_count +
+        ' times'
     );
     for (let i = 0; i < actions.length; i++) {
       new Action(
@@ -542,12 +550,21 @@ class Action {
     id: string,
     text: string,
     disabled: boolean,
-    do_Action: (params?: any) => void,
-    actionParams?: any
+    do_Action: (params: any) => void,
+    actionParams: any
   ): HTMLButtonElement {
     const button: HTMLButtonElement = document.createElement('button');
     button.classList.add('btn');
-    button.setAttribute('id', id + '_' + text);
+    button.setAttribute(
+      'aria-label',
+      text +
+        ' for Course: ' +
+        actionParams['course_code'] +
+        ', Assignment: ' +
+        actionParams['assignment_code'] +
+        ', Student: ' +
+        actionParams['student']
+    );
     button.style.margin = '0 1em';
     if (disabled) {
       button.disabled = true;
@@ -623,7 +640,8 @@ class Action {
             assignment_code,
             data['user'],
             data['path']
-          )
+          ),
+          fetch_params
         );
         buttons_span.append(downloadButton);
       }

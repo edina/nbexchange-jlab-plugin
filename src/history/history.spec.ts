@@ -179,46 +179,11 @@ describe('HistoryWidget', () => {
     await new Promise(resolve => setTimeout(resolve, 1));
 
     console.log('History widget after loading list:', ba.node.outerHTML);
-    // const elem = ba.node.querySelector('#actions-panel-group') as HTMLElement;
-    // console.log('elem is a:', elem.tagName);
-    // console.log('Loaded history list outer HTML:', elem.outerHTML);
-    // const children = elem.children;
-    // expect(children.length).toBe(1);
-    // const course_group = children[0];
-    // expect(course_group.className).toBe('course_group');
-    // console.log('Course group children:', elem.children);
-
-    const elem = ba.node.getElementsByTagName(
-      'details'
-    ) as HTMLCollectionOf<HTMLElement>;
-
-    console.log('Loaded history list details:', elem);
-    // console.log('Loaded history list inner HTML:', elem.innerHTML);
-    // const course_groups = elem.getElementsByClassName('course_group');
-    // console.log('Loaded history list outer HTML:', course_groups);
-    // expect(course_groups.length).toBe(1);
-
-    // const details = elem.getElementsByTagName('details');
-    // expect(details.length).toBe(1);
-
-    // const summaries = elem.getElementsByTagName('summary');
-    // expect(summaries.length).toBe(1);
-
-    // const action_groups = elem.getElementsByClassName('action-group');
-    // expect(action_groups.length).toBe(6);
-
-    // const buttons = elem.getElementsByTagName('button');
-    // expect(buttons.length).toBe(1);
-    // expect(buttons[0].id).toBe('submitted_download_80_13');
-    // details at course level, summary course info plus dates & 'current_course'
-    // const course_outer = elem.querySelector('.course_group') as HTMLElement;
-    // expect(course_outer.innerHTML).toContain('<summary>');
-    // expect(course_outer.innerHTML).toContain('<details>');
-    // detail at assignment level, summary includes role info
-
-    // inside that detail is a div (class=panel-body) with 6 action-group divs
-
-    // there is only 1 button: submitted_download
+    const elem = ba.node.querySelector('#actions-panel-group') as HTMLElement;
+    console.log('elem is a:', elem.tagName);
+    console.log('Loaded history list outer HTML:', elem.outerHTML);
+    console.log('Loaded history list inner HTML:', elem.innerHTML);
+    console.log('Course group children:', elem.children);
   });
 
   it('loads history list identifies valid data with no assignments', async () => {

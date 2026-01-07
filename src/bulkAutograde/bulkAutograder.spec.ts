@@ -177,11 +177,11 @@ describe('BulkAutogradeWidget integration', () => {
     ) as HTMLTableRowElement;
     expect(assignRow).not.toBeNull();
 
-    let collectBtn = widget.node.querySelector(
-      '#assign1_collect'
+    let collectBtn = table.querySelector(
+      'button[aria-label="Collect for Assignment assign1"]'
     ) as HTMLButtonElement;
     const autogradeBtn = widget.node.querySelector(
-      '#assign1_Bulk_Autograde'
+      'button[aria-label="Bulk Autograde for Assignment assign1"]'
     ) as HTMLButtonElement;
 
     expect(collectBtn).not.toBeNull();
@@ -193,8 +193,8 @@ describe('BulkAutogradeWidget integration', () => {
       'tr[aria-label="assign2"]'
     ) as HTMLTableRowElement;
     expect(assignRow).not.toBeNull();
-    collectBtn = widget.node.querySelector(
-      '#assign2_collect'
+    collectBtn = table.querySelector(
+      'button[aria-label="Collect for Assignment assign2"]'
     ) as HTMLButtonElement;
 
     expect(collectBtn).not.toBeNull();
@@ -240,7 +240,7 @@ describe('BulkAutogradeWidget collect functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     const collectBtn = widget.node.querySelector(
-      '#assign1_collect'
+      'button[aria-label="Collect for Assignment assign1"]'
     ) as HTMLButtonElement;
 
     // click collect
@@ -281,7 +281,7 @@ describe('BulkAutogradeWidget collect functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     const collectBtn = widget.node.querySelector(
-      '#assign2_collect'
+      'button[aria-label="Collect for Assignment assign2"]'
     ) as HTMLButtonElement;
 
     // click collect
@@ -315,7 +315,7 @@ describe('BulkAutogradeWidget collect functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     const collectBtn = widget.node.querySelector(
-      '#assign1_collect'
+      'button[aria-label="Collect for Assignment assign1"]'
     ) as HTMLButtonElement;
     collectBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -373,7 +373,7 @@ describe('BulkAutogradeWidget autograde functionality', () => {
     );
 
     const autogradeBtn = widget.node.querySelector(
-      '#assign1_Bulk_Autograde'
+      'button[aria-label="Bulk Autograde for Assignment assign1"]'
     ) as HTMLButtonElement;
 
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -408,7 +408,7 @@ describe('BulkAutogradeWidget autograde functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     const autogradeBtn = widget.node.querySelector(
-      '#assign1_Bulk_Autograde'
+      'button[aria-label="Bulk Autograde for Assignment assign1"]'
     ) as HTMLButtonElement;
     autogradeBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
