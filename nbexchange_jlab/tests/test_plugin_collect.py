@@ -89,7 +89,7 @@ def test_collect_methods(plugin_config, tmpdir):
         dest_path = f"{plugin_config.CourseDirectory.submitted_directory}/123/{ass_1_3}"
         with pytest.raises(
             Exception,
-            match=rf"Error downloading content from exchange path /submitted/{course_id}/{ass_1_3}/1/ - zero data returned",  # noqa: E501
+            match=r"Collect download failed: zero data returned",  # noqa: E501
         ):
             plugin.download(submission, dest_path)
 
@@ -1254,7 +1254,10 @@ def test_collect_handles_failure_json(plugin_config, tmpdir):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         with pytest.raises(ExchangeError) as e_info:
             plugin.start()
-        assert str(e_info.value) == f"Error failing to collect for assignment {ass_1_3} on course {course_id}"
+        assert (
+            str(e_info.value)
+            == f"Collect download failed: Error failing to download for assignment {ass_1_3} on course {course_id}: Collection call requires a course code, an assignment code, and a path"  # noqa: E501 W503
+        )
 
 
 @pytest.mark.gen_test
@@ -1302,10 +1305,7 @@ def test_collect_handles_500_failure(plugin_config, tmpdir):
         with pytest.raises(Exception) as e_info:
             plugin.start()
         assert e_info.type is ExchangeError
-        assert (
-            str(e_info.value)
-            == f"Error failing to collect for assignment {ass_1_3} on course {course_id}: status code 500: error {http_error}"  # noqa: E501 W503
-        )
+        assert str(e_info.value) == f"Collect download failed: status code 500: error {http_error}"  # noqa: E501 W503
 
 
 @pytest.mark.gen_test

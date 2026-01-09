@@ -179,11 +179,8 @@ describe('HistoryWidget', () => {
     await new Promise(resolve => setTimeout(resolve, 1));
 
     console.log('History widget after loading list:', ba.node.outerHTML);
-    const elem = ba.node.querySelector('#actions-panel-group') as HTMLElement;
-    console.log('elem is a:', elem.tagName);
-    console.log('Loaded history list outer HTML:', elem.outerHTML);
-    console.log('Loaded history list inner HTML:', elem.innerHTML);
-    console.log('Course group children:', elem.children);
+    const elems = document.querySelector('details[name="course_level_group"]');
+    console.log(elems?.outerHTML);
   });
 
   it('loads history list identifies valid data with no assignments', async () => {
@@ -198,6 +195,25 @@ describe('HistoryWidget', () => {
         course_title: 'my_course_code'
       }
     ];
+    // mock get_current course to return course code
+    (requestAPI as jest.Mock).mockResolvedValue({
+      success: 'true',
+      value: mockData
+    });
+    const app = {} as JupyterFrontEnd;
+    const ba = new HistoryWidget(app);
+    const error_box = ba.node.querySelector('.alert-info') as HTMLElement;
+
+    // wait for the asynchronous load_list invoked by the widget
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(error_box.innerHTML).toContain(
+      '<p>There is no History to show you</p>'
+    );
+  });
+
+  it('loads history list identifies valid data with no assignments for student', async () => {
+    const mockData = [{}];
     // mock get_current course to return course code
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',

@@ -120,6 +120,10 @@ export class HistoryList {
     if (data.length === 1) {
       for (const key in data) {
         const this_course = data[key];
+        if (!('assignments' in this_course)) {
+          this.show_info('<p>There is no History to show you</p>');
+          return;
+        }
         const assignments: IAssignmentData[] = this_course['assignments'];
         if (assignments.length === 0) {
           this.show_info('<p>There is no History to show you</p>');

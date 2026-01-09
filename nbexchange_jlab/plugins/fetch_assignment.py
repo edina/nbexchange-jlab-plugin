@@ -1,12 +1,8 @@
 import glob
-import io
-import json
 import os
 import shutil
-import tarfile
 from urllib.parse import quote_plus
 
-import requests
 from nbgrader.api import new_uuid
 from nbgrader.exchange import ExchangeFetchAssignment as ABCExchangeFetchAssignment
 
@@ -61,52 +57,11 @@ class ExchangeFetchAssignment(ABCExchangeFetchAssignment, NBExchange):
 
     def download(self):
         self.log.debug(f"Download from {self.service_url}")
-        try:
-            r = self.api_request(
-                f"assignment?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}"  # noqa: E501
-            )
-        except requests.exceptions.Timeout:
-            self.fail("Timed out trying to reach the exchange service to fetch the assignment.")
-        except Exception as err:
-            self.fail(f"fetch_assignment failed: {err}")
-        self.log.debug(f"Got back {r.status_code} ({r.headers['content-type']}) after file download")
-
-        if r.status_code > 399:
-            self.fail(
-                f"Error failing to fetch assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: status code {r.status_code}: error {r.content}"  # noqa: E501
-            )
-
-        if r.headers["content-type"] == "application/gzip":
-            tgz = r.content
-
-            try:
-                tar_file = io.BytesIO(tgz)
-                with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extractall(path=self.src_path)
-            except Exception as e:  # TODO: exception handling
-                if hasattr(e, "message"):
-                    self.fail(
-                        f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e.message}"  # noqa: E501
-                    )
-                else:
-                    self.fail(
-                        f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e}"  # noqa: E501
-                    )
-        else:
-            # Fails, even if the json response is a success (for now)
-            try:
-                data = r.json()
-            except json.decoder.JSONDecodeError as err:
-                self.log.error("fetch_assignment download\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}")
-                self.fail(r.text)
-            if not data["success"]:
-                self.fail(
-                    f"Error failing to fetch assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: message: {data.get('note')}"  # noqa: E501
-                )
-            else:
-                self.fail(
-                    f"Error failing to fetch assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {data.get('note')}"  # noqa: E501
-                )
+        query = f"assignment?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}"  # noqa: E501
+        response = self.common_download(query_url=query, detination_path=self.src_path)
+        if not response["success"]:
+            self.log.error(f"Fetch Assignment download failed: {response['value']}")
+            self.fail(f"Fetch Assignment download failed: {response['value']}")
 
     def copy_if_missing(self, src, dest, ignore=None):
         filenames = sorted(os.listdir(src))
