@@ -116,7 +116,7 @@ class BaAssignmentsList(BaseListerClass):
                     )
                 else:
                     html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
-                    html_fragment = html_fragment + "<p>The following Exception was raised:</p>\n"
+                    html_fragment = html_fragment + "<p>The following traces were recorded:</p>\n"
                     html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
                 html_fragment = html_fragment + "</section>\n"
                 response = response + html_fragment

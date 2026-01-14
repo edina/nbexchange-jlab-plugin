@@ -33,6 +33,7 @@ Github does a pretty good job testing the plugin and Pull Requests, but it may m
 jupyterlab server-extensions are magically enabled using the `_load_jupyter_server_extension` function in the `__init__` file.
 
 For example, the Exchange History code is loaded thus:
+
 1. `nbextension_jlab/__init__.py` loads the `load_jupyter_server_extension` (as `load_history`) from the `nbexchange_jlab/history_list/__init__.py` file.
 2. `nbextension_jlab/__init__.py` defines the `_load_jupyter_server_extension` function as running a set of commands - currently just the `load_history` function, but this is extensable by just adding more functions here.
 
