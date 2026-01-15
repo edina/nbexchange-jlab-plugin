@@ -233,10 +233,13 @@ class HistoryList(BaseListerClass):
                 nbc = self._setup_download(
                     config=config, course_code=course_code, assignment_code=assignment_code, student=student
                 )
-                local_dest_path = nbc.coursedir.format_path(
-                    nbc.coursedir.submitted_directory,
-                    student,
-                    nbc.coursedir.assignment_id,
+                local_dest_path = os.path.join(
+                    os.environ.get("HOME", "."),
+                    nbc.coursedir.format_path(
+                        nbc.coursedir.submitted_directory,
+                        student,
+                        nbc.coursedir.assignment_id,
+                    ),
                 )
                 self._do_download(nbc, local_dest_path, path)
 

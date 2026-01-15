@@ -30,7 +30,7 @@ You will notice that _submissions_ have some buttons:
 
 If you are an instructor on a course, you have some additional features:
 
-- A "Download" button is provided to download a specific submission into your home directory.
+- A "Download" button is provided to download a specific submission into your home directory (`~/Download/<student>/<assignment>/`).
 - For the current course, a "Collect" button will do an NbGrader Collect operation, replacing whatever is already there.
 
 ### Bulk Autograde
