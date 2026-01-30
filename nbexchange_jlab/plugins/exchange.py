@@ -49,34 +49,30 @@ class Exchange(ABCExchange):
 
     path_includes_course = Bool(
         False,
-        help=dedent(
-            """
+        help=dedent("""
             Whether the path for fetching/submitting  assignments should be
             prefixed with the course name. If this is `False`, then the path
             will be something like `./ps1`. If this is `True`, then the path
             will be something like `./course123/ps1`.
-            """
-        ),
+            """),
     ).tag(config=True)
 
     action_dir = Unicode(
         ".",
-        help=dedent(
-            """
+        help=dedent("""
             Local path for storing student assignments.  Defaults to '.'
             which is normally Jupyter's notebook_dir.
-            """
-        ),
+            """),
     ).tag(config=True)
 
     base_service_url = Unicode(os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk")).tag(config=True)
 
     base_path = Unicode(
         "/services/nbexchange/",
-        help="""
-Base path for api queries into the exchange - should match 'base_url' in the NbExchange App configuration.
-Defaults to '/services/nbexchange/'
-""",
+        help=dedent("""
+            Base path for api queries into the exchange - should match 'base_url' in the NbExchange App configuration.
+            Defaults to '/services/nbexchange/'
+            """),
         config=True,
     )
 
