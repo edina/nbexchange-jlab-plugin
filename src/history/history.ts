@@ -155,10 +155,6 @@ export class HistoryList {
 
       // if this is the current course prepended, else appended
       if (isCurrent) {
-        console.log(
-          'prepending current course panel',
-          this_course['course_code']
-        );
         this.panel_group_element.prepend(course_panel_elem);
       } else {
         this.panel_group_element.append(course_panel_elem);
