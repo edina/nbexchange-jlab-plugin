@@ -70,8 +70,6 @@ const menuExtension: JupyterFrontEndPlugin<void> = {
     nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
 
     mainMenu.addMenu(nbgraderMenu);
-
-    console.log('JupyterLab extension {} is activated!', pluginIDs.menus);
   }
 };
 
@@ -137,8 +135,6 @@ const historyListExtension: JupyterFrontEndPlugin<void> = {
         name: () => 'nbexchange-history'
       });
     }
-
-    console.log('JupyterLab extension {} is activated!', pluginIDs.history);
   }
 };
 
@@ -204,11 +200,6 @@ const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
         name: () => 'nbexchange-bulkAutograde'
       });
     }
-
-    console.log(
-      'JupyterLab extension {} is activated!',
-      pluginIDs.bulkAutograde
-    );
   }
 };
 

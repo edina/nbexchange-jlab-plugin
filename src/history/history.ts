@@ -1,9 +1,7 @@
-// import { encode } from 'html-entities';
-
 import { Widget } from '@lumino/widgets';
 
 import { PageConfig } from '@jupyterlab/coreutils';
-// import { Notification } from '@jupyterlab/apputils';
+// disabled, 'cos I can't test them: import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -73,23 +71,26 @@ export class HistoryList {
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
-    let elem = document.querySelector('.alert-danger') as HTMLElement;
+    let elem = this.widget.node.querySelector('.alert-danger') as HTMLElement;
     if (elem) {
       elem.innerHTML = '';
       elem.style.display = 'None';
     }
-    elem = document.querySelector('.alert-info') as HTMLElement;
+    elem = this.widget.node.querySelector('.alert-info') as HTMLElement;
     if (elem) {
       elem.innerHTML = '';
       elem.style.display = 'None';
     }
-    elem = document.querySelector('#results-panel-group') as HTMLElement;
-    if (elem) {
-      elem.innerHTML = '';
-    }
+    // elem = this.widget.node.querySelector(
+    //   '#results-panel-group'
+    // ) as HTMLElement;
+    // if (elem) {
+    //   elem.innerHTML = '';
+    // }
   }
 
-  private formatDate(date: Date): string {
+  // public, so we can test it
+  public formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -113,7 +114,7 @@ export class HistoryList {
     }
     if (data.length === 0) {
       this.show_info(
-        'There is zero history available from the Exchange service'
+        '<p>There is zero history available from the Exchange service'
       );
       return;
     }
@@ -121,12 +122,12 @@ export class HistoryList {
       for (const key in data) {
         const this_course = data[key];
         if (!('assignments' in this_course)) {
-          this.show_info('<p>There is no History to show you</p>');
+          this.show_info('<p>There is no history to show you</p>');
           return;
         }
         const assignments: IAssignmentData[] = this_course['assignments'];
         if (assignments.length === 0) {
-          this.show_info('<p>There is no History to show you</p>');
+          this.show_info('<p>There is no history to show you</p>');
           return;
         }
       }
@@ -151,7 +152,13 @@ export class HistoryList {
       const detail_group_name = this_course['course_code'];
 
       const course_panel_elem = document.createElement('details');
-      this.panel_group_element.append(course_panel_elem);
+
+      // if this is the current course prepended, else appended
+      if (isCurrent) {
+        this.panel_group_element.prepend(course_panel_elem);
+      } else {
+        this.panel_group_element.append(course_panel_elem);
+      }
 
       course_panel_elem.setAttribute('name', 'course_level_group');
       course_panel_elem.classList.add('course_group');
@@ -285,9 +292,9 @@ export class HistoryList {
       element.style.display = 'block';
     } else {
       console.error('show_error element not found');
-      // Notification.emit(message, 'error', { autoClose: false });
+      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
     }
-    // Notification.emit(message, 'error', { autoClose: false });
+    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
   }
 
   public show_info(message: string): void {
@@ -299,7 +306,7 @@ export class HistoryList {
       element.style.display = 'block';
     } else {
       console.log('show_info element not found');
-      // Notification.emit(message, 'error', { autoClose: false });
+      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
     }
     // Notification.emit(message, 'info', { autoClose: false });
   }
@@ -357,7 +364,7 @@ export class CourseList {
   }
 
   public show_error(error: string): void {
-    // Notification.emit(error, 'error', { autoClose: false });
+    // disabled, 'cos I can't test them: Notification.emit(error, 'error', { autoClose: false });
   }
 }
 
@@ -500,7 +507,6 @@ class Action {
         const msg: string = 'Error on GET hisDownload.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
-      console.log('do_download has data: ' + data);
       if (data) {
         alert_area.innerHTML = data.value;
         alert_area.style.display = 'block';
@@ -536,7 +542,6 @@ class Action {
         const msg: string = 'Error on GET hisCollect.\n' + reason;
         this.show_error('<p>' + msg + '</p>');
       }
-      console.log('do_collect has data: ' + data);
 
       if (data) {
         alert_area.innerHTML = data.value;
@@ -546,12 +551,6 @@ class Action {
       console.log('alert box not found');
     }
   }
-
-  // private handle_response_data(results_area: HTMLElement, data: any): void {
-  //   if (results_area) {
-  //     results_area.innerHTML = data.value;
-  //   }
-  // }
 
   private make_button(
     row_index: number,
@@ -673,8 +672,8 @@ class Action {
       element.style.display = 'block';
     } else {
       console.error('show_error element not found');
-      // Notification.emit(message, 'error', { autoClose: false });
+      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
     }
-    // Notification.emit(message, 'error', { autoClose: false });
+    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
   }
 }

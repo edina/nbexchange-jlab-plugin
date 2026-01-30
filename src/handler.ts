@@ -20,7 +20,7 @@ export async function requestAPI<T>(
   const requestUrl = URLExt.join(settings.baseUrl, namespace, endPoint);
 
   let response: Response;
-  console.log('Requesting API url:', requestUrl);
+
   try {
     response = await ServerConnection.makeRequest(requestUrl, init, settings);
   } catch (error) {
