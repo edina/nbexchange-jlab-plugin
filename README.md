@@ -20,7 +20,7 @@ This provides a visual render of NbExchanges `history` endpoint:
 
 ![A screenshot of the History page](history_screenshot_closed.png)
 
-The current course is shown in green, and each course indicates the first and last date of any activity _for the whole course_.
+The current course is shown in green (and is always placed at the top of the list), and each course indicates the first and last date of any activity _for the whole course_.
 
 For each course, a summary of the actions is provided, and then (within each action) all actions are listed in time-order:
 
@@ -30,8 +30,8 @@ You will notice that _submissions_ have some buttons:
 
 If you are an instructor on a course, you have some additional features:
 
-- A "Download" button is provided to download a specific submission into your home directory (`~/Download/<student>/<assignment>/`).
-- For the current course, a "Collect" button will do an NbGrader Collect operation, replacing whatever is already there.
+- A "Download" button is provided to download a specific submission into your home directory (`~/Downloads/<course_code>/<student>/<assignment>/`).
+- For the current course - a "Collect" button is available, which will do a singular NbGrader `Collect` operation, replacing whatever is already there for the specific student.
 
 ### Bulk Autograde
 
@@ -119,6 +119,8 @@ c.Exchange.base_service_url = 'https://nbexchange.example.com'
 c.Exchange.base_path = '/services/exchange'
 
 ```
+
+The `Exchange History` and `Bulk Autograde` commands use the NBgrader system to perform their actions, so require additional configuration.
 
 ## Contributing
 
