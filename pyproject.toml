@@ -43,6 +43,7 @@ test = [
     "pytest-docker-tools>=3.1",
     "pytest-jupyter[server]>=0.10",
     "pytest-tornado>=0.8",
+    "standard-pkg-resources>=0.1.1",
     "isort>=6.0",
     "black>=25.1",
     "flake8>=7.3",

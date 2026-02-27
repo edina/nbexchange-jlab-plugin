@@ -53,7 +53,7 @@ def test_submit_methods(plugin_config, tmpdir, caplog):
     plugin = ExchangeSubmit(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
     plugin.set_timestamp()
     plugin.init_src()
-    assert re.search(r"nbexchange_jlab_plugin/assign_1_1$", plugin.src_path)
+    assert re.search(r"nbexchange-jlab-plugin/assign_1_1$", plugin.src_path)
     plugin.init_dest()
     with pytest.raises(AttributeError) as e_info:
         plugin.dest_path
