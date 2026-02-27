@@ -1,18 +1,16 @@
-import io
 import json
 import os
 import shutil
-import tarfile
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
 from nbgrader.api import Gradebook, MissingEntry
+from nbgrader.exchange import ExchangeCollect as ABCExchangeCollect
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeCollect(abc.ExchangeCollect, Exchange):
+class ExchangeCollect(ABCExchangeCollect, NBExchange):
     def do_copy(self, src, dest):
         pass
 
@@ -27,51 +25,19 @@ class ExchangeCollect(abc.ExchangeCollect, Exchange):
 
     def download(self, submission, dest_path):
         self.log.debug(f"ExchangeCollect.download - record {submission} to {dest_path}")
-        try:
-            r = self.api_request(
-                f"collection?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}&path={quote_plus(submission['path'])}"  # noqa: E501
-            )
-        except requests.exceptions.Timeout:
-            self.fail("Timed out trying to reach the exchange service to collect submissions.")
+        query = f"collection?course_id={quote_plus(self.coursedir.course_id)}&assignment_id={quote_plus(self.coursedir.assignment_id)}&path={quote_plus(submission['path'])}"  # noqa: E501
+        response = self.common_download(query_url=query, detination_path=dest_path)
+        if not response["success"]:
+            self.log.error(f"Collect download failed: {response['value']}")
+            self.fail(f"Collect download failed: {response['value']}")
 
-        self.log.debug(f"Got back {r.status_code}  {r.headers['content-type']} after file download")
-
-        if r.status_code > 399:
-            self.fail(
-                f"Error failing to collect for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: status code {r.status_code}: error {r.content}"  # noqa: E501
-            )
-
-        if r.headers["content-type"] == "application/gzip":
-            tgz = r.content
-
+    def _get_duedate(self):
+        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
             try:
-                tar_file = io.BytesIO(tgz)
-                with tarfile.open(fileobj=tar_file) as handle:
-                    handle.extractall(path=dest_path)
-            except Exception as e:  # TODO: exception handling
-                if hasattr(e, "message"):
-                    self.fail(
-                        f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e.message}"  # noqa: E501
-                    )
-                else:
-                    self.fail(
-                        f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e}"  # noqa: E501
-                    )
-        else:
-            # Fails, even if the json response is a success (for now)
-            try:
-                data = r.json()
-            except json.decoder.JSONDecodeError as err:
-                self.log.error("collect failed to download:\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}")
-
-            if not data["success"]:
-                self.fail(
-                    f"Error failing to collect for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}"  # noqa: E501
-                )
-            else:
-                self.fail(
-                    f"Error failing to collect for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {data['note']}"  # noqa: E501
-                )
+                assignment = gb.find_assignment(self.coursedir.assignment_id)
+                return assignment.duedate
+            except MissingEntry:
+                return None
 
     def do_collect(self):
         """
@@ -112,7 +78,12 @@ class ExchangeCollect(abc.ExchangeCollect, Exchange):
                 f"Processing {len(submissions)} submissions of '{self.coursedir.assignment_id}' for course '{self.coursedir.course_id}'"  # noqa: E501
             )
 
+        self.duedate = self._get_duedate()
         for submission in submissions:
+            # Skip any submissions after the due date
+            if self.duedate and submission["timestamp"] > self.duedate:
+                continue
+
             student_id = submission["student_id"]
             full_name = submission.get("full_name") or ""
             if " " in full_name:

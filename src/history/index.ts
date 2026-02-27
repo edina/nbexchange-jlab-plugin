@@ -5,7 +5,7 @@ import { Widget } from '@lumino/widgets';
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import { HistoryList, CourseList } from './history';
-import { requestAPI } from '../handler';
+// import { requestAPI } from '../handler';
 
 export class HistoryWidget extends Widget {
   app: JupyterFrontEnd;
@@ -14,33 +14,28 @@ export class HistoryWidget extends Widget {
     super();
     this.app = app;
 
+    // In the exchange istelf, the "get submission" action checks for subscription, *and instructor role*.
     this.node.innerHTML = [
-      '<div id="nbexchange-history-list" class="tab-pane">',
-      '  <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
-      '  <div id="history-toolbar" class="row list_toolbar" style="display: none">',
-      '    <div class="col-sm-8 no-padding"> <!-- -->',
-      '      <span id="history_list_info" class="toolbar_info">Current course:</span>',
-      '      <div class="btn-group btn-group-xs">',
-      '        <button type="button" class="btn btn-default" id="course_list_default">Loading, please wait...</button>',
-      '        <button type="button" class="btn btn-default dropdown-toggle" id="course_list_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">',
-      '          <span class="caret"></span>',
-      '          <span class="sr-only">Toggle Dropdown</span>',
-      '        </button>',
-      '        <ul class="dropdown-menu" id="course_list">',
-      '        </ul>',
-      '      </div>',
-      '    </div> <!-- -->',
+      '  <h2 id="history_h2">NbExchange Interaction History</h2>',
+      '  <div id="history-toolbar" class="row list_toolbar" >',
+      '    <div class="col-sm-8 no-padding history-activity">',
+      '      <p>This is a history of activity for <em>all</em> courses you have interacted with &mdash; according to the exchange service.</p>',
+      '      <p>If you are an instructor on a course, you have some additional features:</p>',
+      '      <ul>',
+      '        <li>A "Download" button is provided to download a specific submission into your home directory.</li>',
+      '        <li>For the <em>current course</em>, a "Collect" button will do an NbGrader <samp>Collect</samp> operation, replacing whatever is already there.</li>',
+      '      </ul>',
+      '    </div>',
       '    <div class="col-sm-4 no-padding tree-buttons">',
       '      <span id="history_buttons" class="pull-right toolbar_buttons">',
-      '      <button id="refresh_history_list" title="Refresh history list" class="btn btn-default btn-xs"><i class="fa fa-refresh"></i></button>',
+      '        <button id="refresh_history_list" title="Refresh history list" class="btn btn-default btn-xs"><i class="fa fa-refresh"></i></button>',
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div class="alert alert-danger version_error">',
-      '  </div>',
+      '  <div id="baautograde-alert-danger" role="alert" class="alert alert-danger"></div>',
+      '  <div id="baautograde-alert-info" role="alert" class="alert alert-info"></div>',
       '  <div class="panel-group" id="actions-panel-group">',
-      '  </div>',
-      '</div>'
+      '  </div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 
@@ -49,37 +44,6 @@ export class HistoryWidget extends Widget {
     options.set('base_url', base_url);
     const history_l = new HistoryList(this, 'actions-panel-group');
 
-    new CourseList(
-      this,
-      'course_list',
-      'course_list_default',
-      'course_list_dropdown',
-      'refresh_history_list',
-      history_l,
-      options
-    );
-
-    this.checkNbGraderVersion();
-  }
-
-  checkNbGraderVersion() {
-    const warning = this.node.getElementsByClassName(
-      'version_error'
-    )[0] as HTMLDivElement;
-    requestAPI<any>('nbgrader_version?version=' + '0.9.5', '')
-      .then(response => {
-        if (!response['success']) {
-          warning.hidden = false;
-          warning.innerText = response['message'];
-          warning.style.display = 'block';
-        } else {
-          warning.hidden = true;
-        }
-      })
-      .catch(reason => {
-        console.error(
-          `Error on GET /assignment_list/nbgrader_version.\n${reason}`
-        );
-      });
+    new CourseList(this, 'refresh_history_list', history_l, options);
   }
 }

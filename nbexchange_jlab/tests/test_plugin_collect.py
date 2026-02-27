@@ -89,7 +89,7 @@ def test_collect_methods(plugin_config, tmpdir):
         dest_path = f"{plugin_config.CourseDirectory.submitted_directory}/123/{ass_1_3}"
         with pytest.raises(
             Exception,
-            match=rf"Error unpacking download for {ass_1_3} on course {course_id}: file could not be opened successfully",  # noqa: E501
+            match=r"Collect download failed: zero data returned",  # noqa: E501
         ):
             plugin.download(submission, dest_path)
 
@@ -570,6 +570,223 @@ def test_collect_normal_several(plugin_config, tmpdir):
 
 
 @pytest.mark.gen_test
+def test_collect_honours_duedate_expired(plugin_config, tmpdir):
+    timestamp = "2020-01-01 00:00:00.0 UTC"
+    plugin_config.CourseDirectory.course_id = course_id
+    plugin_config.CourseDirectory.assignment_id = ass_1_3
+    plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted").realpath())
+    plugin = ExchangeCollect(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
+    collections = False
+    collection = False
+
+    def api_request(*args, **kwargs):
+        nonlocal collections, collection
+        tar_file = io.BytesIO()
+        if "collections" in args[0]:
+            assert collections is False
+            collections = True
+            assert args[0] == (f"collections?course_id={course_id}&assignment_id={ass_1_3}")
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "json": lambda: {
+                        "success": True,
+                        "value": [
+                            {
+                                "student_id": student_id,
+                                "path": f"/submitted/{course_id}/{ass_1_3}/1/",
+                                "timestamp": timestamp,
+                            }
+                        ],
+                    },
+                },
+            )
+        else:
+            assert collection is False
+            collection = True
+            assert args[0] == (
+                f"collection?course_id={course_id}&assignment_id={ass_1_3}&path=%2Fsubmitted%2F{course_id}%2F{ass_1_3}%2F1%2F"  # noqa: E501
+            )
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            with tarfile.open(fileobj=tar_file, mode="w:gz") as tar_handle:
+                tar_handle.add(notebook1_filename, arcname=os.path.basename(notebook1_filename))
+            tar_file.seek(0)
+
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "content": tar_file.read(),
+                },
+            )
+
+    with patch.object(Exchange, "api_request", side_effect=api_request):
+        # Due date patched to be before timestamp in "collections" call
+        with patch.object(ExchangeCollect, "_get_duedate", return_value="2019-12-12 23:59:59.9 UTC"):
+            plugin.start()
+            assert collections and not collection
+            assert not os.path.exists(
+                os.path.join(
+                    plugin.coursedir.format_path(
+                        plugin_config.CourseDirectory.submitted_directory,
+                        student_id,
+                        ass_1_3,
+                    ),
+                    os.path.basename(notebook1_filename),
+                )
+            )
+
+
+@pytest.mark.gen_test
+def test_collect_honours_duedate_within(plugin_config, tmpdir):
+    plugin_config.CourseDirectory.course_id = course_id
+    plugin_config.CourseDirectory.assignment_id = ass_1_3
+    plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted").realpath())
+    plugin = ExchangeCollect(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
+    collections = False
+    collection = False
+
+    def api_request(*args, **kwargs):
+        nonlocal collections, collection
+        tar_file = io.BytesIO()
+        if "collections" in args[0]:
+            assert collections is False
+            collections = True
+            assert args[0] == (f"collections?course_id={course_id}&assignment_id={ass_1_3}")
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "json": lambda: {
+                        "success": True,
+                        "value": [
+                            {
+                                "student_id": student_id,
+                                "path": f"/submitted/{course_id}/{ass_1_3}/1/",
+                                "timestamp": "2020-01-01 00:00:00.0 UTC",
+                            },
+                        ],
+                    },
+                },
+            )
+        else:
+            assert collection is False
+            collection = True
+            assert args[0] == (
+                f"collection?course_id={course_id}&assignment_id={ass_1_3}&path=%2Fsubmitted%2F{course_id}%2F{ass_1_3}%2F1%2F"  # noqa: E501
+            )
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            with tarfile.open(fileobj=tar_file, mode="w:gz") as tar_handle:
+                tar_handle.add(notebook1_filename, arcname=os.path.basename(notebook1_filename))
+            tar_file.seek(0)
+
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "content": tar_file.read(),
+                },
+            )
+
+    with patch.object(Exchange, "api_request", side_effect=api_request):
+        # Due date patched to be after timestamp in "collections" call
+        with patch.object(ExchangeCollect, "_get_duedate", return_value="2020-01-01 00:00:01.0 UTC"):
+            plugin.start()
+            assert collections and collection
+            assert os.path.exists(
+                os.path.join(
+                    plugin.coursedir.format_path(
+                        plugin_config.CourseDirectory.submitted_directory,
+                        student_id,
+                        ass_1_3,
+                    ),
+                    os.path.basename(notebook1_filename),
+                )
+            )
+
+
+# The important test in this one is in the `else` part of api_request
+@pytest.mark.gen_test
+def test_collect_collects_last_within_duedate(plugin_config, tmpdir):
+    plugin_config.CourseDirectory.course_id = course_id
+    plugin_config.CourseDirectory.assignment_id = ass_1_3
+    plugin_config.CourseDirectory.submitted_directory = str(tmpdir.mkdir("submitted").realpath())
+    plugin = ExchangeCollect(coursedir=CourseDirectory(config=plugin_config), config=plugin_config)
+    collections = False
+    collection = False
+
+    def api_request(*args, **kwargs):
+        nonlocal collections, collection
+        tar_file = io.BytesIO()
+        if "collections" in args[0]:
+            assert collections is False
+            collections = True
+            assert args[0] == (f"collections?course_id={course_id}&assignment_id={ass_1_3}")
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "json": lambda: {
+                        "success": True,
+                        "value": [
+                            {
+                                "student_id": student_id,
+                                "path": f"/submitted/{course_id}/{ass_1_3}/1/a",
+                                "timestamp": "2016-12-12 00:00:00.0 UTC",  # 1 day before
+                            },
+                            {
+                                "student_id": student_id,
+                                "path": f"/submitted/{course_id}/{ass_1_3}/1/b",
+                                "timestamp": "2020-01-02 00:00:00.0 UTC",  # 1 day after
+                            },
+                        ],
+                    },
+                },
+            )
+        else:
+            assert collection is False
+            collection = True
+            # This should be the 1st path, not the second
+            assert args[0] == (
+                f"collection?course_id={course_id}&assignment_id={ass_1_3}&path=%2Fsubmitted%2F{course_id}%2F{ass_1_3}%2F1%2Fa"  # noqa: E501
+            )
+            assert "method" not in kwargs or kwargs.get("method").lower() == "get"
+            with tarfile.open(fileobj=tar_file, mode="w:gz") as tar_handle:
+                tar_handle.add(notebook1_filename, arcname=os.path.basename(notebook1_filename))
+            tar_file.seek(0)
+
+            return type(
+                "Response",
+                (object,),
+                {
+                    "status_code": 200,
+                    "headers": {"content-type": "application/gzip"},
+                    "content": tar_file.read(),
+                },
+            )
+
+    with patch.object(Exchange, "api_request", side_effect=api_request):
+        # Due date patched to be after timestamp in "collections" call
+        with patch.object(ExchangeCollect, "_get_duedate", return_value="2020-01-01 00:00:01.0 UTC"):
+            plugin.start()
+            assert collections and collection
+
+
+@pytest.mark.gen_test
 def test_collect_normal_gradebook_called(plugin_config, tmpdir):
     plugin_config.CourseDirectory.course_id = course_id
     plugin_config.CourseDirectory.assignment_id = ass_1_3
@@ -1037,7 +1254,10 @@ def test_collect_handles_failure_json(plugin_config, tmpdir):
     with patch.object(Exchange, "api_request", side_effect=api_request):
         with pytest.raises(ExchangeError) as e_info:
             plugin.start()
-        assert str(e_info.value) == f"Error failing to collect for assignment {ass_1_3} on course {course_id}"
+        assert (
+            str(e_info.value)
+            == f"Collect download failed: Error failing to download for assignment {ass_1_3} on course {course_id}: Collection call requires a course code, an assignment code, and a path"  # noqa: E501 W503
+        )
 
 
 @pytest.mark.gen_test
@@ -1085,10 +1305,7 @@ def test_collect_handles_500_failure(plugin_config, tmpdir):
         with pytest.raises(Exception) as e_info:
             plugin.start()
         assert e_info.type is ExchangeError
-        assert (
-            str(e_info.value)
-            == f"Error failing to collect for assignment {ass_1_3} on course {course_id}: status code 500: error {http_error}"  # noqa: E501 W503
-        )
+        assert str(e_info.value) == f"Collect download failed: status code 500: error {http_error}"  # noqa: E501 W503
 
 
 @pytest.mark.gen_test

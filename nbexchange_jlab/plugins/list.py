@@ -4,12 +4,12 @@ import json
 import os
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
+from nbgrader.exchange import ExchangeList as ABCExchangeList
 from nbgrader.exchange.default.list import ExchangeList as DefaultExchangeList
 from traitlets import Unicode
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
 def _checksum(path):
@@ -21,7 +21,7 @@ def _checksum(path):
 # "outbound" is files released by instructors (.... but there may be local copies!)
 # "inbound" is files submitted by students (on external service)
 # "cached" is files submitted by students & collected by instructors (so on local disk)
-class ExchangeList(abc.ExchangeList, Exchange):
+class ExchangeList(ABCExchangeList, NBExchange):
 
     def do_copy(self, src, dest):
         pass

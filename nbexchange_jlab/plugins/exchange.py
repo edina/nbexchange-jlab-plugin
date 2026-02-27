@@ -1,6 +1,9 @@
 import fnmatch
 import glob
+import io
+import json
 import os
+import tarfile
 from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import partial
@@ -9,8 +12,8 @@ from urllib.parse import urljoin
 from zoneinfo import ZoneInfo
 
 import requests
+from nbgrader.exchange import Exchange as ABCExchange
 from nbgrader.exchange import ExchangeError
-from nbgrader.exchange.abc import Exchange as ABCExchange
 from traitlets import Bool, Integer, Type, Unicode
 
 
@@ -46,34 +49,30 @@ class Exchange(ABCExchange):
 
     path_includes_course = Bool(
         False,
-        help=dedent(
-            """
+        help=dedent("""
             Whether the path for fetching/submitting  assignments should be
             prefixed with the course name. If this is `False`, then the path
             will be something like `./ps1`. If this is `True`, then the path
             will be something like `./course123/ps1`.
-            """
-        ),
+            """),
     ).tag(config=True)
 
     action_dir = Unicode(
         ".",
-        help=dedent(
-            """
+        help=dedent("""
             Local path for storing student assignments.  Defaults to '.'
             which is normally Jupyter's notebook_dir.
-            """
-        ),
+            """),
     ).tag(config=True)
 
     base_service_url = Unicode(os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk")).tag(config=True)
 
     base_path = Unicode(
         "/services/nbexchange/",
-        help="""
-Base path for api queries into the exchange - should match 'base_url' in the NbExchange App configuration.
-Defaults to '/services/nbexchange/'
-""",
+        help=dedent("""
+            Base path for api queries into the exchange - should match 'base_url' in the NbExchange App configuration.
+            Defaults to '/services/nbexchange/'
+            """),
         config=True,
     )
 
@@ -146,6 +145,65 @@ Defaults to '/services/nbexchange/'
             return delete_req(*args, **kwargs)
         else:
             raise NotImplementedError(f"HTTP Method {method} is not implemented")
+
+    def common_download(self, query_url, detination_path):
+        self.log.info("common_download starts")
+        try:
+            r = self.api_request(query_url)
+        except requests.exceptions.Timeout:
+            self.log.info("timeout failure")
+            return {"success": False, "value": "Timed out trying to reach the exchange service."}
+
+        self.log.debug(f"Common_download got back {r.status_code}  {r.headers['content-type']} after file download")
+
+        if r.status_code > 399:
+            self.log.info("status_code > 399")
+            return {"success": False, "value": f"status code {r.status_code}: error {r.content}"}  # noqa E501
+
+        if r.headers["content-type"] == "application/gzip":
+            tgz = r.content
+            if not tgz:
+                self.log.info("not tgz")
+
+                return {"success": False, "value": "zero data returned"}  # noqa E501
+
+            try:
+                tar_file = io.BytesIO(tgz)
+                with tarfile.open(fileobj=tar_file) as handle:
+                    handle.extractall(path=detination_path)
+                    self.log.info("success")
+                    return {
+                        "success": True,
+                        "value": f"Extracted to {detination_path}",
+                    }
+            except Exception as e:  # TODO: exception handling
+                self.log.info("tarball failure")
+                if hasattr(e, "message"):
+                    return {
+                        "success": False,
+                        "value": f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e.message}",  # noqa: E501
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "value": f"Error unpacking download for {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {e}",  # noqa: E501
+                    }
+        else:
+            # Fails, even if the json response is a success (for now)
+            try:
+                data = r.json()
+            except json.decoder.JSONDecodeError as err:
+                self.log.error("Failed to download:\n" f"response text: {r.text}\n" f"JSONDecodeError: {err}")
+            if "success" not in data:
+                return {
+                    "success": False,
+                    "value": f"Error failing to download for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}",  # noqa: E501
+                }
+            else:
+                return {
+                    "success": False,
+                    "value": f"Error failing to download for assignment {self.coursedir.assignment_id} on course {self.coursedir.course_id}: {data['note']}",  # noqa: E501
+                }
 
     # Function from ELM
     def add_to_tar(self, tar_file, dir_path, exclude_patterns=[]):

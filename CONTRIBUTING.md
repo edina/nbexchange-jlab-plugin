@@ -32,13 +32,14 @@ Github does a pretty good job testing the plugin and Pull Requests, but it may m
 
 jupyterlab server-extensions are magically enabled using the `_load_jupyter_server_extension` function in the `__init__` file.
 
-`nbextension_jlab/__init__.py` loads the `load_jupyter_server_extension` (as `load_history`) from the `nbexchange_jlab/history_list/__init__.py` file.
-`nbextension_jlab/__init__.py` defines the `_load_jupyter_server_extension` function as running a set of commands - currently just the `load_history` function, but this is extensable by just adding more functions here.
+For example, the Exchange History code is loaded thus:
 
-`nbextension_jlab/history_list/__init__.py` maps `_load_jupyter_server_extension` `load_jupyter_server_extension`, which it loads from the `nbexchange_jlab/history_list/handlers.py` file.
-`nbexchange_jlab/history_list/handlers.py` defines the `load_jupyter_server_extension` function to set up the handler (`<base_url>/nbexchange-jlab/history` -> `HistoryListHandler`).
+1. `nbextension_jlab/__init__.py` loads the `load_jupyter_server_extension` (as `load_history`) from the `nbexchange_jlab/history_list/__init__.py` file.
+2. `nbextension_jlab/__init__.py` defines the `_load_jupyter_server_extension` function as running a set of commands - currently just the `load_history` function, but this is extensable by just adding more functions here.
 
-`nbexchange_jlab/history_list/handlers.py` itself, when wanting to query the exchange, creates an instance of the Exchange plugin object [thus inheriting all the configuration and authentication details that provides the nbgrader-centric plugins], which it uses to query the external service.
+3. `nbextension_jlab/history_list/__init__.py` maps `_load_jupyter_server_extension` `load_jupyter_server_extension`, which it loads from the `nbexchange_jlab/history_list/handlers.py` file.
+4. `nbexchange_jlab/history_list/handlers.py` defines the `load_jupyter_server_extension` function to set up the handler (`<base_url>/nbexchange-jlab/history` -> `HistoryListHandler`).
+5. `nbexchange_jlab/history_list/handlers.py` itself, when wanting to query the exchange, creates an instance of the Exchange plugin object [thus inheriting all the configuration and authentication details that provides the nbgrader-centric plugins], which it uses to query the external service.
 
 When creating additional functionailty / extensions, essentially you create code in parallel to `nbexchange_jlab/history_list`, and include it in the initialisers in `nbexchange_jlab/__init__.py`.
 

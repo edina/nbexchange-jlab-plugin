@@ -1,0 +1,208 @@
+"""Tornado handlers for nbgrader course list web service."""
+
+# import contextlib
+import html
+import json
+import os
+from typing import Dict, Set
+
+# from jupyter_core.paths import jupyter_config_path
+from jupyter_server.base.handlers import JupyterHandler
+from jupyter_server.utils import url_path_join
+from nbgrader.apps import NbGraderAPI  # NbGrader,
+from tornado import web
+
+from nbexchange_jlab.history_list import HistoryList
+from nbexchange_jlab.utils import BaseListerClass, get_current_course
+
+# from traitlets.config import LoggingConfigurable
+
+
+# import traceback
+
+
+class BaAssignmentsList(BaseListerClass):
+
+    SUPPORTED_METHODS = ("GET", "HEAD")
+
+    # Takes in a full course record, returns a dict of assignment_code: set-of-submitted-users
+    def _parse_course_data(self, course: dict = None) -> Dict:
+        if not course:
+            return None
+        data: Set = {}
+        for assignment in course["assignments"]:
+            data[assignment["assignment_code"]] = set()
+            for action in list(
+                filter(lambda tag: tag["action"] == "AssignmentActions.submitted", assignment["actions"])
+            ):
+                data[assignment["assignment_code"]].add(action["user"])
+        return data
+
+    def _get_history_data(self, course_id: str = None) -> Dict:
+        historyList = HistoryList()
+        history = historyList.list_history()
+
+        for course in history["value"]:
+            if course["course_code"] == course_id:
+                return self._parse_course_data(course)
+        return None
+
+    def list_BaAssignment(self, course_id: str = None) -> Dict:
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+
+        if not self.check_enabled():
+            return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
+
+        data: Dict = {}
+        with self.yield_config() as config:
+            api = NbGraderAPI(config=config)
+
+            history = self._get_history_data(course_id=get_current_course())
+            if history:
+                for assignment in history.keys():
+                    api.coursedir.assignment_id = assignment
+                    local_submissions = api.get_submissions(assignment)
+                    data[assignment] = {"exchange": len(history[assignment]), "locally": len(local_submissions)}
+        retvalue = {"success": True, "value": data}
+        return retvalue
+
+    def do_collect(self, assignment_code: str = None) -> Dict:
+        if not self.check_enabled():
+            return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
+
+        if not assignment_code:
+            return {"success": False, "value": "<p>You need to supply an assignment code.<\\p>"}
+
+        retvalue = {"success": False, "value": "<p>Unable to correctly configure to do the collect.<\\p>"}
+        data: Dict = {}
+        response = '<section class="ba_response_section">\n'
+
+        with self.yield_config() as config:
+            api = NbGraderAPI(config=config)
+            data = api.collect(assignment_code)
+
+            if not data["success"]:
+                response = response + '<p class="ba_response_failure">Failure.</p>\n'
+                response = response + html.escape(data["error"])
+            else:
+                response = response + '<p class="ba_response_success">Success.</p>\n'
+                response = response + html.escape(data["log"])
+            retvalue["value"] = response + "</section>\n"
+        return retvalue
+
+    def do_autograde(self, assignment_code: str = None) -> Dict:
+
+        if not get_current_course():
+            return {"success": False, "value": "You need to have a current course code."}
+        if not assignment_code:
+            return {"success": False, "value": "You need to supply an assignment code."}
+
+        retvalue = {"success": False, "value": "Unable to correctly configure to do the collect"}
+        response = ""
+        with self.yield_config() as config:
+            api = NbGraderAPI(config=config)
+            students = api.get_submitted_students(assignment_code)
+            for student in students:
+                data = api.autograde(assignment_code, student)
+                html_fragment = '<section class="ba_response_section">\n'
+                if not data["success"]:
+                    html_fragment = (
+                        html_fragment + f'<p class="ba_response_failure">Failure to autograde: {student}</p>\n'
+                    )
+                    html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
+                    html_fragment = (
+                        html_fragment + f'<pre class="ba_response_failure">\n{html.escape(data["error"])}\n</pre>\n'
+                    )
+                else:
+                    html_fragment = html_fragment + f'<p class="ba_response_success">Success: {student}</p>\n'
+                    html_fragment = html_fragment + "<p>The following traces were recorded:</p>\n"
+                    html_fragment = html_fragment + f'<pre>\n{html.escape(data["log"])}\n</pre>\n'
+                html_fragment = html_fragment + "</section>\n"
+                response = response + html_fragment
+                retvalue["value"] = response
+        return retvalue
+
+
+class BaseBaAssignmentHandler(JupyterHandler):
+    api_timeout = 10
+
+    base_service_url = os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")
+
+    @property
+    def manager(self) -> JupyterHandler:
+        return self.settings["BaAssignment_list_manager"]
+
+
+# All three Handler classes use the same BaAssignmentsList class, but call different methods inside it
+class BaAssignmentsListHandler(BaseBaAssignmentHandler):
+
+    # get a dict of assignments: name; in exchange; locally
+    @web.authenticated
+    def get(self) -> JupyterHandler:
+        course_id = self.get_argument("course_id", get_current_course())
+        self.log.debug(f"get assignments for course: {course_id}")
+
+        self.finish(json.dumps(self.manager.list_BaAssignment(course_id=course_id)))
+
+
+class BaCollectAssignmentHandler(BaseBaAssignmentHandler):
+
+    # kick of a collect script & return the result
+    @web.authenticated
+    def get(self) -> JupyterHandler:
+        course_id = self.get_argument("course_id", get_current_course())
+        assignment_code = self.get_argument("assignment_code")
+
+        if not assignment_code:
+            self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
+
+        self.log.debug(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.finish(json.dumps(self.manager.do_collect(assignment_code=assignment_code)))
+
+
+class BaBulkAutogradeHandler(BaseBaAssignmentHandler):
+
+    # kick of a autograde script & return the result
+    @web.authenticated
+    def get(self) -> JupyterHandler:
+        course_id = self.get_argument("course_id", get_current_course())
+        assignment_code = self.get_argument("assignment_code")
+
+        if not assignment_code:
+            self.finish(json.dumps({"success": False, "value": "No assignment code given"}))
+
+        self.log.debug(f"run collect for assignment {assignment_code} course: {course_id}")
+        self.finish(json.dumps(self.manager.do_autograde(assignment_code=assignment_code)))
+
+
+def setup_handlers(web_app):
+    host_pattern = ".*$"
+
+    base_url = web_app.settings["base_url"]
+
+    default_handlers = [
+        (r"getAssignment", BaAssignmentsListHandler),
+        (r"baCollect", BaCollectAssignmentHandler),
+        (r"baAutograde", BaBulkAutogradeHandler),
+    ]
+    # route_pattern_BaAssignment = url_path_join(base_url, "nbexchange-jlab", "getAssignment")
+    # handlers = [(route_pattern_BaAssignment, BaAssignmentsListHandler)]
+    # web_app.add_handlers(host_pattern, handlers)
+
+    # Our hander urls are made up of <base_url>, <namespace>, <endpoint>
+    # (this is done to keep things out of the nbgrader & jupyterlab handler paths)
+    web_app.add_handlers(
+        host_pattern,
+        [(url_path_join(base_url, "nbexchange-jlab", hook), handler) for hook, handler in default_handlers],
+    )
+
+
+def load_jupyter_server_extension(nbapp):
+    web_app = nbapp.web_app
+    web_app.settings["BaAssignment_list_manager"] = BaAssignmentsList(parent=nbapp)
+    web_app.settings["BaAssignment_list_manager"].root_dir = nbapp.root_dir
+
+    setup_handlers(web_app)
+    name = "nbexchange_jlab"
+    nbapp.log.info(f"Registered {name} server extension")

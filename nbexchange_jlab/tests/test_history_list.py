@@ -7,9 +7,8 @@ from nbgrader.auth import Authenticator
 from nbgrader.coursedir import CourseDirectory
 from traitlets.config.loader import LazyConfigValue
 
+from nbexchange_jlab.history_list.handlers import HistoryError, HistoryList
 from nbexchange_jlab.plugins import Exchange, ExchangeError
-
-from .handlers import HistoryError, HistoryList
 
 mocked_json_response = {
     "success": True,
@@ -83,18 +82,22 @@ def test_load_config():
 
     config = plugin.load_config()
 
-    assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
+    assert config["Exchange"]["path_includes_course"] is True or isinstance(
+        config["Exchange"]["path_includes_course"], LazyConfigValue
+    )
     assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
 @pytest.mark.gen_test
-def test_load_history_config():
+def test_yield_config():
 
     plugin = HistoryList()
 
-    with plugin.get_history_config() as config:
-        assert config["Exchange"]["path_includes_course"] is True or isinstance(config["Exchange"], LazyConfigValue)
+    with plugin.yield_config() as config:
+        assert config["Exchange"]["path_includes_course"] is True or isinstance(
+            config["Exchange"]["path_includes_course"], LazyConfigValue
+        )
         assert config["CourseDirectory"]["course_id"] == "missing" or isinstance(config["Exchange"], LazyConfigValue)
 
 

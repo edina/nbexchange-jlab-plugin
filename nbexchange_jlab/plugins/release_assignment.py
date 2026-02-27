@@ -6,13 +6,13 @@ import sys
 from urllib.parse import quote_plus
 
 import humanize
-import nbgrader.exchange.abc as abc
 import requests
+from nbgrader.exchange import ExchangeReleaseAssignment as ABCExchangeReleaseAssignment
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeReleaseAssignment(abc.ExchangeReleaseAssignment, Exchange):
+class ExchangeReleaseAssignment(ABCExchangeReleaseAssignment, NBExchange):
     def do_copy(self, src, dest):
         pass
 

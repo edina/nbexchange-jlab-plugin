@@ -358,7 +358,7 @@ def test_fetch_assignment_handles_500_failure(plugin_config):
                 plugin.start()
             assert (
                 str(e_info.value)
-                == f"Error failing to fetch assignment {ass_1_2} on course {course_id}: status code 500: error {http_error}"  # noqa: E501 W503
+                == f"Fetch Assignment download failed: status code 500: error {http_error}"  # noqa: E501 W503
             )
     finally:
         shutil.rmtree(plugin.dest_path)
@@ -409,7 +409,7 @@ def test_fetch_does_timeout(plugin_config, caplog):
     def api_request(*args, **kwargs):
         raise requests.exceptions.Timeout
 
-    expected_message = "Timed out trying to reach the exchange service to fetch the assignment."
+    expected_message = "Fetch Assignment download failed: Timed out trying to reach the exchange service."
     with patch.object(Exchange, "api_request", side_effect=api_request):
         with pytest.raises(ExchangeError, match=expected_message):
             plugin.start()
@@ -446,5 +446,5 @@ def test_fetch_assignment_handles_json_not_success(plugin_config):
             plugin.start()
         assert (
             str(e_info.value)
-            == "Error failing to fetch assignment assign_1_2 on course no_course: message: This is a note"  # noqa W503
+            == "Fetch Assignment download failed: Error failing to download for assignment assign_1_2 on course no_course: This is a note"  # noqa W503
         )

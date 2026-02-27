@@ -4,15 +4,15 @@ import os
 import re
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
 from dateutil import parser
+from nbgrader.exchange import ExchangeReleaseFeedback as ABCExchangeReleaseFeedback
 from nbgrader.utils import make_unique_key, notebook_hash
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeReleaseFeedback(abc.ExchangeReleaseFeedback, Exchange):
+class ExchangeReleaseFeedback(ABCExchangeReleaseFeedback, NBExchange):
     src_path = None
 
     # where the downloaded files are placed

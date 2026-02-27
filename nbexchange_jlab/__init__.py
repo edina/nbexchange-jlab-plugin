@@ -10,6 +10,9 @@ except ImportError:
     warnings.warn("Importing 'nbexchange_jlab' outside a proper installation.")
     __version__ = "dev"
 
+from nbexchange_jlab.bulk_authograder import (
+    load_jupyter_server_extension as load_bulkAutograder,
+)
 from nbexchange_jlab.history_list import load_jupyter_server_extension as load_history
 
 
@@ -30,3 +33,4 @@ def _load_jupyter_server_extension(server_app):
         JupyterLab application instance
     """
     load_history(server_app)
+    load_bulkAutograder(server_app)

@@ -3,13 +3,13 @@ import json
 import os
 from urllib.parse import quote_plus
 
-import nbgrader.exchange.abc as abc
 import requests
+from nbgrader.exchange import ExchangeFetchFeedback as ABCExchangeFetchFeedback
 
-from .exchange import Exchange
+from .exchange import Exchange as NBExchange
 
 
-class ExchangeFetchFeedback(abc.ExchangeFetchFeedback, Exchange):
+class ExchangeFetchFeedback(ABCExchangeFetchFeedback, NBExchange):
     # where the downloaded files are placed
     def init_src(self):
         if self.coursedir.course_id == "":

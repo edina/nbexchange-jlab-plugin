@@ -4,11 +4,28 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
+.alert {
+  display: none;
+}
+
+.alert-info {
+  color: var(--jp-info-color0);
+  background-color: var(--jp-info-color3);
+  border-color: var(--jp-info-color2);
+}
+
+.alert-warning {
+  color: var(--jp-warn-color0);
+  background-color: var(--jp-warn-color3);
+  border-color: var(--jp-warn-color2);
+}
+
 .action-group {
   display: flex;
   flex-direction: column;
   padding: 10px 0;
   border-top: var(--jp-inverse-border-color) 1px solid;
+  color: var(--jp-ui-font-color1);
 }
 
 .action-group:last-child {
@@ -25,6 +42,11 @@
   margin-top: 10px;
 }
 
+.action_buttons {
+  float: right;
+  text-align: right;
+}
+
 .action-badge {
   /* display: inline-block; */
   float: right;
@@ -38,13 +60,14 @@
   margin-left: 1em;
 }
 
-#nbexchange-history-list .panel-group .panel {
-  margin-top: 3px;
-  margin-bottom: 1em;
-}
+#nbexchange-history-list {
+  .panel-group .panel {
+    margin-top: 3px;
+  }
 
-#nbexchange-history-list .version_error {
-  display: none;
+  .version_error {
+    display: none;
+  }
 }
 
 #history-toolbar {
@@ -57,14 +80,93 @@
   border: 1px solid var(--jp-border-color);
   border-radius: 10px;
   padding: 0.25em 0.5em;
-  margin-bottom: 1em;
+  margin: 1em;
 }
 
 .current_course {
   border-color: var(--jp-success-color1);
   background-color: var(--jp-success-color3);
+  color: var(--md-grey-900);
 }
 
 .panel_radiused {
   border-radius: 8px;
+}
+
+#assignment-table {
+  width: 75%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border: 1px solid var(--jp-border-color2);
+  }
+
+  th {
+    background-color: var(--jp-dialog-background);
+  }
+
+  td {
+    text-align: center;
+    padding: 0.8em 0;
+  }
+}
+
+#baautograde-alert-box {
+  display: none;
+}
+
+.ba_response_section {
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-dialog-background);
+  border: 1px solid var(--jp-border-color);
+  border-radius: 10px;
+  padding: 0.25em 0.5em;
+  margin: 1em;
+
+  .ba_response_failure {
+    border-color: var(--jp-error-color1);
+    background-color: var(--jp-error-color3);
+    color: var(--md-grey-900);
+    border-radius: 2px;
+    padding: 0.25em;
+  }
+
+  .ba_response_success {
+    border-color: var(--jp-success-color1);
+    background-color: var(--jp-success-color3);
+  }
+
+  .ba_loader {
+    width: 96px;
+    height: 16px;
+    display: inline-block;
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    background-image: linear-gradient(
+      45deg,
+      rgb(0 0 0 / 25%) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgb(0 0 0 / 25%) 50%,
+      rgb(0 0 0 / 25%) 75%,
+      transparent 75%,
+      transparent
+    );
+    font-size: 30px;
+    background-size: 1em 1em;
+    box-sizing: border-box;
+    animation: bar-stripe 1s linear infinite;
+  }
+
+  @keyframes bar-stripe {
+    0% {
+      background-position: 1em 0;
+    }
+
+    100% {
+      background-position: 0 0;
+    }
+  }
 }

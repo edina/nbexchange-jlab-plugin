@@ -24,6 +24,8 @@ notebook1_file = get_feedback_file(notebook1_filename)
 notebook2_filename = os.path.join(os.path.dirname(__file__), "data", "assignment-0.6-2.ipynb")
 notebook2_file = get_feedback_file(notebook2_filename)
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
 
 def test_release_assignment_methods_init_src(plugin_config, tmpdir, caplog):
     plugin_config.CourseDirectory.root = "/"
@@ -378,6 +380,7 @@ def test_release_105MB_not_blocked(plugin_config, tmpdir):
 
 
 # @pytest.mark.gen_test
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped long test in GitHub")
 def test_release_5point1GB_is_blocked__long_test(plugin_config, tmpdir):
     plugin_config.CourseDirectory.root = "/"
     plugin_config.CourseDirectory.course_id = course_id
