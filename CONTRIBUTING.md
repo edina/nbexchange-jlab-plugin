@@ -59,8 +59,7 @@ When creating additional functionailty / extensions, essentially you create code
 ## Developing nbexchange_jlab
 
 The plugins run python on the jupyter-server backend, and typescript in the jupyterlab frontend, so you will need
-both Python and Node to work on the codeabse. The node version is defined in `.node-version`, and the main developers
-of the system currently run python 3.12.
+both Python and Node to work on the codeabse. The node version is defined in `.node-version` (version 20.13.1), and the python version in `.envrc` (version 3.13.12.)
 
 We suggest you set up an appropriate virtual environments.
 
