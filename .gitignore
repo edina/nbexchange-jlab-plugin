@@ -10,6 +10,8 @@ node_modules/
 .ipynb_checkpoints
 *.tsbuildinfo
 nbexchange_jlab/labextension
+# Version file is handled by hatchling
+nbexchange_jlab/_version.py
 
 # Integration tests
 ui-tests/test-results/
