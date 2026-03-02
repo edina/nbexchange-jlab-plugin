@@ -209,4 +209,12 @@ More information are provided within the [ui-tests](./ui-tests/README.md) README
 
 Before making any Pull Requests, please ensure your code has been _linted_ in various ways
 
-See [RELEASE](RELEASE.md)
+### Version Numnbers, Tags, and Releases
+
+**Version numbers** are given in `package.json`. Version numbers follow the SemVar system (`Major.Minor.Patch` - `X.Y.Z`)
+
+**Tags** can be _minted_ any time, should reflect the version number - but may also include and `alpha` or `beta` suffix for larger changes that are going to warrent wider testing.
+Tags will be `vX.Y.Z-beta`
+
+**Releases** should be _minted_ only when there is a significant change, and a stable version of the code.
+Releases are the tag - `vX.Y.Z`.
