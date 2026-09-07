@@ -113,12 +113,10 @@ class Exchange(ABCExchange):
     def api_request(self, path, method="GET", *args, **kwargs):
 
         url, cookies, headers = self.prep_api_call(path)
-        self.log.info(f"Exchange.api_request {method} has a timeout of {self.api_timeout} seconds")
 
         self.log.debug(f"Exchange.api_request calling exchange with url {url}")
 
         if method == "GET":
-            self.log.info(f"Exchange.api_request GET has a timeout of {self.api_timeout} seconds")
             get_req = partial(
                 requests.get,
                 url,

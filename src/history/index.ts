@@ -2,9 +2,7 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 
 import { Widget } from '@lumino/widgets';
 
-import { PageConfig } from '@jupyterlab/coreutils';
-
-import { HistoryList, CourseList } from './history';
+import { HistoryList } from './history';
 // import { requestAPI } from '../handler';
 
 export class HistoryWidget extends Widget {
@@ -34,16 +32,15 @@ export class HistoryWidget extends Widget {
       '  </div>',
       '  <div id="baautograde-alert-danger" role="alert" class="alert alert-danger"></div>',
       '  <div id="baautograde-alert-info" role="alert" class="alert alert-info"></div>',
+      '  <div id="history-loading" class="history-loading" role="status" aria-live="polite" hidden>',
+      '    <span class="history-loading-spinner" aria-hidden="true"></span>',
+      '    <span>Loading history…</span>',
+      '  </div>',
       '  <div class="panel-group" id="actions-panel-group">',
       '  </div>'
     ].join('\n');
     this.node.style.overflowY = 'auto';
 
-    const base_url = PageConfig.getBaseUrl();
-    const options = new Map();
-    options.set('base_url', base_url);
-    const history_l = new HistoryList(this, 'actions-panel-group');
-
-    new CourseList(this, 'refresh_history_list', history_l, options);
+    new HistoryList(this, 'actions-panel-group', 'refresh_history_list');
   }
 }

@@ -88,7 +88,7 @@ describe('HistoryWidget', () => {
     document.body.innerHTML = '';
   });
 
-  it('initializes correctly', () => {
+  it('initializes correctly and loads all-course history', async () => {
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: null
@@ -104,6 +104,36 @@ describe('HistoryWidget', () => {
     ).not.toBeNull();
     expect(widget.node.querySelector('#baautograde-alert-info')).not.toBeNull();
     expect(widget.node.querySelector('#actions-panel-group')).not.toBeNull();
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(requestAPI).toHaveBeenCalledWith('history?course_id=');
+  });
+
+  it('shows a loading spinner until the history request completes', async () => {
+    let resolveRequest: (value: unknown) => void;
+    (requestAPI as jest.Mock).mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveRequest = resolve;
+        })
+    );
+
+    const widget = new HistoryWidget({} as JupyterFrontEnd);
+    const spinner = widget.node.querySelector(
+      '#history-loading'
+    ) as HTMLElement;
+    const refreshButton = widget.node.querySelector(
+      '#refresh_history_list'
+    ) as HTMLButtonElement;
+
+    expect(spinner.hidden).toBe(false);
+    expect(refreshButton.disabled).toBe(true);
+
+    resolveRequest!({ success: true, value: null });
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(spinner.hidden).toBe(true);
+    expect(refreshButton.disabled).toBe(false);
   });
 
   // test load-list gets network error
@@ -312,6 +342,11 @@ describe('HistoryWidget', () => {
     ];
     newMockedHistoryData[0]['isInstructor'] = false;
     newMockedHistoryData[0]['role'] = { Student: 1 };
+    newMockedHistoryData[0]['assignments'][0]['actions'] =
+      newMockedHistoryData[0]['assignments'][0]['actions'].filter(
+        (action: { action: string }) =>
+          action.action !== 'AssignmentActions.feedback_fetched'
+      );
 
     // mock get_current course to return course code
     (requestAPI as jest.Mock).mockResolvedValue({
@@ -332,7 +367,8 @@ describe('HistoryWidget', () => {
       'My Course Title (my_course_code) - 2022-01-17 -&gt; 2022-01-17'
     );
     const action_groups = elems?.querySelectorAll('div.action-group');
-    expect(action_groups?.length).toBe(6);
+    expect(action_groups?.length).toBe(5);
+    expect(elems?.textContent).not.toContain('Feedback Fetched');
 
     if (action_groups) {
       const submit_action_group = action_groups[2];

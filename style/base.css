@@ -53,6 +53,39 @@
   padding: 3px;
 }
 
+.history-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 1em;
+}
+
+.history-loading[hidden] {
+  display: none;
+}
+
+.history-loading-spinner {
+  width: 1.25em;
+  height: 1.25em;
+  border: 0.2em solid var(--jp-border-color2);
+  border-top-color: var(--jp-brand-color1);
+  border-radius: 50%;
+  animation: history-spinner 0.75s linear infinite;
+}
+
+@keyframes history-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-loading-spinner {
+    animation: none;
+  }
+}
+
 .course_group {
   color: var(--jp-ui-font-color1);
   background-color: var(--jp-dialog-background);
