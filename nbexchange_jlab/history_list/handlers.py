@@ -104,8 +104,10 @@ class HistoryList(BaseListerClass):
         with self.yield_config() as config:
 
             try:
-                if course_id:
+                if course_id and course_id != "moot":
                     config.CourseDirectory.course_id = course_id
+                else:
+                    config.CourseDirectory.course_id = ""
 
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)

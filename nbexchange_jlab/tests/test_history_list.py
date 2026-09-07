@@ -364,6 +364,31 @@ def test_list_history_correct_course_code(monkeypatch):
 
 
 @pytest.mark.gen_test
+def test_list_history_moot_course_code_lists_all_courses(monkeypatch):
+    requested_urls = []
+
+    def api_request(url, *args, **kwargs):
+        requested_urls.append(url)
+        return type(
+            "Request",
+            (object,),
+            {
+                "status_code": 200,
+                "json": (lambda: mocked_json_response),
+            },
+        )
+
+    plugin = HistoryList()
+    monkeypatch.setenv("NAAS_COURSE_ID", "my_course_code")
+
+    with patch.object(Exchange, "api_request", side_effect=api_request):
+        data = plugin.list_history(course_id="moot")
+
+    assert data["success"] is True
+    assert requested_urls == ["history"]
+
+
+@pytest.mark.gen_test
 def test_list_history_error_raised_by_query_exchange(monkeypatch):
 
     def api_request(*args, **kwargs):

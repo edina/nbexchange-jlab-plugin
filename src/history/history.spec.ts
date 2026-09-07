@@ -136,6 +136,16 @@ describe('HistoryWidget', () => {
     expect(refreshButton.disabled).toBe(false);
   });
 
+  it('loads all courses when given the moot course code', async () => {
+    (requestAPI as jest.Mock).mockResolvedValue({ success: true, value: null });
+    const widget = new HistoryWidget({} as JupyterFrontEnd);
+    const historyList = new HistoryList(widget, 'actions-panel-group');
+
+    await historyList.load_list('moot');
+
+    expect(requestAPI).toHaveBeenLastCalledWith('history?course_id=');
+  });
+
   // test load-list gets network error
   it('handles network error when loading history list', async () => {
     (requestAPI as jest.Mock).mockRejectedValue(new Error('Network Error'));

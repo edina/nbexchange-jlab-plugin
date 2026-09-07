@@ -287,9 +287,10 @@ export class HistoryList {
   public async load_list(course = '') {
     this.clear_list();
     this.set_loading(true);
+    const course_id = course === 'moot' ? '' : course;
     let data: any = null;
     try {
-      data = await requestAPI<any>('history?course_id=' + course);
+      data = await requestAPI<any>('history?course_id=' + course_id);
     } catch (reason) {
       console.error('load_list caught error:', reason);
       const msg: string = `Error on GET /history.\n${reason}`;
