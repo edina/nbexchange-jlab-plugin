@@ -104,10 +104,11 @@
 
 /* they all need to override `panel` and `panel-group` styles */
 .panel_radiused {
-  border-width: 0px !important;
+  border-width: 0 !important;
   border-bottom: 2px solid var(--jp-border-color3) !important;
+
   &:last-of-type {
-    border-bottom: 0px !important;
+    border-bottom: 0 !important;
   }
 }
 
