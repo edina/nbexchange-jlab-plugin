@@ -88,17 +88,18 @@
 
 .course_group {
   color: var(--jp-ui-font-color1);
-  background-color: var(--jp-dialog-background);
-  border: 1px solid var(--jp-border-color);
+  background-color: var(--jp-layout-color2);
+  border: 1px solid var(--jp-border-color2);
   border-radius: 10px;
   padding: 0.25em 0.5em;
   margin: 1em;
 }
 
 .current_course {
-  border-color: var(--jp-success-color1);
-  background-color: var(--jp-success-color3);
-  color: var(--md-grey-900);
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-layout-color2);
+  border: 2px solid var(--jp-success-color1);
+  box-shadow: inset 0.35em 0 0 var(--jp-success-color1);
 }
 
 .panel_radiused {
