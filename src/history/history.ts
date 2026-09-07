@@ -1,6 +1,5 @@
 import { Widget } from '@lumino/widgets';
 
-import { PageConfig } from '@jupyterlab/coreutils';
 // disabled, 'cos I can't test them: import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
@@ -58,8 +57,14 @@ export class HistoryList {
   widget: Widget;
   panel_group_selector: string;
   panel_group_element: HTMLDivElement;
+  refresh_element: HTMLButtonElement | null;
+  loading_element: HTMLElement | null;
 
-  constructor(widget: Widget, panel_group_selector: string) {
+  constructor(
+    widget: Widget,
+    panel_group_selector: string,
+    refresh_selector?: string
+  ) {
     this.panel_group_selector = panel_group_selector;
     this.widget = widget;
 
@@ -67,6 +72,19 @@ export class HistoryList {
     this.panel_group_element = <HTMLDivElement>(
       div_elements.namedItem(panel_group_selector)
     );
+    this.loading_element = widget.node.querySelector('#history-loading');
+
+    const buttons = widget.node.getElementsByTagName('button');
+    this.refresh_element = refresh_selector
+      ? buttons.namedItem(refresh_selector)
+      : null;
+
+    if (this.refresh_element) {
+      this.refresh_element.onclick = () => {
+        void this.load_list('');
+      };
+      this.refresh_element.click();
+    }
   }
 
   public clear_list(): void {
@@ -87,6 +105,15 @@ export class HistoryList {
     // if (elem) {
     //   elem.innerHTML = '';
     // }
+  }
+
+  private set_loading(isLoading: boolean): void {
+    if (this.loading_element) {
+      this.loading_element.hidden = !isLoading;
+    }
+    if (this.refresh_element) {
+      this.refresh_element.disabled = isLoading;
+    }
   }
 
   // public, so we can test it
@@ -225,9 +252,13 @@ export class HistoryList {
         }
 
         for (let j = 0; j < actionTypes.length; j++) {
-          const groupActions: any[] = actions.filter(
+          const groupActions: IActionData[] = actions.filter(
             a => a.action === actionTypes[j].id
           );
+
+          if (!this_course['isInstructor'] && groupActions.length === 0) {
+            continue;
+          }
 
           // Add group in panel_body_id
           new ActionGroup(
@@ -253,16 +284,20 @@ export class HistoryList {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public async load_list(course?: string) {
+  public async load_list(course = '') {
     this.clear_list();
+    this.set_loading(true);
+    const course_id = course === 'moot' ? '' : course;
     let data: any = null;
     try {
-      data = await requestAPI<any>('history?course_id=' + course);
+      data = await requestAPI<any>('history?course_id=' + course_id);
     } catch (reason) {
       console.error('load_list caught error:', reason);
       const msg: string = `Error on GET /history.\n${reason}`;
       this.show_error('<p>' + msg + '</p>');
       return;
+    } finally {
+      this.set_loading(false);
     }
 
     if (data.success) {
@@ -310,62 +345,6 @@ export class HistoryList {
       // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
     }
     // Notification.emit(message, 'info', { autoClose: false });
-  }
-}
-
-export class CourseList {
-  refresh_selector: string;
-  history: HistoryList;
-  current_course: string | null;
-  options = new Map();
-  base_url: string;
-  data: string[];
-  refresh_element: HTMLButtonElement | null;
-
-  constructor(
-    widget: Widget,
-    refresh_selector: string,
-    history: HistoryList,
-    options: Map<string, string>
-  ) {
-    this.refresh_selector = refresh_selector;
-    const buttons = widget.node.getElementsByTagName('button');
-    this.refresh_element = buttons.namedItem(refresh_selector);
-
-    this.history = history;
-    this.current_course = 'select a course';
-
-    this.options = options;
-    this.base_url = options.get('base_url') || PageConfig.getBaseUrl();
-
-    this.data = [];
-
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    that.load_list();
-
-    this.refresh_element!.onclick = function () {
-      that.load_list();
-    };
-
-    this.bind_events();
-  }
-
-  private bind_events(): void {
-    this.refresh_element!.click();
-  }
-
-  private async load_list() {
-    try {
-      this.history.load_list('moot');
-    } catch (reason) {
-      const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      this.show_error(msg);
-    }
-  }
-
-  public show_error(error: string): void {
-    // disabled, 'cos I can't test them: Notification.emit(error, 'error', { autoClose: false });
   }
 }
 

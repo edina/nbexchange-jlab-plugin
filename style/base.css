@@ -53,23 +53,63 @@
   padding: 3px;
 }
 
+.history-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 1em;
+}
+
+.history-loading[hidden] {
+  display: none;
+}
+
+.history-loading-spinner {
+  width: 1.25em;
+  height: 1.25em;
+  border: 0.2em solid var(--jp-border-color2);
+  border-top-color: var(--jp-brand-color1);
+  border-radius: 50%;
+  animation: history-spinner 0.75s linear infinite;
+}
+
+@keyframes history-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-loading-spinner {
+    animation: none;
+  }
+}
+
 .course_group {
   color: var(--jp-ui-font-color1);
-  background-color: var(--jp-dialog-background);
-  border: 1px solid var(--jp-border-color);
+  background-color: var(--jp-layout-color2);
+  border-bottom: 2px solid var(--jp-border-color2);
   border-radius: 10px;
   padding: 0.25em 0.5em;
   margin: 1em;
 }
 
 .current_course {
-  border-color: var(--jp-success-color1);
-  background-color: var(--jp-success-color3);
-  color: var(--md-grey-900);
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-layout-color2);
+  border: 2px solid var(--jp-success-color1);
+  box-shadow: inset 0.35em 0 0 var(--jp-success-color1);
 }
 
+/* they all need to override `panel` and `panel-group` styles */
 .panel_radiused {
-  border-radius: 8px;
+  border-width: 0 !important;
+  border-bottom: 2px solid var(--jp-border-color3) !important;
+
+  &:last-of-type {
+    border-bottom: 0 !important;
+  }
 }
 
 #assignment-table {

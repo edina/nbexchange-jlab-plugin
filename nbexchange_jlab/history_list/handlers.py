@@ -55,6 +55,7 @@ class HistoryList(BaseListerClass):
         """
 
         try:
+            self.exchange.api_timeout = 30  # seconds
             if self.exchange.coursedir.course_id:
                 """List history for specific course"""
                 self.log.info(f"calling exchange.api_request with course_code {self.exchange.coursedir.course_id}")
@@ -94,14 +95,6 @@ class HistoryList(BaseListerClass):
             else:
                 item["isCurrent"] = False
 
-        currnent_course_code = get_current_course()
-
-        for item in history["value"]:
-            if item["course_code"] == currnent_course_code:
-                item["isCurrent"] = True
-            else:
-                item["isCurrent"] = False
-
         return history["value"]
 
     def list_history(self, course_id: str = None) -> Dict | str | Exception:
@@ -111,8 +104,10 @@ class HistoryList(BaseListerClass):
         with self.yield_config() as config:
 
             try:
-                if course_id:
+                if course_id and course_id != "moot":
                     config.CourseDirectory.course_id = course_id
+                else:
+                    config.CourseDirectory.course_id = ""
 
                 coursedir = CourseDirectory(config=config)
                 authenticator = Authenticator(config=config)
@@ -267,7 +262,7 @@ class HistoryList(BaseListerClass):
 
 
 class BaseHistoryHandler(JupyterHandler):
-    api_timeout = 10
+    api_timeout = 30
 
     base_service_url = os.environ.get("NAAS_BASE_URL", "https://noteable.edina.ac.uk/exchange")
 
