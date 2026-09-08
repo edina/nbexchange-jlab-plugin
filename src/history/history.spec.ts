@@ -14,8 +14,8 @@ jest.mock('@jupyterlab/apputils', () => ({
 }));
 
 /* Tests still to write */
-// show_error gets widget with missing 'alert-danger' class
-// show_info gets widget with missing 'alert-info' class
+// show_error
+// show_info
 // ? Can we get rid of the whole `CourseList` class ?
 // ? Does history even have a "disabled button" concept ?
 // test Actions show_error
@@ -107,10 +107,6 @@ describe('HistoryWidget', () => {
     const widget = new HistoryWidget(app);
     expect(widget.node.querySelector('#history_h2')).not.toBeNull();
     expect(widget.node.querySelector('#history-toolbar')).not.toBeNull();
-    expect(
-      widget.node.querySelector('#baautograde-alert-danger')
-    ).not.toBeNull();
-    expect(widget.node.querySelector('#baautograde-alert-info')).not.toBeNull();
     expect(widget.node.querySelector('#actions-panel-group')).not.toBeNull();
 
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -272,7 +268,6 @@ describe('HistoryWidget', () => {
     const downloadButton = widget.node.querySelector(
       'button[aria-label^="download for Course"]'
     ) as HTMLButtonElement;
-    const infoBox = widget.node.querySelector('.alert-info') as HTMLElement;
     (requestAPI as jest.Mock)
       .mockResolvedValueOnce({ success: true, value: 'Submission collected' })
       .mockResolvedValueOnce({ success: true, value: 'Submission downloaded' });
@@ -296,7 +291,6 @@ describe('HistoryWidget', () => {
         autoClose: false
       }
     );
-    expect(infoBox.innerHTML).toBe('');
   });
 
   it('loads history list identifies valid data with no assignments', async () => {

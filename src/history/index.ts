@@ -30,8 +30,6 @@ export class HistoryWidget extends Widget {
       '      </span>',
       '    </div>',
       '  </div>',
-      '  <div id="baautograde-alert-danger" role="alert" class="alert alert-danger"></div>',
-      '  <div id="baautograde-alert-info" role="alert" class="alert alert-info"></div>',
       '  <div id="history-loading" class="history-loading" role="status" aria-live="polite" hidden>',
       '    <span class="history-loading-spinner" aria-hidden="true"></span>',
       '    <span>Loading history…</span>',

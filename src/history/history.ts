@@ -89,22 +89,6 @@ export class HistoryList {
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
-    // let elem = this.widget.node.querySelector('.alert-danger') as HTMLElement;
-    // if (elem) {
-    //   elem.innerHTML = '';
-    //   elem.style.display = 'None';
-    // }
-    // elem = this.widget.node.querySelector('.alert-info') as HTMLElement;
-    // if (elem) {
-    //   elem.innerHTML = '';
-    //   elem.style.display = 'None';
-    // }
-    // elem = this.widget.node.querySelector(
-    //   '#results-panel-group'
-    // ) as HTMLElement;
-    // if (elem) {
-    //   elem.innerHTML = '';
-    // }
   }
 
   private set_loading(isLoading: boolean): void {
