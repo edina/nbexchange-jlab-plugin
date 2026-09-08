@@ -4,9 +4,16 @@
 
 import { BulkAutogradeWidget } from './index';
 import { JupyterFrontEnd } from '@jupyterlab/application';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
+jest.mock('@jupyterlab/apputils', () => ({
+  Notification: {
+    error: jest.fn(),
+    info: jest.fn()
+  }
+}));
 
 import { BaAssignmentsList, AssignmentsList } from './bulkAutograde';
 
@@ -85,16 +92,16 @@ describe('BulkAutogradeWidget integration', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(errorSpy).toHaveBeenCalled();
 
-    expect(error_box.innerHTML).toContain('Error on GET /BaAssignment');
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error on GET /BaAssignment.\nError: Faux network failure',
+      { autoClose: false }
+    );
     errorSpy.mockRestore();
   });
 
@@ -105,15 +112,13 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(msgEl.innerHTML).toContain(
-      '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error fetching gradable assignments:\nno assignments',
+      { autoClose: false }
     );
   });
 
@@ -124,15 +129,13 @@ describe('BulkAutogradeWidget integration', () => {
     });
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(msgEl.innerHTML).toContain(
-      '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error fetching gradable assignments:\nno assignments',
+      { autoClose: false }
     );
   });
 
@@ -228,7 +231,7 @@ describe('BulkAutogradeWidget collect functionality', () => {
       if ((endpoint as string).startsWith('baCollect?')) {
         return Promise.resolve({
           success: true,
-          value: '<div>collected</div>'
+          value: 'Submissions collected'
         });
       }
       return Promise.resolve({});
@@ -246,11 +249,9 @@ describe('BulkAutogradeWidget collect functionality', () => {
     // click collect
     collectBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-
-    expect(results.innerHTML).toContain('collected');
+    expect(Notification.info).toHaveBeenCalledWith('Submissions collected', {
+      autoClose: false
+    });
   });
 
   // row2 rather than row1 since row2 collect button is disabled
@@ -287,11 +288,7 @@ describe('BulkAutogradeWidget collect functionality', () => {
     // click collect
     collectBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-
-    expect(results.innerHTML).not.toContain('collected');
+    expect(Notification.info).not.toHaveBeenCalled();
   });
 
   it('handles collect api failure gracefully', async () => {
@@ -321,10 +318,10 @@ describe('BulkAutogradeWidget collect functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(errorSpy).toHaveBeenCalled();
-    const alert = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET baCollect');
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error on GET baCollect.\nbad',
+      { autoClose: false }
+    );
 
     errorSpy.mockRestore();
   });
@@ -355,7 +352,7 @@ describe('BulkAutogradeWidget autograde functionality', () => {
       }
 
       if ((endpoint as string).startsWith('baAutograde?')) {
-        return Promise.resolve({ value: '<div>autograded</div>' });
+        return Promise.resolve({ value: 'Submissions autograded' });
       }
       return Promise.resolve({});
     });
@@ -377,14 +374,12 @@ describe('BulkAutogradeWidget autograde functionality', () => {
     ) as HTMLButtonElement;
 
     await new Promise(resolve => setTimeout(resolve, 0));
-    const results = widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-
     // click autograde
     autogradeBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
-    expect(results.innerHTML).toContain('autograded');
+    expect(Notification.info).toHaveBeenCalledWith('Submissions autograded', {
+      autoClose: false
+    });
   });
 
   it('handles autograde api failure gracefully', async () => {
@@ -414,10 +409,10 @@ describe('BulkAutogradeWidget autograde functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(errorSpy).toHaveBeenCalled();
-    const alert = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET baAutograde');
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error on GET baAutograde.\nbad',
+      { autoClose: false }
+    );
 
     errorSpy.mockRestore();
   });

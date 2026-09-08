@@ -1,6 +1,6 @@
 import { Widget } from '@lumino/widgets';
 import { PageConfig } from '@jupyterlab/coreutils';
-// import { Notification } from '@jupyterlab/apputils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -112,96 +112,56 @@ export class AssignmentsList {
     } catch (reason: Error | any) {
       console.error('load_list caught error:', reason);
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      this.show_error('<p>' + msg + '</p>');
+      this.show_error(msg);
       return;
     }
 
     if (data.success) {
       this.handle_load_list(data);
     } else {
-      this.show_error(
-        '<p>AssignmentsList.load_list() failed:</p>\n<pre>' +
-          data.value +
-          '</pre>'
-      );
+      this.show_error(`AssignmentsList.load_list() failed:\n${data.value}`);
     }
   }
 
   private handle_load_list(data: IBaAssignmentResponse): void {
     if (typeof data.value === 'string') {
-      this.show_error(
-        '<p>Error fetching gradable assignments:</p>\n<pre>' +
-          data.value +
-          '</pre>'
-      );
+      this.show_error(`Error fetching gradable assignments:\n${data.value}`);
     } else {
       this.load_list_success(data.value);
     }
   }
 
   private async do_collect(assignent_code: string) {
-    const results_area = this.widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-    if (results_area) {
-      this.clear_area(results_area);
-      let data: any = null;
-      try {
-        data = await requestAPI<any>(
-          'baCollect?assignment_code=' + assignent_code
-        );
-      } catch (reason) {
-        console.error('do_collect caught error:', reason);
-        const msg: string = 'Error on GET baCollect.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
-      }
+    let data: any = null;
+    try {
+      data = await requestAPI<any>(
+        'baCollect?assignment_code=' + assignent_code
+      );
+    } catch (reason) {
+      console.error('do_collect caught error:', reason);
+      const msg: string = 'Error on GET baCollect.\n' + reason;
+      this.show_error(msg);
+    }
 
-      if (data) {
-        this.handle_response_data(results_area, data);
-      }
+    if (data) {
+      Notification.info(data.value, { autoClose: false });
     }
   }
 
   private async do_autograde(assignent_code: string) {
-    const results_area = this.widget.node.querySelector(
-      '#results-panel-group'
-    ) as HTMLElement;
-    if (results_area) {
-      this.loading_statement(results_area);
-      let data: any = null;
-      try {
-        data = await requestAPI<any>(
-          'baAutograde?assignment_code=' + assignent_code
-        );
-      } catch (reason) {
-        console.error('do_utograde caught error:', reason);
-        const msg: string = 'Error on GET baAutograde.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
-      }
-
-      if (data) {
-        this.handle_response_data(results_area, data);
-      }
+    let data: any = null;
+    try {
+      data = await requestAPI<any>(
+        'baAutograde?assignment_code=' + assignent_code
+      );
+    } catch (reason) {
+      console.error('do_utograde caught error:', reason);
+      const msg: string = 'Error on GET baAutograde.\n' + reason;
+      this.show_error(msg);
     }
-  }
 
-  private handle_response_data(results_area: HTMLElement, data: any): void {
-    if (results_area) {
-      results_area.innerHTML = data.value;
-    }
-  }
-
-  private clear_area(element: HTMLElement): void {
-    if (element!.children.length > 0) {
-      element!.innerHTML = '';
-    }
-  }
-
-  private loading_statement(element: HTMLElement): void {
-    if (element) {
-      if (element.children.length > 0) {
-        element.innerHTML = '<p class="ba_loader">Loading......</p>';
-      }
+    if (data) {
+      Notification.info(data.value, { autoClose: false });
     }
   }
 
@@ -319,15 +279,6 @@ export class AssignmentsList {
   }
 
   public show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // Notification.emit(message, 'error', { autoClose: false });
-    }
+    Notification.error(message, { autoClose: false });
   }
 }
