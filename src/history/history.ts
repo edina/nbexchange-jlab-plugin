@@ -1,6 +1,6 @@
 import { Widget } from '@lumino/widgets';
 
-// disabled, 'cos I can't test them: import { Notification } from '@jupyterlab/apputils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -89,16 +89,16 @@ export class HistoryList {
 
   public clear_list(): void {
     this.panel_group_element.innerHTML = '';
-    let elem = this.widget.node.querySelector('.alert-danger') as HTMLElement;
-    if (elem) {
-      elem.innerHTML = '';
-      elem.style.display = 'None';
-    }
-    elem = this.widget.node.querySelector('.alert-info') as HTMLElement;
-    if (elem) {
-      elem.innerHTML = '';
-      elem.style.display = 'None';
-    }
+    // let elem = this.widget.node.querySelector('.alert-danger') as HTMLElement;
+    // if (elem) {
+    //   elem.innerHTML = '';
+    //   elem.style.display = 'None';
+    // }
+    // elem = this.widget.node.querySelector('.alert-info') as HTMLElement;
+    // if (elem) {
+    //   elem.innerHTML = '';
+    //   elem.style.display = 'None';
+    // }
     // elem = this.widget.node.querySelector(
     //   '#results-panel-group'
     // ) as HTMLElement;
@@ -126,9 +126,7 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      this.show_info(
-        '<p>There is no history available from the Exchange service</p>'
-      );
+      this.show_info('There is no history available from the Exchange service');
       return;
     }
     if (typeof data !== 'object') {
@@ -141,7 +139,7 @@ export class HistoryList {
     }
     if (data.length === 0) {
       this.show_info(
-        '<p>There is zero history available from the Exchange service'
+        'There is zero history available from the Exchange service'
       );
       return;
     }
@@ -149,12 +147,12 @@ export class HistoryList {
       for (const key in data) {
         const this_course = data[key];
         if (!('assignments' in this_course)) {
-          this.show_info('<p>There is no history to show you</p>');
+          this.show_info('There is no history to show you');
           return;
         }
         const assignments: IAssignmentData[] = this_course['assignments'];
         if (assignments.length === 0) {
-          this.show_info('<p>There is no history to show you</p>');
+          this.show_info('There is no history to show you');
           return;
         }
       }
@@ -294,7 +292,7 @@ export class HistoryList {
     } catch (reason) {
       console.error('load_list caught error:', reason);
       const msg: string = `Error on GET /history.\n${reason}`;
-      this.show_error('<p>' + msg + '</p>');
+      this.show_error(msg);
       return;
     } finally {
       this.set_loading(false);
@@ -320,31 +318,11 @@ export class HistoryList {
   }
 
   public show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
+    Notification.error(message, { autoClose: false });
   }
 
   public show_info(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.log('show_info element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // Notification.emit(message, 'info', { autoClose: false });
+    Notification.info(message, { autoClose: false });
   }
 }
 
@@ -467,32 +445,26 @@ class Action {
     student: string,
     path: string
   ) {
-    const alert_area = document.querySelector('.alert-info') as HTMLElement;
-    if (alert_area) {
-      let data: any = null;
-      try {
-        const url =
-          'hisDownload?course_code=' +
-          encodeURIComponent(course_code) +
-          '&assignment_code=' +
-          encodeURIComponent(assignent_code) +
-          '&student=' +
-          encodeURIComponent(student) +
-          '&path=' +
-          encodeURIComponent(path);
+    let data: any = null;
+    try {
+      const url =
+        'hisDownload?course_code=' +
+        encodeURIComponent(course_code) +
+        '&assignment_code=' +
+        encodeURIComponent(assignent_code) +
+        '&student=' +
+        encodeURIComponent(student) +
+        '&path=' +
+        encodeURIComponent(path);
 
-        data = await requestAPI<any>(url);
-      } catch (reason) {
-        console.error('Action do_download caught error:', reason);
-        const msg: string = 'Error on GET hisDownload.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
-      }
-      if (data) {
-        alert_area.innerHTML = data.value;
-        alert_area.style.display = 'block';
-      }
-    } else {
-      console.log('alert box not found');
+      data = await requestAPI<any>(url);
+    } catch (reason) {
+      console.error('Action do_download caught error:', reason);
+      const msg: string = 'Error on GET hisDownload.\n' + reason;
+      this.show_error(msg);
+    }
+    if (data) {
+      Notification.info(data.value, { autoClose: false });
     }
   }
 
@@ -502,33 +474,27 @@ class Action {
     student: string,
     path: string
   ) {
-    const alert_area = document.querySelector('.alert-info') as HTMLElement;
-    if (alert_area) {
-      let data: any = null;
-      try {
-        const url =
-          'hisCollect?course_code=' +
-          encodeURIComponent(course_code) +
-          '&assignment_code=' +
-          encodeURIComponent(assignent_code) +
-          '&student=' +
-          encodeURIComponent(student) +
-          '&path=' +
-          encodeURIComponent(path);
+    let data: any = null;
+    try {
+      const url =
+        'hisCollect?course_code=' +
+        encodeURIComponent(course_code) +
+        '&assignment_code=' +
+        encodeURIComponent(assignent_code) +
+        '&student=' +
+        encodeURIComponent(student) +
+        '&path=' +
+        encodeURIComponent(path);
 
-        data = await requestAPI<any>(url);
-      } catch (reason) {
-        console.error('Action do_collect caught error:', reason);
-        const msg: string = 'Error on GET hisCollect.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
-      }
+      data = await requestAPI<any>(url);
+    } catch (reason) {
+      console.error('Action do_collect caught error:', reason);
+      const msg: string = 'Error on GET hisCollect.\n' + reason;
+      this.show_error(msg);
+    }
 
-      if (data) {
-        alert_area.innerHTML = data.value;
-        alert_area.style.display = 'block';
-      }
-    } else {
-      console.log('alert box not found');
+    if (data) {
+      Notification.info(data.value, { autoClose: false });
     }
   }
 
@@ -644,16 +610,6 @@ class Action {
   }
 
   private show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
+    Notification.error(message, { autoClose: false });
   }
 }

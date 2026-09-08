@@ -1,9 +1,17 @@
 import { HistoryWidget } from './index';
 import { JupyterFrontEnd } from '@jupyterlab/application';
+import { Notification } from '@jupyterlab/apputils';
+import { Widget } from '@lumino/widgets';
 
 import { requestAPI } from '../handler';
 import { HistoryList } from './history';
 jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
+jest.mock('@jupyterlab/apputils', () => ({
+  Notification: {
+    error: jest.fn(),
+    info: jest.fn()
+  }
+}));
 
 /* Tests still to write */
 // show_error gets widget with missing 'alert-danger' class
@@ -146,23 +154,38 @@ describe('HistoryWidget', () => {
     expect(requestAPI).toHaveBeenLastCalledWith('history?course_id=');
   });
 
+  it('emits persistent JupyterLab notifications', () => {
+    const widget = new Widget();
+    const historyList = new HistoryList(widget, 'actions-panel-group');
+    const error = jest.spyOn(Notification, 'error').mockReturnValue('error-id');
+    const info = jest.spyOn(Notification, 'info').mockReturnValue('info-id');
+    historyList.show_error('Unable to load history');
+    historyList.show_info('No history is available');
+
+    expect(error).toHaveBeenCalledWith('Unable to load history', {
+      autoClose: false
+    });
+    expect(info).toHaveBeenCalledWith('No history is available', {
+      autoClose: false
+    });
+  });
+
   // test load-list gets network error
   it('handles network error when loading history list', async () => {
     (requestAPI as jest.Mock).mockRejectedValue(new Error('Network Error'));
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(errorSpy).toHaveBeenCalled();
 
-    expect(error_box.innerHTML).toContain('Error on GET /history');
+    expect(Notification.error).toHaveBeenCalledWith(
+      'Error on GET /history.\nError: Network Error',
+      { autoClose: false }
+    );
     errorSpy.mockRestore();
   });
 
@@ -171,16 +194,14 @@ describe('HistoryWidget', () => {
     (requestAPI as jest.Mock).mockResolvedValue('Non-JSON Response');
 
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed with string:</p>\n<pre>Non-JSON Response</pre>'
+    expect(Notification.error).toHaveBeenCalledWith(
+      '<p>HistoryList.load_list() failed with string:</p>\n<pre>Non-JSON Response</pre>',
+      { autoClose: false }
     );
   });
 
@@ -191,16 +212,14 @@ describe('HistoryWidget', () => {
       value: 'Some error occurred'
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>Some error occurred</pre>'
+    expect(Notification.error).toHaveBeenCalledWith(
+      '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>Some error occurred</pre>',
+      { autoClose: false }
     );
   });
 
@@ -235,6 +254,51 @@ describe('HistoryWidget', () => {
     }
   });
 
+  it('reports collect and download responses through notifications', async () => {
+    const currentCourseData = [
+      { ...simpleMockedHistoryData[0], isCurrent: true }
+    ];
+    (requestAPI as jest.Mock).mockResolvedValue({
+      success: true,
+      value: currentCourseData
+    });
+    const widget = new HistoryWidget({} as JupyterFrontEnd);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const collectButton = widget.node.querySelector(
+      'button[aria-label^="collect for Course"]'
+    ) as HTMLButtonElement;
+    const downloadButton = widget.node.querySelector(
+      'button[aria-label^="download for Course"]'
+    ) as HTMLButtonElement;
+    const infoBox = widget.node.querySelector('.alert-info') as HTMLElement;
+    (requestAPI as jest.Mock)
+      .mockResolvedValueOnce({ success: true, value: 'Submission collected' })
+      .mockResolvedValueOnce({ success: true, value: 'Submission downloaded' });
+
+    collectButton.click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    downloadButton.click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(Notification.info).toHaveBeenNthCalledWith(
+      1,
+      'Submission collected',
+      {
+        autoClose: false
+      }
+    );
+    expect(Notification.info).toHaveBeenNthCalledWith(
+      2,
+      'Submission downloaded',
+      {
+        autoClose: false
+      }
+    );
+    expect(infoBox.innerHTML).toBe('');
+  });
+
   it('loads history list identifies valid data with no assignments', async () => {
     const mockData = [
       {
@@ -253,14 +317,15 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const error_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
+    new HistoryWidget(app);
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(Notification.info).toHaveBeenCalledWith(
+      'There is no history to show you',
+      {
+        autoClose: false
+      }
     );
   });
 
@@ -272,14 +337,15 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const error_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
+    new HistoryWidget(app);
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(Notification.info).toHaveBeenCalledWith(
+      'There is no history to show you',
+      {
+        autoClose: false
+      }
     );
   });
 
@@ -410,45 +476,24 @@ describe('HistoryWidget', () => {
     );
   });
 
-  it('sets on show_error correctly', async () => {
-    (requestAPI as jest.Mock).mockResolvedValue({
-      success: 'true',
-      value: null
+  it('emits an error notification', () => {
+    const historyList = new HistoryList(new Widget(), 'actions-panel-group');
+
+    historyList.show_error('Test error message');
+
+    expect(Notification.error).toHaveBeenCalledWith('Test error message', {
+      autoClose: false
     });
-
-    // Mock JupyterFrontEnd
-    const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const historyList = new HistoryList(widget, 'actions-panel-group');
-
-    const element = widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    expect(element.innerHTML).toBe('');
-
-    historyList.show_error('<p>Test error message</p>');
-
-    expect(element.innerHTML).toBe('<p>Test error message</p>');
   });
 
-  it('sets on show_info correctly', async () => {
-    (requestAPI as jest.Mock).mockResolvedValue({
-      success: 'true',
-      value: null
+  it('emits an info notification', () => {
+    const historyList = new HistoryList(new Widget(), 'actions-panel-group');
+
+    historyList.show_info('Test info message');
+
+    expect(Notification.info).toHaveBeenCalledWith('Test info message', {
+      autoClose: false
     });
-
-    // Mock JupyterFrontEnd
-    const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const historyList = new HistoryList(widget, 'actions-panel-group');
-
-    const element = widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    expect(element.innerHTML).toBe('');
-
-    historyList.show_info('<p>Test info message</p>');
-    expect(element.innerHTML).toBe('<p>Test info message</p>');
   });
 
   it('runs clear_list correctly', async () => {
@@ -462,12 +507,6 @@ describe('HistoryWidget', () => {
     const widget = new HistoryWidget(app);
     const historyList = new HistoryList(widget, 'actions-panel-group');
 
-    const info = widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    const danger = widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
     const results_panel = widget.node.querySelector(
       '#actions-panel-group'
     ) as HTMLElement;
@@ -475,16 +514,8 @@ describe('HistoryWidget', () => {
     // populate the elements
     results_panel.innerHTML = '<p>Some results</p>';
 
-    historyList.show_info('<p>Test info message</p>');
-    historyList.show_error('<p>Test error message</p>');
-
-    expect(info.innerHTML).toBe('<p>Test info message</p>');
-    expect(danger.innerHTML).toBe('<p>Test error message</p>');
-
     historyList.clear_list();
 
-    expect(info.innerHTML).toBe('');
-    expect(danger.innerHTML).toBe('');
     expect(results_panel.innerHTML).toBe('');
   });
 
@@ -496,15 +527,14 @@ describe('HistoryWidget', () => {
       value: null
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    const info_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
-    expect(info_box.innerHTML).toContain(
-      '<p>There is no history available from the Exchange service</p>'
+    expect(Notification.info).toHaveBeenCalledWith(
+      'There is no history available from the Exchange service',
+      { autoClose: false }
     );
   });
 
@@ -527,15 +557,14 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    const info_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
-    expect(info_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(Notification.info).toHaveBeenCalledWith(
+      'There is no history to show you',
+      { autoClose: false }
     );
   });
 });
