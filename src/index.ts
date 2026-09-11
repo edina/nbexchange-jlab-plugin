@@ -6,8 +6,11 @@ import { ICommandPalette } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Menu } from '@lumino/widgets';
 
+import { historyPlugin } from './history/plugin';
+import { bulkAutogradePlugin } from './bulkAutograde/plugin';
+
 /**
- * The plugin ID
+ * The menu plugin ID
  */
 const pluginID = '@jupyter/nbexchange:menu';
 
@@ -67,4 +70,4 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default menuPlugin;
+export default [menuPlugin, historyPlugin, bulkAutogradePlugin];

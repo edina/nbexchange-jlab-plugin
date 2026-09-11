@@ -42,8 +42,8 @@
     "scripts": {
         "build": "jlpm build:lib && jlpm build:packages && jlpm build:labextension:dev",
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:packages:prod && jlpm build:labextension",
-        "build:packages": "jlpm --workspaces foreach --all run build:lib && jlpm --workspaces foreach --all run build:labextension:dev",
-        "build:packages:prod": "jlpm --workspaces foreach --all run build:lib:prod && jlpm --workspaces foreach --all run build:labextension",
+        "build:packages": "jlpm workspaces foreach --all run build:lib && jlpm workspaces foreach --all run build:labextension:dev",
+        "build:packages:prod": "jlpm workspaces foreach --all run build:lib:prod && jlpm workspaces foreach --all run build:labextension",
         "build:labextension": "jupyter-builder build .",
         "build:labextension:dev": "jupyter-builder build --development True .",
         "build:lib": "tsc --sourceMap",
@@ -52,7 +52,7 @@
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
         "clean:labextension": "rimraf nbexchange_jlab/labextension nbexchange_jlab/_version.py",
-        "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache && jlpm --workspaces foreach --all run clean:all",
+        "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache && jlpm workspaces foreach --all run clean:all",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
         "install:extension": "jlpm build",
@@ -127,11 +127,7 @@
         },
         "extension": true,
         "outputDir": "nbexchange_jlab/labextension",
-        "schemaDir": "schema",
-        "singletonPackages": [
-            "@jupyter/nbexchange-history",
-            "@jupyter/nbexchange-bulkautograde"
-        ]
+        "schemaDir": "schema"
     },
     "eslintIgnore": [
         "node_modules",
