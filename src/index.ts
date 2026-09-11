@@ -6,23 +6,32 @@ import {
 import {
   ICommandPalette,
   MainAreaWidget,
+  Notification,
   WidgetTracker
 } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { INotebookTree } from '@jupyter-notebook/tree';
+import { Token } from '@lumino/coreutils';
 import { Menu } from '@lumino/widgets';
 
 import { HistoryWidget } from './history';
 import { BulkAutogradeWidget } from './bulkAutograde';
+import { requestAPI } from './handler';
 
 /**
  * The plugin IDs
  */
-const pluginIDs = {
-  menus: '@jupyter/nbexchange:menu',
-  history: '@jupyter/nbexchange:history',
-  bulkAutograde: '@jupyter/nbexchange:bulkAutograde'
+export const pluginIDs = {
+  menu: '@noteable/nbexchange_plugins:menu',
+  history: '@noteable/nbexchange_plugins:history',
+  bulkAutograde: '@noteable/nbexchange_plugins:bulkautograde',
+  courseArchive: '@noteable/nbexchange_plugins:coursearchive'
 };
+
+/** The Nbgrader menu shared by the independently configurable plugins. */
+export const INbgraderMenu = new Token<Menu>(
+  '@noteable/nbexchange_plugins:INbgraderMenu'
+);
 
 /**
  * The command IDs
@@ -34,42 +43,42 @@ export const commandIDs = {
   openFormgraderLocal: 'nbgrader:open-formgrader-local',
   openCreateAssignment: 'nbgrader:open-create-assignment',
   openHistory: 'nbexchange:open-history',
-  openBulkAutograde: 'nbexchange:open-bulk-autograde'
+  openBulkAutograde: 'nbexchange:open-bulk-autograde',
+  exportCourseGrades: 'nbexchange:export-course-grades',
+  archiveCourseFiles: 'nbexchange:archive-course-files',
+  makeArchive: 'nbexchange:make-archive'
 };
+
+interface IArchiveResponse {
+  success: boolean;
+  value: string;
+}
 
 /**
  * Initialization data for the nbexchange-jlab extension.
  */
-const menuExtension: JupyterFrontEndPlugin<void> = {
-  id: pluginIDs.menus,
+const menuExtension: JupyterFrontEndPlugin<Menu> = {
+  id: pluginIDs.menu,
   description: 'Add NbExchange main menu',
   autoStart: true,
+  provides: INbgraderMenu,
   requires: [IMainMenu],
-  optional: [ICommandPalette],
-  activate: (
-    app: JupyterFrontEnd,
-    mainMenu: IMainMenu,
-    palette: ICommandPalette | null
-  ) => {
+  activate: (app: JupyterFrontEnd, mainMenu: IMainMenu): Menu => {
     const nbgraderMenu = new Menu({ commands: app.commands });
     nbgraderMenu.id = 'jp-mainmenu-nbgrader';
     nbgraderMenu.title.label = 'Nbgrader';
 
-    if (palette) {
-      palette.addItem({
-        command: commandIDs.openHistory,
-        category: 'nbgrader'
-      });
-    }
-
-    nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
+    nbgraderMenu.addItem({
+      command: commandIDs.openAssignmentsList
+    });
     nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
     nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
-    nbgraderMenu.addItem({ command: commandIDs.openFormgraderLocal });
-    nbgraderMenu.addItem({ command: commandIDs.openHistory });
-    nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+    nbgraderMenu.addItem({
+      command: commandIDs.openFormgraderLocal
+    });
 
     mainMenu.addMenu(nbgraderMenu);
+    return nbgraderMenu;
   }
 };
 
@@ -79,11 +88,14 @@ const menuExtension: JupyterFrontEndPlugin<void> = {
 const historyListExtension: JupyterFrontEndPlugin<void> = {
   id: pluginIDs.history,
   autoStart: true,
-  optional: [ILayoutRestorer, INotebookTree],
+  requires: [INbgraderMenu],
+  optional: [ILayoutRestorer, INotebookTree, ICommandPalette],
   activate: (
     app: JupyterFrontEnd,
+    nbgraderMenu: Menu,
     restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
+    notebookTree: INotebookTree | null,
+    palette: ICommandPalette | null
   ) => {
     // Declare a widget variable
     let widget: MainAreaWidget<HistoryWidget>;
@@ -127,6 +139,11 @@ const historyListExtension: JupyterFrontEndPlugin<void> = {
         app.shell.activateById(widget.id);
       }
     });
+    nbgraderMenu.addItem({ command: commandIDs.openHistory });
+    palette?.addItem({
+      command: commandIDs.openHistory,
+      category: 'nbgrader'
+    });
 
     // Restore the widget state
     if (restorer !== null) {
@@ -144,11 +161,14 @@ const historyListExtension: JupyterFrontEndPlugin<void> = {
 const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
   id: pluginIDs.bulkAutograde,
   autoStart: true,
-  optional: [ILayoutRestorer, INotebookTree],
+  requires: [INbgraderMenu],
+  optional: [ILayoutRestorer, INotebookTree, ICommandPalette],
   activate: (
     app: JupyterFrontEnd,
+    nbgraderMenu: Menu,
     restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
+    notebookTree: INotebookTree | null,
+    palette: ICommandPalette | null
   ) => {
     // Declare a widget variable
     let widget: MainAreaWidget<BulkAutogradeWidget>;
@@ -192,6 +212,11 @@ const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
         app.shell.activateById(widget.id);
       }
     });
+    nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+    palette?.addItem({
+      command: commandIDs.openBulkAutograde,
+      category: 'nbgrader'
+    });
 
     // Restore the widget state
     if (restorer !== null) {
@@ -203,4 +228,62 @@ const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default [menuExtension, historyListExtension, bulkAutogradeExtension];
+/**
+ * Course archive actions. This is deliberately a distinct plugin so it can be
+ * managed independently with JupyterLab's enable/disable commands.
+ */
+const courseArchiveExtension: JupyterFrontEndPlugin<void> = {
+  id: pluginIDs.courseArchive,
+  autoStart: true,
+  requires: [INbgraderMenu],
+  optional: [ICommandPalette],
+  activate: (
+    app: JupyterFrontEnd,
+    nbgraderMenu: Menu,
+    palette: ICommandPalette | null
+  ) => {
+    const runArchive = async (endpoint: string): Promise<void> => {
+      try {
+        const response = await requestAPI<IArchiveResponse>(endpoint);
+        if (response.success) {
+          Notification.info(response.value, { autoClose: false });
+        } else {
+          Notification.error(response.value, { autoClose: false });
+        }
+      } catch (reason) {
+        Notification.error(`Could not create archive: ${reason}`, {
+          autoClose: false
+        });
+      }
+    };
+
+    app.commands.addCommand(commandIDs.exportCourseGrades, {
+      label: 'Export Course Grades (CSV)',
+      execute: () => runArchive('exportGrades')
+    });
+    app.commands.addCommand(commandIDs.archiveCourseFiles, {
+      label: 'Archive Files (Tarball)',
+      execute: () => runArchive('archiveCourse')
+    });
+    app.commands.addCommand(commandIDs.makeArchive, {
+      label: 'Archive Course (files and grades)',
+      execute: () => runArchive('makeArchive')
+    });
+
+    for (const command of [
+      commandIDs.exportCourseGrades,
+      commandIDs.archiveCourseFiles,
+      commandIDs.makeArchive
+    ]) {
+      nbgraderMenu.addItem({ command });
+      palette?.addItem({ command, category: 'nbgrader' });
+    }
+  }
+};
+
+export default [
+  menuExtension,
+  historyListExtension,
+  bulkAutogradeExtension,
+  courseArchiveExtension
+];

@@ -1,5 +1,5 @@
 {
-    "name": "nbexchange_jlab",
+    "name": "@noteable/nbexchange_plugins",
     "version": "2.0.6",
     "description": "A JupyterLab extension to add Noteable Look and Feel",
     "keywords": [

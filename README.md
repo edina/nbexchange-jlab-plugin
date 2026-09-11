@@ -2,11 +2,11 @@
 
 A JupyterLab extension which provides the plugins for [nbgrader](https://github.com/jupyter/nbgrader) to use [NbExchange](https://github.com/edina/nbexchange) as an external Exchange service.
 
-It is composed of a Python package named `nbexchange_jlab` for the server extension and a NPM package named `nbexchange_jlab` for the frontend extension.
+It is composed of a Python package named `nbexchange_jlab` for the server extension and an NPM package named `@noteable/nbexchange_plugins` for the frontend extension.
 
 ## Additional Functionality
 
-In addition to the usual suite of plugins for exchanging files, the plugin provides a new autograde pre-processor and two additional commands options to the Nbgrader menu: `Exchange History` and `Bulk Autograding`.
+In addition to the usual suite of plugins for exchanging files, the plugin provides a new autograde pre-processor and additional commands in the Nbgrader menu: `Exchange History`, `Bulk Autograding`, and Course Archive actions.
 
 ![The new nbgrader menu options](new_menu_options.png)
 
@@ -47,6 +47,15 @@ For each assignment, there's
 Outputs from the actions of the buttons are displayed below the table
 
 ![A screenshot of a successful ](ba_autograde_autograde.png)
+
+### Course Archive
+
+This creates a record of the course for long-term archiving:
+
+- a `.csv` file of grades for each student for assignment
+- a `.tgz` file of the original release, all collected submissions, and the autograded & feedback directories.
+
+The files are written to `coursedir.root`
 
 ## Requirements
 
@@ -121,6 +130,22 @@ c.Exchange.base_path = '/services/exchange'
 ```
 
 The `Exchange History` and `Bulk Autograde` commands use the NBgrader system to perform their actions, so require additional configuration.
+
+### Enabling or disabling optional features
+
+The Bulk Autograde and Course Archive features are independent JupyterLab plugins.
+They can be enabled or disabled without disabling the rest of NBGrader/NBExchange plugins:
+
+```bash
+jupyter labextension disable @noteable/nbexchange_plugins:bulkautograde
+jupyter labextension disable @noteable/nbexchange_plugins:coursearchive
+
+jupyter labextension enable @noteable/nbexchange_plugins:bulkautograde
+jupyter labextension enable @noteable/nbexchange_plugins:coursearchive
+```
+
+Disabling either plugin removes its commands from the Nbgrader menu and command
+palette. Restart JupyterLab after changing the configuration.
 
 ## Contributing
 
