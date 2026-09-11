@@ -11,7 +11,8 @@ const HISTORY_PLUGIN_ID = '@jupyter/nbexchange:history';
 
 export const historyPlugin: JupyterFrontEndPlugin<void> = {
   id: HISTORY_PLUGIN_ID,
-  description: 'NbExchange Interaction History',
+  description:
+    'Exchange History: View all actions in an out of the exchange, by course and assignment.',
   autoStart: true,
   optional: [ICommandPalette],
   activate: (app: JupyterFrontEnd, palette: ICommandPalette | null) => {
@@ -19,12 +20,12 @@ export const historyPlugin: JupyterFrontEndPlugin<void> = {
     const main = new MainAreaWidget({ content: historyWidget });
 
     main.id = 'nbexchange-history';
-    main.title.label = 'NbExchange History';
+    main.title.label = 'Exchange History';
     main.title.closable = true;
 
     const command = commandIDs.openHistory;
     app.commands.addCommand(command, {
-      label: 'NbExchange History',
+      label: 'Exchange History',
       execute: () => {
         if (!main.isAttached) {
           app.shell.add(main, 'main');

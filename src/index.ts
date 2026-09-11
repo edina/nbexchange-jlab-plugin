@@ -47,6 +47,20 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
     nbgraderMenu.title.label = 'Nbgrader';
 
     // Add commands if they exist (provided by other extensions)
+    nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
+    nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
+    nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
+    nbgraderMenu.addItem({ command: commandIDs.openFormgraderLocal });
+
+    if (app.commands.hasCommand(commandIDs.openBulkAutograde)) {
+      if (palette) {
+        palette.addItem({
+          command: commandIDs.openBulkAutograde,
+          category: 'NbExchange'
+        });
+      }
+      nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+    }
     if (app.commands.hasCommand(commandIDs.openHistory)) {
       if (palette) {
         palette.addItem({
@@ -55,15 +69,6 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
         });
       }
       nbgraderMenu.addItem({ command: commandIDs.openHistory });
-    }
-
-    nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
-    nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
-    nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
-    nbgraderMenu.addItem({ command: commandIDs.openFormgraderLocal });
-
-    if (app.commands.hasCommand(commandIDs.openBulkAutograde)) {
-      nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
     }
 
     mainMenu.addMenu(nbgraderMenu);
