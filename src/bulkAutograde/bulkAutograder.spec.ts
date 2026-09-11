@@ -4,9 +4,16 @@
 
 import { BulkAutogradeWidget } from './index';
 import { JupyterFrontEnd } from '@jupyterlab/application';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
+
+jest.mock('@jupyterlab/apputils', () => ({
+  Notification: {
+    emit: jest.fn()
+  }
+}));
 
 import { BaAssignmentsList, AssignmentsList } from './bulkAutograde';
 
@@ -83,57 +90,64 @@ describe('BulkAutogradeWidget integration', () => {
     (requestAPI as jest.Mock).mockRejectedValue(err);
 
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const notificationSpy = jest.spyOn(Notification, 'emit');
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(errorSpy).toHaveBeenCalled();
 
-    expect(error_box.innerHTML).toContain('Error on GET /BaAssignment');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error on GET /BaAssignment'),
+      'error',
+      { autoClose: false }
+    );
     errorSpy.mockRestore();
+    notificationSpy.mockRestore();
   });
 
   it('shows string error if getAssignment says success:false', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
+
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'false',
       value: 'no assignments'
     });
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(msgEl.innerHTML).toContain(
-      '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'Error fetching gradable assignments:\nno assignments',
+      'error',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   it('shows string error if getAssignment says success:true', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
+
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: 'no assignments'
     });
 
     const app = {} as JupyterFrontEnd;
-    const widget = new BulkAutogradeWidget(app);
+    new BulkAutogradeWidget(app);
 
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    const msgEl = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(msgEl.innerHTML).toContain(
-      '<p>Error fetching gradable assignments:</p>\n<pre>no assignments</pre>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'Error fetching gradable assignments:\nno assignments',
+      'error',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   it('builds table on success and buttons show as expected', async () => {
@@ -295,6 +309,8 @@ describe('BulkAutogradeWidget collect functionality', () => {
   });
 
   it('handles collect api failure gracefully', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
+
     (requestAPI as jest.Mock).mockImplementation((endpoint: string) => {
       if (endpoint === 'getAssignment') {
         return Promise.resolve({
@@ -321,12 +337,14 @@ describe('BulkAutogradeWidget collect functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(errorSpy).toHaveBeenCalled();
-    const alert = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET baCollect');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'Error on GET baCollect.\nbad',
+      'error',
+      { autoClose: false }
+    );
 
     errorSpy.mockRestore();
+    notificationSpy.mockRestore();
   });
 });
 
@@ -388,6 +406,8 @@ describe('BulkAutogradeWidget autograde functionality', () => {
   });
 
   it('handles autograde api failure gracefully', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
+
     (requestAPI as jest.Mock).mockImplementation((endpoint: string) => {
       if (endpoint === 'getAssignment') {
         return Promise.resolve({
@@ -414,11 +434,13 @@ describe('BulkAutogradeWidget autograde functionality', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(errorSpy).toHaveBeenCalled();
-    const alert = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
-    expect(alert.innerHTML).toContain('Error on GET baAutograde');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'Error on GET baAutograde.\nbad',
+      'error',
+      { autoClose: false }
+    );
 
     errorSpy.mockRestore();
+    notificationSpy.mockRestore();
   });
 });
