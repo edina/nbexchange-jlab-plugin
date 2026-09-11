@@ -1,6 +1,6 @@
 import { Widget } from '@lumino/widgets';
 import { PageConfig } from '@jupyterlab/coreutils';
-// import { Notification } from '@jupyterlab/apputils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -112,28 +112,20 @@ export class AssignmentsList {
     } catch (reason: Error | any) {
       console.error('load_list caught error:', reason);
       const msg: string = 'Error on GET /BaAssignment.\n' + reason;
-      this.show_error('<p>' + msg + '</p>');
+      this.show_error(msg);
       return;
     }
 
     if (data.success) {
       this.handle_load_list(data);
     } else {
-      this.show_error(
-        '<p>AssignmentsList.load_list() failed:</p>\n<pre>' +
-          data.value +
-          '</pre>'
-      );
+      this.show_error('AssignmentsList.load_list() failed:\n' + data.value);
     }
   }
 
   private handle_load_list(data: IBaAssignmentResponse): void {
     if (typeof data.value === 'string') {
-      this.show_error(
-        '<p>Error fetching gradable assignments:</p>\n<pre>' +
-          data.value +
-          '</pre>'
-      );
+      this.show_error('Error fetching gradable assignments:\n' + data.value);
     } else {
       this.load_list_success(data.value);
     }
@@ -153,7 +145,7 @@ export class AssignmentsList {
       } catch (reason) {
         console.error('do_collect caught error:', reason);
         const msg: string = 'Error on GET baCollect.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
+        this.show_error(msg);
       }
 
       if (data) {
@@ -176,7 +168,7 @@ export class AssignmentsList {
       } catch (reason) {
         console.error('do_utograde caught error:', reason);
         const msg: string = 'Error on GET baAutograde.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
+        this.show_error(msg);
       }
 
       if (data) {
@@ -319,15 +311,6 @@ export class AssignmentsList {
   }
 
   public show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // Notification.emit(message, 'error', { autoClose: false });
-    }
+    Notification.emit(message, 'error', { autoClose: false });
   }
 }
