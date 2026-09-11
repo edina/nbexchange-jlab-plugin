@@ -11,7 +11,8 @@ const BULK_AUTOGRADE_PLUGIN_ID = '@jupyter/nbexchange:bulk-autograde';
 
 export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
   id: BULK_AUTOGRADE_PLUGIN_ID,
-  description: 'NbExchange Bulk Autograder',
+  description:
+    'A Bulk Autograder: Autogrades all submissions for a given assignment without stopping at the first error.',
   autoStart: true,
   optional: [ICommandPalette],
   activate: (app: JupyterFrontEnd, palette: ICommandPalette | null) => {
@@ -24,7 +25,7 @@ export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
 
     const command = commandIDs.openBulkAutograde;
     app.commands.addCommand(command, {
-      label: 'NbExchange Bulk Autograde',
+      label: 'Bulk Autograde',
       execute: () => {
         if (!main.isAttached) {
           app.shell.add(main, 'main');
