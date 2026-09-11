@@ -25,7 +25,6 @@ export const pluginIDs = {
   menu: '@noteable/nbexchange_plugins:menu',
   history: '@noteable/nbexchange_plugins:history',
   bulkAutograde: '@noteable/nbexchange_plugins:bulkautograde',
-  courseArchive: '@noteable/nbexchange_plugins:coursearchive'
 };
 
 /** The Nbgrader menu shared by the independently configurable plugins. */
@@ -44,15 +43,7 @@ export const commandIDs = {
   openCreateAssignment: 'nbgrader:open-create-assignment',
   openHistory: 'nbexchange:open-history',
   openBulkAutograde: 'nbexchange:open-bulk-autograde',
-  exportCourseGrades: 'nbexchange:export-course-grades',
-  archiveCourseFiles: 'nbexchange:archive-course-files',
-  makeArchive: 'nbexchange:make-archive'
 };
-
-interface IArchiveResponse {
-  success: boolean;
-  value: string;
-}
 
 /**
  * Initialization data for the nbexchange-jlab extension.
@@ -228,62 +219,4 @@ const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
   }
 };
 
-/**
- * Course archive actions. This is deliberately a distinct plugin so it can be
- * managed independently with JupyterLab's enable/disable commands.
- */
-const courseArchiveExtension: JupyterFrontEndPlugin<void> = {
-  id: pluginIDs.courseArchive,
-  autoStart: true,
-  requires: [INbgraderMenu],
-  optional: [ICommandPalette],
-  activate: (
-    app: JupyterFrontEnd,
-    nbgraderMenu: Menu,
-    palette: ICommandPalette | null
-  ) => {
-    const runArchive = async (endpoint: string): Promise<void> => {
-      try {
-        const response = await requestAPI<IArchiveResponse>(endpoint);
-        if (response.success) {
-          Notification.info(response.value, { autoClose: false });
-        } else {
-          Notification.error(response.value, { autoClose: false });
-        }
-      } catch (reason) {
-        Notification.error(`Could not create archive: ${reason}`, {
-          autoClose: false
-        });
-      }
-    };
-
-    app.commands.addCommand(commandIDs.exportCourseGrades, {
-      label: 'Export Course Grades (CSV)',
-      execute: () => runArchive('exportGrades')
-    });
-    app.commands.addCommand(commandIDs.archiveCourseFiles, {
-      label: 'Archive Files (Tarball)',
-      execute: () => runArchive('archiveCourse')
-    });
-    app.commands.addCommand(commandIDs.makeArchive, {
-      label: 'Archive Course (files and grades)',
-      execute: () => runArchive('makeArchive')
-    });
-
-    for (const command of [
-      commandIDs.exportCourseGrades,
-      commandIDs.archiveCourseFiles,
-      commandIDs.makeArchive
-    ]) {
-      nbgraderMenu.addItem({ command });
-      palette?.addItem({ command, category: 'nbgrader' });
-    }
-  }
-};
-
-export default [
-  menuExtension,
-  historyListExtension,
-  bulkAutogradeExtension,
-  courseArchiveExtension
-];
+export default [menuExtension, historyListExtension, bulkAutogradeExtension];

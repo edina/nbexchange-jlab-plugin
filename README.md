@@ -6,7 +6,7 @@ It is composed of a Python package named `nbexchange_jlab` for the server extens
 
 ## Additional Functionality
 
-In addition to the usual suite of plugins for exchanging files, the plugin provides a new autograde pre-processor and additional commands in the Nbgrader menu: `Exchange History`, `Bulk Autograding`, and Course Archive actions.
+In addition to the usual suite of plugins for exchanging files, the plugin provides a new autograde pre-processor and additional commands in the Nbgrader menu: `Exchange History` and `Bulk Autograding`.
 
 ![The new nbgrader menu options](new_menu_options.png)
 
@@ -47,15 +47,6 @@ For each assignment, there's
 Outputs from the actions of the buttons are displayed below the table
 
 ![A screenshot of a successful ](ba_autograde_autograde.png)
-
-### Course Archive
-
-This creates a record of the course for long-term archiving:
-
-- a `.csv` file of grades for each student for assignment
-- a `.tgz` file of the original release, all collected submissions, and the autograded & feedback directories.
-
-The files are written to `coursedir.root`
 
 ## Requirements
 
