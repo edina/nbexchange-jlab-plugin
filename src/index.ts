@@ -6,7 +6,6 @@ import {
 import {
   ICommandPalette,
   MainAreaWidget,
-  Notification,
   WidgetTracker
 } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
@@ -16,7 +15,6 @@ import { Menu } from '@lumino/widgets';
 
 import { HistoryWidget } from './history';
 import { BulkAutogradeWidget } from './bulkAutograde';
-import { requestAPI } from './handler';
 
 /**
  * The plugin IDs
