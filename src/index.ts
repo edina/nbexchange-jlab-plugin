@@ -1,31 +1,18 @@
 import {
-  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import {
-  ICommandPalette,
-  MainAreaWidget,
-  WidgetTracker
-} from '@jupyterlab/apputils';
+import { ICommandPalette } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
-import { INotebookTree } from '@jupyter-notebook/tree';
 import { Menu } from '@lumino/widgets';
 
-import { HistoryWidget } from './history';
-import { BulkAutogradeWidget } from './bulkAutograde';
-
 /**
- * The plugin IDs
+ * The plugin ID
  */
-const pluginIDs = {
-  menus: '@jupyter/nbexchange:menu',
-  history: '@jupyter/nbexchange:history',
-  bulkAutograde: '@jupyter/nbexchange:bulkAutograde'
-};
+const pluginID = '@jupyter/nbexchange:menu';
 
 /**
- * The command IDs
+ * The command IDs (shared with other nbexchange extensions)
  */
 export const commandIDs = {
   openAssignmentsList: 'nbgrader:open-assignment-list',
@@ -38,10 +25,11 @@ export const commandIDs = {
 };
 
 /**
- * Initialization data for the nbexchange-jlab extension.
+ * Menu plugin - provides Nbgrader menu with commands from all nbexchange extensions.
+ * This plugin is optional and can be disabled independently.
  */
-const menuExtension: JupyterFrontEndPlugin<void> = {
-  id: pluginIDs.menus,
+const menuPlugin: JupyterFrontEndPlugin<void> = {
+  id: pluginID,
   description: 'Add NbExchange main menu',
   autoStart: true,
   requires: [IMainMenu],
@@ -55,152 +43,28 @@ const menuExtension: JupyterFrontEndPlugin<void> = {
     nbgraderMenu.id = 'jp-mainmenu-nbgrader';
     nbgraderMenu.title.label = 'Nbgrader';
 
-    if (palette) {
-      palette.addItem({
-        command: commandIDs.openHistory,
-        category: 'nbgrader'
-      });
+    // Add commands if they exist (provided by other extensions)
+    if (app.commands.hasCommand(commandIDs.openHistory)) {
+      if (palette) {
+        palette.addItem({
+          command: commandIDs.openHistory,
+          category: 'NbExchange'
+        });
+      }
+      nbgraderMenu.addItem({ command: commandIDs.openHistory });
     }
 
     nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
     nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
     nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
     nbgraderMenu.addItem({ command: commandIDs.openFormgraderLocal });
-    nbgraderMenu.addItem({ command: commandIDs.openHistory });
-    nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+
+    if (app.commands.hasCommand(commandIDs.openBulkAutograde)) {
+      nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+    }
 
     mainMenu.addMenu(nbgraderMenu);
   }
 };
 
-/**
- * History page plugin.
- */
-const historyListExtension: JupyterFrontEndPlugin<void> = {
-  id: pluginIDs.history,
-  autoStart: true,
-  optional: [ILayoutRestorer, INotebookTree],
-  activate: (
-    app: JupyterFrontEnd,
-    restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
-  ) => {
-    // Declare a widget variable
-    let widget: MainAreaWidget<HistoryWidget>;
-
-    // Track the widget state
-    const tracker = new WidgetTracker<MainAreaWidget<HistoryWidget>>({
-      namespace: 'nbexchange-history'
-    });
-
-    app.commands.addCommand(commandIDs.openHistory, {
-      label: 'Exchange History',
-      isEnabled: () => {
-        return true;
-      },
-      execute: () => {
-        if (!widget || widget.isDisposed) {
-          const content = new HistoryWidget(app);
-          widget = new MainAreaWidget({ content });
-          widget.id = 'nbexchange-history';
-          widget.addClass('nbgrader-mainarea-widget');
-          widget.title.label = 'Exchange History';
-          widget.title.closable = true;
-        }
-        if (!tracker.has(widget)) {
-          // Track the state of the widget for later restoration
-          tracker.add(widget);
-        }
-
-        // Attach the widget to the main area if it's not there
-        if (!widget.isAttached) {
-          if (notebookTree) {
-            notebookTree.addWidget(widget);
-            notebookTree.currentWidget = widget;
-          } else {
-            app.shell.add(widget, 'main');
-          }
-        }
-
-        widget.content.update();
-
-        app.shell.activateById(widget.id);
-      }
-    });
-
-    // Restore the widget state
-    if (restorer !== null) {
-      restorer.restore(tracker, {
-        command: commandIDs.openHistory,
-        name: () => 'nbexchange-history'
-      });
-    }
-  }
-};
-
-/**
- * Bulk Autograde page plugin.
- */
-const bulkAutogradeExtension: JupyterFrontEndPlugin<void> = {
-  id: pluginIDs.bulkAutograde,
-  autoStart: true,
-  optional: [ILayoutRestorer, INotebookTree],
-  activate: (
-    app: JupyterFrontEnd,
-    restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
-  ) => {
-    // Declare a widget variable
-    let widget: MainAreaWidget<BulkAutogradeWidget>;
-
-    // Track the widget state
-    const tracker = new WidgetTracker<MainAreaWidget<BulkAutogradeWidget>>({
-      namespace: 'nbexchange-bulkAutograde'
-    });
-
-    app.commands.addCommand(commandIDs.openBulkAutograde, {
-      label: 'Bulk Autograding',
-      isEnabled: () => {
-        return true;
-      },
-      execute: () => {
-        if (!widget || widget.isDisposed) {
-          const content = new BulkAutogradeWidget(app);
-          widget = new MainAreaWidget({ content });
-          widget.id = 'nbexchange-bulkAutograde';
-          widget.addClass('nbgrader-mainarea-widget');
-          widget.title.label = 'Bulk Autograding';
-          widget.title.closable = true;
-        }
-        if (!tracker.has(widget)) {
-          // Track the state of the widget for later restoration
-          tracker.add(widget);
-        }
-
-        // Attach the widget to the main area if it's not there
-        if (!widget.isAttached) {
-          if (notebookTree) {
-            notebookTree.addWidget(widget);
-            notebookTree.currentWidget = widget;
-          } else {
-            app.shell.add(widget, 'main');
-          }
-        }
-
-        widget.content.update();
-
-        app.shell.activateById(widget.id);
-      }
-    });
-
-    // Restore the widget state
-    if (restorer !== null) {
-      restorer.restore(tracker, {
-        command: commandIDs.openBulkAutograde,
-        name: () => 'nbexchange-bulkAutograde'
-      });
-    }
-  }
-};
-
-export default [menuExtension, historyListExtension, bulkAutogradeExtension];
+export default menuPlugin;
