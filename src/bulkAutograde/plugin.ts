@@ -6,6 +6,7 @@ import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 
 import { BulkAutogradeWidget } from './index';
 import { commandIDs } from '../index';
+import { IFeatureStatus } from '../featureStatus';
 
 const BULK_AUTOGRADE_PLUGIN_ID = '@jupyter/nbexchange:bulk-autograde';
 
@@ -14,8 +15,13 @@ export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
   description:
     'A Bulk Autograder: Autogrades all submissions for a given assignment without stopping at the first error.',
   autoStart: true,
+  requires: [IFeatureStatus],
   optional: [ICommandPalette],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette | null) => {
+  activate: (
+    app: JupyterFrontEnd,
+    featureStatus: IFeatureStatus,
+    palette: ICommandPalette | null
+  ) => {
     const bulkAutogradeWidget = new BulkAutogradeWidget(app);
     const main = new MainAreaWidget({ content: bulkAutogradeWidget });
 
@@ -31,7 +37,9 @@ export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
           app.shell.add(main, 'main');
         }
         app.shell.activateById(main.id);
-      }
+      },
+      isEnabled: () =>
+        featureStatus.isReady && featureStatus.bulkAutogradeEnabled
     });
 
     if (palette) {
@@ -40,6 +48,10 @@ export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
         category: 'NbExchange'
       });
     }
+
+    featureStatus.bulkAutogradeEnabledChanged.connect(() => {
+      app.commands.notifyCommandChanged(command);
+    });
   }
 };
 
