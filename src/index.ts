@@ -8,6 +8,7 @@ import { Menu } from '@lumino/widgets';
 
 import { historyPlugin } from './history/plugin';
 import { bulkAutogradePlugin } from './bulkAutograde/plugin';
+import { IFeatureStatus } from './featureStatus';
 
 /**
  * The menu plugin ID
@@ -35,18 +36,28 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
   id: pluginID,
   description: 'Add NbExchange main menu',
   autoStart: true,
-  requires: [IMainMenu],
+  requires: [IMainMenu, IFeatureStatus],
   optional: [ICommandPalette],
   activate: (
     app: JupyterFrontEnd,
     mainMenu: IMainMenu,
+    featureStatus: IFeatureStatus,
     palette: ICommandPalette | null
   ) => {
     const nbgraderMenu = new Menu({ commands: app.commands });
     nbgraderMenu.id = 'jp-mainmenu-nbgrader';
     nbgraderMenu.title.label = 'Nbgrader';
 
-    // Add commands if they exist (provided by other extensions)
+    if (app.commands.hasCommand(commandIDs.openHistory)) {
+      if (palette) {
+        palette.addItem({
+          command: commandIDs.openHistory,
+          category: 'NbExchange'
+        });
+      }
+      nbgraderMenu.addItem({ command: commandIDs.openHistory });
+    }
+
     nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
     nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
     nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
@@ -61,17 +72,16 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
       }
       nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
     }
-    if (app.commands.hasCommand(commandIDs.openHistory)) {
-      if (palette) {
-        palette.addItem({
-          command: commandIDs.openHistory,
-          category: 'NbExchange'
-        });
-      }
-      nbgraderMenu.addItem({ command: commandIDs.openHistory });
-    }
 
     mainMenu.addMenu(nbgraderMenu);
+
+    featureStatus.historyEnabledChanged.connect(() => {
+      app.commands.notifyCommandChanged(commandIDs.openHistory);
+    });
+
+    featureStatus.bulkAutogradeEnabledChanged.connect(() => {
+      app.commands.notifyCommandChanged(commandIDs.openBulkAutograde);
+    });
   }
 };
 

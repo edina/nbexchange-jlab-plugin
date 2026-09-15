@@ -13,6 +13,9 @@ except ImportError:
 from nbexchange_jlab.bulk_authograder import (
     load_jupyter_server_extension as load_bulkAutograder,
 )
+from nbexchange_jlab.feature_status import (
+    load_jupyter_server_extension as load_feature_status,
+)
 from nbexchange_jlab.history_list import load_jupyter_server_extension as load_history
 
 
@@ -34,3 +37,4 @@ def _load_jupyter_server_extension(server_app):
     """
     load_history(server_app)
     load_bulkAutograder(server_app)
+    load_feature_status(server_app)
