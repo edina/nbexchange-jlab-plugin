@@ -48,9 +48,32 @@ Outputs from the actions of the buttons are displayed below the table
 
 ![A screenshot of a successful ](ba_autograde_autograde.png)
 
+### Enabling/disabling extensions
+
+Both extensions auto-start _enabled_, but can be **disabled** via the command-line (eg, within a notebook-servers `before-hooks` routine):
+
+```
+jupyter labextension disable @jupyter/nbexchange:history
+jupyter labextension disable @jupyter/nbexchange:bulk-autograde
+
+jupyter labextension enable @jupyter/nbexchange:history
+jupyter labextension enable @jupyter/nbexchange:bulk-autograde
+```
+
+Extensions can also be controlled via `jupyter-config/labconfig/page_config.json`:
+
+```
+{
+  "disabledExtensions": {
+    "@jupyter/nbexchange:history": true,
+    "@jupyter/nbexchange:bulk-autograde": true
+  }
+}
+```
+
 ## Requirements
 
-- JupyterLab >= 4.0.0
+- JupyterLab >= 4.5.0
 - NbGrader
 
 ## Installation
