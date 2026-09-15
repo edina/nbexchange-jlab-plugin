@@ -77,6 +77,8 @@ Both extensions are also _context aware_: they will only be enabled if certain e
 - History enabled when NAAS_COURSE_ID exists
 - Bulk Autograde enabled when NAAS_ROLE exists
 
+To clarify: the extension can be _enabled_ in the UI (and thus in the menu), but will be grey'd out unless the appropriate env-var _also_ exists.
+
 ## Requirements
 
 - JupyterLab >= 4.5.0
