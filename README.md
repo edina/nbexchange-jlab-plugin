@@ -70,6 +70,7 @@ Extensions can also be controlled via `jupyter-config/labconfig/page_config.json
   }
 }
 ```
+
 ### Context awareness
 
 Both extensions are also _context aware_: they will only be enabled if certain environment variables exist in the jupyterlab notebook-server environment:

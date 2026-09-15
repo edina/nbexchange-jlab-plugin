@@ -18,8 +18,8 @@ export const IFeatureStatus = new Token<IFeatureStatus>(
 );
 
 export class FeatureStatusService implements IFeatureStatus, IDisposable {
-  private _historyEnabled = true;
-  private _bulkAutogradeEnabled = true;
+  private _historyEnabled = false;
+  private _bulkAutogradeEnabled = false;
   private _isReady = false;
   private _disposed = false;
 

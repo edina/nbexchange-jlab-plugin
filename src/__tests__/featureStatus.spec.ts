@@ -23,8 +23,8 @@ describe('FeatureStatusService', () => {
 
   describe('initialization', () => {
     it('should initialize with default values', () => {
-      expect(service.historyEnabled).toBe(true);
-      expect(service.bulkAutogradeEnabled).toBe(true);
+      expect(service.historyEnabled).toBe(false);
+      expect(service.bulkAutogradeEnabled).toBe(false);
       expect(service.isReady).toBe(false);
     });
 
@@ -58,8 +58,8 @@ describe('FeatureStatusService', () => {
       await service.refresh();
 
       expect(service.isReady).toBe(true);
-      expect(service.historyEnabled).toBe(true);
-      expect(service.bulkAutogradeEnabled).toBe(true);
+      expect(service.historyEnabled).toBe(false);
+      expect(service.bulkAutogradeEnabled).toBe(false);
     });
 
     it('should handle malformed response gracefully', async () => {
