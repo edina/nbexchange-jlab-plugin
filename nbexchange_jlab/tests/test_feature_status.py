@@ -1,9 +1,6 @@
 """Tests for the feature status module."""
 
-import os
-
 import pytest
-from mock import patch
 
 from nbexchange_jlab.feature_status.handlers import (
     FeatureStatusHandler,
@@ -100,7 +97,7 @@ class TestFeatureStatusManagerGetStatus:
         """When no env vars are set, history and bulk_autograde should be disabled."""
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["general"] is True
         assert result["value"]["history"] is False
@@ -112,7 +109,7 @@ class TestFeatureStatusManagerGetStatus:
         monkeypatch.setenv("NAAS_COURSE_ID", "course_123")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["history"] is True
 
@@ -122,7 +119,7 @@ class TestFeatureStatusManagerGetStatus:
         monkeypatch.setenv("NAAS_ROLE", "Instructor")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["bulk_autograde"] is True
 
@@ -133,7 +130,7 @@ class TestFeatureStatusManagerGetStatus:
         monkeypatch.setenv("NAAS_ROLE", "Instructor")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["history"] is True
         assert result["value"]["bulk_autograde"] is True
@@ -144,7 +141,7 @@ class TestFeatureStatusManagerGetStatus:
         monkeypatch.setenv("NAAS_COURSE_ID", "course_123")
         manager = FeatureStatusManager()
         result = manager.get_status("history")
-        
+
         assert result["success"] is True
         assert result["value"]["feature"] == "history"
         assert result["value"]["enabled"] is True
@@ -155,7 +152,7 @@ class TestFeatureStatusManagerGetStatus:
         """Get status for specific feature (history) when disabled."""
         manager = FeatureStatusManager()
         result = manager.get_status("history")
-        
+
         assert result["success"] is True
         assert result["value"]["feature"] == "history"
         assert result["value"]["enabled"] is False
@@ -166,7 +163,7 @@ class TestFeatureStatusManagerGetStatus:
         monkeypatch.setenv("NAAS_ROLE", "Instructor")
         manager = FeatureStatusManager()
         result = manager.get_status("bulk_autograde")
-        
+
         assert result["success"] is True
         assert result["value"]["feature"] == "bulk_autograde"
         assert result["value"]["enabled"] is True
@@ -177,7 +174,7 @@ class TestFeatureStatusManagerGetStatus:
         """Get status for specific feature (bulk_autograde) when disabled."""
         manager = FeatureStatusManager()
         result = manager.get_status("bulk_autograde")
-        
+
         assert result["success"] is True
         assert result["value"]["feature"] == "bulk_autograde"
         assert result["value"]["enabled"] is False
@@ -187,7 +184,7 @@ class TestFeatureStatusManagerGetStatus:
         """Get status for unknown feature should check its specific env var."""
         manager = FeatureStatusManager()
         result = manager.get_status("unknown_feature")
-        
+
         assert result["success"] is True
         assert result["value"]["feature"] == "unknown_feature"
         assert result["value"]["env_var"] == "NBEXCHANGE_UNKNOWN_FEATURE_ENABLED"
@@ -200,13 +197,11 @@ class TestFeatureStatusHandler:
     @pytest.mark.gen_test
     def test_handler_get_all_features(self):
         """Test handler GET endpoint for all features."""
-        from tornado.testing import AsyncHTTPTestCase
-        from tornado.web import Application
-        
+
         class MockHandler(FeatureStatusHandler):
             def initialize(self):
                 self.settings["feature_status_manager"] = FeatureStatusManager()
-        
+
         # Basic test that handler can be instantiated
         manager = FeatureStatusManager()
         assert manager is not None
@@ -229,7 +224,7 @@ class TestFeatureStatusManagerEdgeCases:
         monkeypatch.setenv("NAAS_COURSE_ID", "course-with-special-chars_123!@#")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["history"] is True
 
@@ -239,7 +234,7 @@ class TestFeatureStatusManagerEdgeCases:
         monkeypatch.setenv("NAAS_COURSE_ID", "   ")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["history"] is True
 
@@ -249,7 +244,7 @@ class TestFeatureStatusManagerEdgeCases:
         monkeypatch.setenv("NAAS_COURSE_ID", "course_\u00e9")
         manager = FeatureStatusManager()
         result = manager.get_status()
-        
+
         assert result["success"] is True
         assert result["value"]["history"] is True
 
@@ -258,11 +253,11 @@ class TestFeatureStatusManagerEdgeCases:
         """Test that multiple calls return consistent results."""
         monkeypatch.setenv("NAAS_COURSE_ID", "course_123")
         manager = FeatureStatusManager()
-        
+
         result1 = manager.get_status()
         result2 = manager.get_status()
         result3 = manager.get_status()
-        
+
         assert result1 == result2 == result3
 
     @pytest.mark.gen_test
@@ -270,10 +265,10 @@ class TestFeatureStatusManagerEdgeCases:
         """Test behavior when env var is removed between calls."""
         monkeypatch.setenv("NAAS_COURSE_ID", "course_123")
         manager = FeatureStatusManager()
-        
+
         result1 = manager.get_status()
         assert result1["value"]["history"] is True
-        
+
         monkeypatch.delenv("NAAS_COURSE_ID")
         result2 = manager.get_status()
         assert result2["value"]["history"] is False

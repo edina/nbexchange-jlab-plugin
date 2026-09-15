@@ -44,7 +44,8 @@ class BaseListerClass(LoggingConfigurable):
             The value of the variable does not matter.
         """
         if env_var is None or env_var == "":
-            return True
+            self.log.info(f"Feature enabled check: {env_var} exists=False")
+            return False  # Default to False if no env_var is provided
 
         exists = env_var in os.environ
         self.log.info(f"Feature enabled check: {env_var} exists={exists}")
