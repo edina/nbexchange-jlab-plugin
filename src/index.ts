@@ -48,16 +48,6 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
     nbgraderMenu.id = 'jp-mainmenu-nbgrader';
     nbgraderMenu.title.label = 'Nbgrader';
 
-    if (app.commands.hasCommand(commandIDs.openHistory)) {
-      if (palette) {
-        palette.addItem({
-          command: commandIDs.openHistory,
-          category: 'NbExchange'
-        });
-      }
-      nbgraderMenu.addItem({ command: commandIDs.openHistory });
-    }
-
     nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
     nbgraderMenu.addItem({ command: commandIDs.openCoursesList });
     nbgraderMenu.addItem({ command: commandIDs.openFormgrader });
@@ -71,6 +61,16 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
         });
       }
       nbgraderMenu.addItem({ command: commandIDs.openBulkAutograde });
+    }
+
+    if (app.commands.hasCommand(commandIDs.openHistory)) {
+      if (palette) {
+        palette.addItem({
+          command: commandIDs.openHistory,
+          category: 'NbExchange'
+        });
+      }
+      nbgraderMenu.addItem({ command: commandIDs.openHistory });
     }
 
     mainMenu.addMenu(nbgraderMenu);

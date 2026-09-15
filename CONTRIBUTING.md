@@ -93,7 +93,7 @@ All (appropriate) files are checked with `isort`, `black`, `flake8`, and lints t
 
 Linting for the typescript is `jlpm lint` (this will actually check css (using `stylelint`), reformat code (using `prettier`), and check for _well-formedness_ (using `eslint`))
 
-**NOTE**: we use `jlpm` rather than `yarn` - there's something broken in the system that's broken `yarn` :sadness:
+**NOTE**: we use `jlpm` rather than `yarn` - whilst theoretically the same, `jlpm` is based on an older version of `yarn` :sadness:
 
 ## Running Tests
 
