@@ -33,7 +33,7 @@ class TestCheckFeatureEnabled:
         monkeypatch.setenv("TEST_FEATURE_VAR", "")
         manager = BaseListerClass()
         result = manager.check_feature_enabled("TEST_FEATURE_VAR")
-        assert result is True
+        assert result is False  # Empty string is considered as not set, so should return False
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_env_var_does_not_exist(self):

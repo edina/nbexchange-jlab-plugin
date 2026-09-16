@@ -40,12 +40,12 @@ class BaseListerClass(LoggingConfigurable):
                     returns False (feature disabled by default).
 
         Returns:
-            True if the environment variable exists (is set), False otherwise.
+            True if the environment variable exists (is set and not empty), False otherwise.
             The value of the variable does not matter.
         """
         if env_var is None or env_var == "":
             return False  # Default to False if no env_var is provided
 
-        exists = env_var in os.environ
-        self.log.info(f"Feature enabled check: {env_var} exists={exists}")
-        return exists
+        value = os.getenv(env_var, "")
+        self.log.info(f"Feature enabled check: {env_var} exists={value}")
+        return True if value else False
