@@ -39,7 +39,6 @@ class FeatureStatusManager(BaseListerClass):
             features = {
                 "history": self.check_feature_enabled("NAAS_COURSE_ID"),
                 "bulk_autograde": self.check_feature_enabled("NAAS_ROLE"),
-                "general": self.check_feature_enabled(),
             }
             return {"success": True, "value": features}
 

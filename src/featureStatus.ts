@@ -54,8 +54,8 @@ export class FeatureStatusService implements IFeatureStatus, IDisposable {
       const oldHistory = this._historyEnabled;
       const oldBulkAutograde = this._bulkAutogradeEnabled;
 
-      this._historyEnabled = status.history && status.general;
-      this._bulkAutogradeEnabled = status.bulk_autograde && status.general;
+      this._historyEnabled = status.history;
+      this._bulkAutogradeEnabled = status.bulk_autograde;
       this._isReady = true;
 
       if (oldHistory !== this._historyEnabled) {

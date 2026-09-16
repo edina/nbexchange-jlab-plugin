@@ -53,7 +53,6 @@ export function isInstructor(): boolean {
 export interface IFeatureStatus {
   history: boolean;
   bulk_autograde: boolean;
-  general: boolean;
 }
 
 export interface IFeatureStatusResponse {
