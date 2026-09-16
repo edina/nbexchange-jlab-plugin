@@ -99,7 +99,6 @@ class TestFeatureStatusManagerGetStatus:
         result = manager.get_status()
 
         assert result["success"] is True
-        assert result["value"]["general"] is False
         assert result["value"]["history"] is False
         assert result["value"]["bulk_autograde"] is False
 

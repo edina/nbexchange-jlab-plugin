@@ -37,8 +37,7 @@ describe('FeatureStatusService', () => {
     it('should update feature status on successful refresh', async () => {
       const mockGetFeatureStatus = jest.fn().mockResolvedValue({
         history: false,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
@@ -78,13 +77,11 @@ describe('FeatureStatusService', () => {
     it('should emit historyEnabledChanged when history status changes', async () => {
       const mockGetFeatureStatus1 = jest.fn().mockResolvedValue({
         history: true,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
       const mockGetFeatureStatus2 = jest.fn().mockResolvedValue({
         history: false,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
 
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus1;
@@ -105,13 +102,11 @@ describe('FeatureStatusService', () => {
     it('should emit bulkAutogradeEnabledChanged when bulk autograde status changes', async () => {
       const mockGetFeatureStatus1 = jest.fn().mockResolvedValue({
         history: true,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
       const mockGetFeatureStatus2 = jest.fn().mockResolvedValue({
         history: true,
-        bulk_autograde: false,
-        general: true
+        bulk_autograde: false
       });
 
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus1;
@@ -183,8 +178,7 @@ describe('FeatureStatusService', () => {
     it('should return correct historyEnabled value', async () => {
       const mockGetFeatureStatus = jest.fn().mockResolvedValue({
         history: false,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
@@ -195,8 +189,7 @@ describe('FeatureStatusService', () => {
     it('should return correct bulkAutogradeEnabled value', async () => {
       const mockGetFeatureStatus = jest.fn().mockResolvedValue({
         history: true,
-        bulk_autograde: false,
-        general: true
+        bulk_autograde: false
       });
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
@@ -207,8 +200,7 @@ describe('FeatureStatusService', () => {
     it('should return correct isReady value after refresh', async () => {
       const mockGetFeatureStatus = jest.fn().mockResolvedValue({
         history: true,
-        bulk_autograde: true,
-        general: true
+        bulk_autograde: true
       });
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
