@@ -78,7 +78,7 @@ Both extensions are also _context aware_: they will only be enabled if certain e
 - History enabled when the environment variable `NAAS_COURSE_ID` exists
 - Bulk Autograde enabled when environment variable `NAAS_ROLE` exists
 
-To clarify: the extension can be _enabled_ in the UI (and thus in the menu), but will be grey'd out unless the appropriate env-var _also_ exists.
+To clarify: the extension can be _enabled_ in the UI (and thus in the menu), but will be grey'd out unless the appropriate env-var also exists _and has a value_.
 
 ## Requirements
 
