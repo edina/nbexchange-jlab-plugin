@@ -49,3 +49,21 @@ export function isInstructor(): boolean {
   // Will actually query server-side code in a real implementation
   return true; // Assume all users are instructors for this example
 }
+
+export interface IFeatureStatus {
+  history: boolean;
+  bulk_autograde: boolean;
+}
+
+export interface IFeatureStatusResponse {
+  success: boolean;
+  value: IFeatureStatus;
+}
+
+export async function getFeatureStatus(): Promise<IFeatureStatus> {
+  const response = await requestAPI<IFeatureStatusResponse>('feature-status');
+  if (!response.success) {
+    throw new Error('Failed to get feature status');
+  }
+  return response.value;
+}

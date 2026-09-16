@@ -3,6 +3,7 @@
 *.bundle.*
 lib/
 node_modules/
+packages/
 *.log
 .eslintcache
 .stylelintcache
