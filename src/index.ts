@@ -54,6 +54,7 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
     nbgraderMenu.addItem({ command: commandIDs.openFormgraderLocal });
 
     if (app.commands.hasCommand(commandIDs.openBulkAutograde)) {
+      console.log('Adding openBulkAutograde command to palette');
       if (palette) {
         palette.addItem({
           command: commandIDs.openBulkAutograde,
@@ -65,6 +66,7 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
 
     if (app.commands.hasCommand(commandIDs.openHistory)) {
       if (palette) {
+        console.log('Adding openHistory command to palette');
         palette.addItem({
           command: commandIDs.openHistory,
           category: 'NbExchange'
@@ -76,10 +78,12 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
     mainMenu.addMenu(nbgraderMenu);
 
     featureStatus.historyEnabledChanged.connect(() => {
+      console.log('openHistory connected');
       app.commands.notifyCommandChanged(commandIDs.openHistory);
     });
 
     featureStatus.bulkAutogradeEnabledChanged.connect(() => {
+      console.log('openBulkAutograde connected');
       app.commands.notifyCommandChanged(commandIDs.openBulkAutograde);
     });
   }

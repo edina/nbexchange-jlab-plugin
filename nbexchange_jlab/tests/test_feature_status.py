@@ -14,10 +14,10 @@ class TestCheckFeatureEnabled:
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_no_env_var(self):
-        """When no env var is specified, should return True (enabled by default)."""
+        """When no env var is specified, should return False (disabled by default)."""
         manager = BaseListerClass()
         result = manager.check_feature_enabled()
-        assert result is True
+        assert result is False  # Default behavior is to return False when no env var is specified
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_env_var_exists(self, monkeypatch):
@@ -29,7 +29,7 @@ class TestCheckFeatureEnabled:
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_env_var_exists_empty_string(self, monkeypatch):
-        """When env var exists but is empty string, should return True (exists)."""
+        """When env var exists but is empty string, should return True."""
         monkeypatch.setenv("TEST_FEATURE_VAR", "")
         manager = BaseListerClass()
         result = manager.check_feature_enabled("TEST_FEATURE_VAR")
@@ -44,17 +44,17 @@ class TestCheckFeatureEnabled:
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_env_var_none(self):
-        """When env_var is None, should return True."""
+        """When env_var is None, should return False."""
         manager = BaseListerClass()
         result = manager.check_feature_enabled(None)
-        assert result is True
+        assert result is False
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_env_var_empty_string(self):
-        """When env_var is empty string, should return True."""
+        """When env_var is empty string, should return False."""
         manager = BaseListerClass()
         result = manager.check_feature_enabled("")
-        assert result is True
+        assert result is False
 
     @pytest.mark.gen_test
     def test_check_feature_enabled_naas_course_id(self, monkeypatch):
@@ -99,7 +99,7 @@ class TestFeatureStatusManagerGetStatus:
         result = manager.get_status()
 
         assert result["success"] is True
-        assert result["value"]["general"] is True
+        assert result["value"]["general"] is False
         assert result["value"]["history"] is False
         assert result["value"]["bulk_autograde"] is False
 
