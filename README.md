@@ -48,9 +48,62 @@ Outputs from the actions of the buttons are displayed below the table
 
 ![A screenshot of a successful ](ba_autograde_autograde.png)
 
+### Context-aware menu items
+
+Both extensions are _context aware_: their menu items are automatically enabled or disabled based on your nbgrader configuration:
+
+- **Exchange History**: Enabled when `course_id` is set in your nbgrader config
+- **Bulk Autograde**: Enabled when both `course_id` and `db_url` are set (instructor-only feature)
+
+The menu items will appear in the **Nbgrader** menu, but will be greyed out (disabled) if the required configuration is not present. This ensures users only see features that are available for their current course context.
+
+#### Configuration Examples
+
+**Enable History only** (course_id without db_url):
+```python
+# nbgrader_config.py
+c.CourseDirectory.course_id = "course101"
+```
+
+**Enable both History and Bulk Autograde** (course_id with db_url):
+```python
+# nbgrader_config.py
+c.CourseDirectory.course_id = "course101"
+c.CourseDirectory.db_url = "sqlite:///gradebook.db"
+```
+
+**Disable both** (no course_id):
+```python
+# nbgrader_config.py
+# Don't set course_id
+```
+
+#### Manual Extension Control
+
+If needed, extensions can also be manually disabled via command-line:
+
+```bash
+jupyter labextension disable @jupyter/nbexchange:history
+jupyter labextension disable @jupyter/nbexchange:bulk-autograde
+
+jupyter labextension enable @jupyter/nbexchange:history
+jupyter labextension enable @jupyter/nbexchange:bulk-autograde
+```
+
+Or via `jupyter-config/labconfig/page_config.json`:
+
+```json
+{
+  "disabledExtensions": {
+    "@jupyter/nbexchange:history": true,
+    "@jupyter/nbexchange:bulk-autograde": true
+  }
+}
+```
+
 ## Requirements
 
-- JupyterLab >= 4.0.0
+- JupyterLab >= 4.5.0
 - NbGrader
 
 ## Installation
