@@ -4,6 +4,7 @@ import os
 from jupyter_core.paths import jupyter_config_path
 from nbgrader.apps import NbGrader
 from traitlets.config import LoggingConfigurable
+from traitlets.config.loader import LazyConfigValue
 
 
 def get_current_course():
@@ -24,28 +25,30 @@ class BaseListerClass(LoggingConfigurable):
     def yield_config(self):
         yield self.load_config()
 
-    def check_enabled(self):
-        """Returns whether or not the History list should be enabled in the UI."""
-        config = self.load_config()
-        self.log.info(f"Loaded config: {config}")
-        if config.get("CourseDirectory").get("db_url") is not None:
-            return True
-        return False
+    def check_enabled(self, instructor_only: bool = False) -> bool:
+        """
+        Returns whether or not a feature should be enabled in the UI.
 
-    def check_feature_enabled(self, env_var: str = None) -> bool:
-        """Returns whether a feature is enabled based on environment variable existence.
+        Checks configuration validity (course_id, db_url).
 
         Args:
-            env_var: The full environment variable name to check. If None or empty,
-                    returns False (feature disabled by default).
+            instructor_only: If True, only instructors can use the feature. Requires db_url. Default is False.
 
         Returns:
-            True if the environment variable exists (is set and not empty), False otherwise.
-            The value of the variable does not matter.
+            True if the feature is enabled, False otherwise.
         """
-        if env_var is None or env_var == "":
-            return False  # Default to False if no env_var is provided
+        config = self.load_config()
+        self.log.info(f"Loaded config: {config}")
 
-        value = os.getenv(env_var, "")
-        self.log.info(f"Feature enabled check: {env_var} exists={value}")
-        return True if value else False
+        course_dir = config.get("CourseDirectory")
+        if course_dir is None or isinstance(course_dir, LazyConfigValue):
+            self.log.warning("CourseDirectory config is missing or not fully loaded.")
+            return False
+        if not course_dir.get("course_id"):
+            self.log.warning("Feature is disabled because course_id is not set.")
+            return False
+        if instructor_only:
+            if not course_dir.get("db_url"):
+                self.log.warning("Instructor-only feature is disabled because db_url is not set.")
+                return False
+        return True
