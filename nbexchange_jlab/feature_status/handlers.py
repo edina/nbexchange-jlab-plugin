@@ -10,15 +10,14 @@ from nbexchange_jlab.utils import BaseListerClass
 
 
 class FeatureStatusManager(BaseListerClass):
-    """Manager for checking feature status based on environment variables."""
+    """Manager for checking feature status based on configuration validity."""
 
     SUPPORTED_METHODS = ("GET", "HEAD")
 
     def get_status(self, feature_name: str = None) -> dict:
         """Get the status of a feature or all features.
 
-        Checks for the existence (not value) of environment variables.
-        Configure which variables to check by modifying the env_var assignments below.
+        Checks configuration validity (course_id, db_url) to determine if features are available.
 
         Args:
             feature_name: Optional specific feature to check. If None, returns all features.
@@ -26,19 +25,18 @@ class FeatureStatusManager(BaseListerClass):
         Returns:
             Dict with feature status information.
         """
-        env_var_map = {
-            "history": "NAAS_COURSE_ID",
-            "bulk_autograde": "NAAS_ROLE",
-        }
-
         if feature_name:
-            env_var = env_var_map.get(feature_name, f"NBEXCHANGE_{feature_name.upper()}_ENABLED")
-            enabled = self.check_feature_enabled(env_var)
-            return {"success": True, "value": {"feature": feature_name, "enabled": enabled, "env_var": env_var}}
+            if feature_name == "history":
+                enabled = self.check_enabled(instructor_only=False)
+            elif feature_name == "bulk_autograde":
+                enabled = self.check_enabled(instructor_only=True)
+            else:
+                enabled = False
+            return {"success": True, "value": {"feature": feature_name, "enabled": enabled}}
         else:
             features = {
-                "history": self.check_feature_enabled("NAAS_COURSE_ID"),
-                "bulk_autograde": self.check_feature_enabled("NAAS_ROLE"),
+                "history": self.check_enabled(instructor_only=False),
+                "bulk_autograde": self.check_enabled(instructor_only=True),
             }
             return {"success": True, "value": features}
 

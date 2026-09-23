@@ -17,8 +17,8 @@ repos:
       - id: flake8
   - repo: local
     hooks:
-    - id: lint_typescript
-      name : lint the typescript code
-      language: system
-      entry: bash -c 'jlpm lint'
-      pass_filenames: false
+      - id: lint_typescript
+        name: lint the typescript code
+        language: system
+        entry: bash -c 'jlpm lint'
+        pass_filenames: false
