@@ -19,6 +19,17 @@ def preprocessor():
     return pp
 
 
+@pytest.fixture(autouse=True)
+def course_root(tmp_path, monkeypatch):
+    """Run each test from a temporary directory.
+
+    The preprocessor writes its report to nbgrader's course root, which defaults to the
+    current directory, so without this the reports end up in the repository.
+    """
+    monkeypatch.chdir(tmp_path)
+    return tmp_path
+
+
 class TestDeduplicateIds(BaseTestPreprocessor):
 
     def test_duplicate_grade_cell(self, preprocessor, tmpdir):
@@ -114,3 +125,24 @@ class TestDeduplicateIds(BaseTestPreprocessor):
             "task": False,
         }
         assert nb.cells[1].source == "goodbye"
+
+    def test_report_written_to_course_root(self, preprocessor, course_root):
+        cell1 = create_grade_cell("hello", "code", "foo", 2)
+        cell2 = create_grade_cell("goodbye", "code", "foo", 2)
+        nb = new_notebook()
+        nb.cells.append(cell1)
+        nb.cells.append(cell2)
+
+        preprocessor.preprocess(nb, mock_resources)
+
+        reports = list(course_root.glob("autograde_report_1-test_exam 1_deduplicate_*.txt"))
+        assert len(reports) == 1
+        assert "Duplicates removed for student 1-test" in reports[0].read_text()
+
+    def test_no_report_without_duplicates(self, preprocessor, course_root):
+        nb = new_notebook()
+        nb.cells.append(create_grade_cell("hello", "code", "foo", 2))
+
+        preprocessor.preprocess(nb, mock_resources)
+
+        assert list(course_root.glob("autograde_report_*.txt")) == []
