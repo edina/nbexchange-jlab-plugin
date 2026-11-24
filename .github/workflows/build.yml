@@ -1,0 +1,81 @@
+# Lint and test every push and pull request.
+#
+# Mirrors what pre-commit and `pytest nbexchange_jlab` do locally (see CONTRIBUTING.md).
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      # Installs go through jlpm (JupyterLab's bundled yarn), so skip setup-node's
+      # packageManager-based cache: it shells out to the runner's Yarn 1 and fails.
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+
+      - name: Lint python
+        run: |
+          pip install isort black flake8
+          isort --check-only --diff .
+          black --check --diff .
+          flake8 nbexchange_jlab
+
+      - name: Lint typescript
+        run: |
+          pip install "jupyterlab>=4.0.0,<5"
+          jlpm install
+          jlpm lint:check
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Installs go through jlpm (JupyterLab's bundled yarn), so skip setup-node's
+      # packageManager-based cache: it shells out to the runner's Yarn 1 and fails.
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+
+      # setuptools < 81 ships its own pkg_resources, which clashes with the
+      # standard-pkg-resources test dependency (needed by pytest-tornado) and
+      # breaks pytest at startup. The runner's Python 3.10/3.11 come with an old
+      # setuptools, so upgrade it before installing.
+      - name: Install nbexchange_jlab
+        run: |
+          python -m pip install -U pip setuptools
+          python -m pip install -e ".[test]"
+
+      # The 5.1GB upload tests skip themselves when GITHUB_ACTIONS is set.
+      - name: Run python tests
+        run: pytest nbexchange_jlab --cov=nbexchange_jlab --cov-report=term
+
+      - name: Run typescript tests
+        if: matrix.python-version == '3.13'
+        run: jlpm jest
