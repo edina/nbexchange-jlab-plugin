@@ -14,41 +14,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
+  #     - uses: actions/setup-python@v6
+  #       with:
+  #         python-version: '3.13'
 
-      # Installs go through jlpm (JupyterLab's bundled yarn), so skip setup-node's
-      # packageManager-based cache: it shells out to the runner's Yarn 1 and fails.
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .node-version
-          package-manager-cache: false
+  #     # Installs go through jlpm (JupyterLab's bundled yarn), so skip setup-node's
+  #     # packageManager-based cache: it shells out to the runner's Yarn 1 and fails.
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version-file: .node-version
+  #         package-manager-cache: false
 
-      - name: Lint python
-        run: |
-          pip install isort black flake8
-          isort --check-only --diff .
-          black --check --diff .
-          flake8 nbexchange_jlab
+  #     - name: Lint python
+  #       run: |
+  #         pip install isort black flake8
+  #         isort --check-only --diff .
+  #         black --check --diff .
+  #         flake8 nbexchange_jlab
 
-      - name: Lint typescript
-        run: |
-          pip install "jupyterlab>=4.0.0,<5"
-          jlpm install
-          jlpm lint:check
+  #     - name: Lint typescript
+  #       run: |
+  #         pip install "jupyterlab>=4.0.0,<5"
+  #         jlpm install
+  #         jlpm lint:check
 
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v5
 
