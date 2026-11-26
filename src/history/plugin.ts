@@ -6,35 +6,37 @@ import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 
 import { HistoryWidget } from './index';
 import { commandIDs } from '../index';
-import { FeatureStatusService, IFeatureStatus } from '../featureStatus';
+import { IFeatureStatus } from '../featureStatus';
 
 const HISTORY_PLUGIN_ID = '@jupyter/nbexchange:history';
 
-export const historyPlugin: JupyterFrontEndPlugin<IFeatureStatus> = {
+export const historyPlugin: JupyterFrontEndPlugin<void> = {
   id: HISTORY_PLUGIN_ID,
   description:
     'Exchange History: View all actions in an out of the exchange, by course and assignment.',
   autoStart: true,
-  provides: IFeatureStatus,
+  requires: [IFeatureStatus],
   optional: [ICommandPalette],
   activate: (
     app: JupyterFrontEnd,
+    featureStatus: IFeatureStatus,
     palette: ICommandPalette | null
-  ): IFeatureStatus => {
-    const historyWidget = new HistoryWidget(app);
-    const main = new MainAreaWidget({ content: historyWidget });
-
-    main.id = 'nbexchange-history';
-    main.title.label = 'Exchange History';
-    main.title.closable = true;
-
-    const featureStatus = new FeatureStatusService();
-    void featureStatus.refresh();
+  ) => {
+    let main: MainAreaWidget<HistoryWidget> | null = null;
 
     const command = commandIDs.openHistory;
     app.commands.addCommand(command, {
       label: 'Exchange History',
       execute: () => {
+        // Create new widget if none exists, or if the current one is disposed
+        if (!main || main.isDisposed) {
+          const historyWidget = new HistoryWidget(app);
+          main = new MainAreaWidget({ content: historyWidget });
+          main.id = 'nbexchange-history';
+          main.title.label = 'Exchange History';
+          main.title.closable = true;
+        }
+
         if (!main.isAttached) {
           app.shell.add(main, 'main');
         }
@@ -53,8 +55,6 @@ export const historyPlugin: JupyterFrontEndPlugin<IFeatureStatus> = {
     featureStatus.historyEnabledChanged.connect(() => {
       app.commands.notifyCommandChanged(command);
     });
-
-    return featureStatus;
   }
 };
 

@@ -6,6 +6,7 @@ import { ICommandPalette } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Menu } from '@lumino/widgets';
 
+import { featureStatusPlugin } from './featureStatusPlugin';
 import { historyPlugin } from './history/plugin';
 import { bulkAutogradePlugin } from './bulkAutograde/plugin';
 import { IFeatureStatus } from './featureStatus';
@@ -89,4 +90,9 @@ const menuPlugin: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default [menuPlugin, historyPlugin, bulkAutogradePlugin];
+export default [
+  featureStatusPlugin,
+  menuPlugin,
+  historyPlugin,
+  bulkAutogradePlugin
+];

@@ -22,17 +22,21 @@ export const bulkAutogradePlugin: JupyterFrontEndPlugin<void> = {
     featureStatus: IFeatureStatus,
     palette: ICommandPalette | null
   ) => {
-    const bulkAutogradeWidget = new BulkAutogradeWidget(app);
-    const main = new MainAreaWidget({ content: bulkAutogradeWidget });
-
-    main.id = 'nbexchange-bulk-autograde';
-    main.title.label = 'Bulk Autograde';
-    main.title.closable = true;
+    let main: MainAreaWidget<BulkAutogradeWidget> | null = null;
 
     const command = commandIDs.openBulkAutograde;
     app.commands.addCommand(command, {
       label: 'Bulk Autograde',
       execute: () => {
+        // Create new widget if none exists, or if the current one is disposed
+        if (!main || main.isDisposed) {
+          const bulkAutogradeWidget = new BulkAutogradeWidget(app);
+          main = new MainAreaWidget({ content: bulkAutogradeWidget });
+          main.id = 'nbexchange-bulk-autograde';
+          main.title.label = 'Bulk Autograde';
+          main.title.closable = true;
+        }
+
         if (!main.isAttached) {
           app.shell.add(main, 'main');
         }

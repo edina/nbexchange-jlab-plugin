@@ -54,11 +54,22 @@ describe('FeatureStatusService', () => {
         .mockRejectedValue(new Error('Network error'));
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
-      await service.refresh();
+      // Suppress console.error output during this test
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
-      expect(service.isReady).toBe(true);
-      expect(service.historyEnabled).toBe(false);
-      expect(service.bulkAutogradeEnabled).toBe(false);
+      try {
+        await service.refresh();
+
+        expect(service.isReady).toBe(true);
+        expect(service.historyEnabled).toBe(false);
+        expect(service.bulkAutogradeEnabled).toBe(false);
+        // Optionally verify that console.error was called (proves error was caught)
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      } finally {
+        consoleErrorSpy.mockRestore();
+      }
     });
 
     it('should handle malformed response gracefully', async () => {
@@ -67,9 +78,18 @@ describe('FeatureStatusService', () => {
         .mockRejectedValue(new Error('Invalid response'));
       (handler.getFeatureStatus as jest.Mock) = mockGetFeatureStatus;
 
-      await service.refresh();
+      // Suppress console.error output during this test
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
-      expect(service.isReady).toBe(true);
+      try {
+        await service.refresh();
+
+        expect(service.isReady).toBe(true);
+      } finally {
+        consoleErrorSpy.mockRestore();
+      }
     });
   });
 

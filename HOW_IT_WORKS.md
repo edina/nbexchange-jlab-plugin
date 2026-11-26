@@ -59,7 +59,45 @@ The `prep_api_call` function needs to return 3 things:
 
 (See the [README](README.md) for an example.)
 
-# The History extension
+## Frontend Plugin Architecture
+
+The JupyterLab extension is composed of four independent plugins that work together:
+
+### 1. Feature Status Plugin (`@jupyter/nbexchange:feature-status`)
+
+A standalone plugin that provides the `IFeatureStatus` service. This service:
+
+- Queries the server-side nbgrader configuration
+- Determines which features should be enabled based on `course_id` and `db_url` settings
+- Provides reactive signals when feature status changes
+
+This plugin has no dependencies and is required by both the History and Bulk Autograde plugins.
+
+### 2. Exchange History Plugin (`@jupyter/nbexchange:history`)
+
+Provides the Exchange History UI widget. It:
+
+- **Requires:** `IFeatureStatus` service (from the Feature Status Plugin)
+- **Provides:** History widget with course activity timeline
+- Can be disabled independently without affecting Bulk Autograde
+
+### 3. Bulk Autograde Plugin (`@jupyter/nbexchange:bulk-autograde`)
+
+Provides the Bulk Autograder UI widget. It:
+
+- **Requires:** `IFeatureStatus` service (from the Feature Status Plugin)
+- **Provides:** Bulk autograding interface for processing all submissions
+- Can be disabled independently without affecting Exchange History
+
+### 4. Menu Plugin (`@jupyter/nbexchange:menu`)
+
+Integrates all nbexchange features into the Nbgrader main menu. It:
+
+- **Requires:** `IFeatureStatus` service and main menu
+- Adds menu items for History and Bulk Autograde (when available)
+- Respects the enabled/disabled state from the feature status service
+
+## The History extension
 
 Knowing that the exchange service has a list of actions (see [NBExchange docs](https://github.com/edina/nbexchange/blob/master/how_it_works.md)), and the service has a `history` API-endpoint, then displaying a users interactions is feasable.
 
