@@ -51,7 +51,7 @@ class BaAssignmentsList(BaseListerClass):
         if not get_current_course():
             return {"success": False, "value": "You need to have a current course code."}
 
-        if not self.check_enabled():
+        if not self.check_enabled(instructor_only=True):
             return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
 
         data: Dict = {}
@@ -68,7 +68,7 @@ class BaAssignmentsList(BaseListerClass):
         return retvalue
 
     def do_collect(self, assignment_code: str = None) -> Dict:
-        if not self.check_enabled():
+        if not self.check_enabled(instructor_only=True):
             return {"success": False, "value": "You need to be an Instructor on this course to use this feature."}
 
         if not assignment_code:

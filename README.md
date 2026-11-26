@@ -48,9 +48,88 @@ Outputs from the actions of the buttons are displayed below the table
 
 ![A screenshot of a successful ](ba_autograde_autograde.png)
 
+### Context-aware menu items
+
+Both extensions are _context aware_: their menu items are automatically enabled or disabled based on your nbgrader configuration:
+
+- **Exchange History**: Enabled when `course_id` is set in your nbgrader config
+- **Bulk Autograde**: Enabled when both `course_id` and `db_url` are set (instructor-only feature)
+
+The menu items will appear in the **Nbgrader** menu, but will be greyed out (disabled) if the required configuration is not present. This ensures users only see features that are available for their current course context.
+
+#### Configuration Examples
+
+**Enable History only** (course_id without db_url):
+
+```python
+# nbgrader_config.py
+c.CourseDirectory.course_id = "course101"
+```
+
+In this configuration, Exchange History will be enabled, but Bulk Autograde will remain disabled (greyed out in the menu).
+
+**Enable both History and Bulk Autograde** (course_id with db_url):
+
+```python
+# nbgrader_config.py
+c.CourseDirectory.course_id = "course101"
+c.CourseDirectory.db_url = "sqlite:///gradebook.db"
+```
+
+Both features will be fully enabled and accessible from the Nbgrader menu.
+
+**Disable both** (no course_id):
+
+```python
+# nbgrader_config.py
+# Don't set course_id
+```
+
+Without a course_id, both features will be disabled (greyed out in the menu).
+
+#### Manual Extension Control
+
+Extensions can be manually enabled or disabled independently. This is useful if you want to completely hide a feature from the UI rather than just having it greyed out.
+
+**Disable/enable specific extensions:**
+
+```bash
+# Disable Exchange History (Bulk Autograde will continue to work)
+jupyter labextension disable @jupyter/nbexchange:history
+jupyter labextension enable @jupyter/nbexchange:history
+
+# Disable Bulk Autograde (History will continue to work)
+jupyter labextension disable @jupyter/nbexchange:bulk-autograde
+jupyter labextension enable @jupyter/nbexchange:bulk-autograde
+```
+
+**Disable/enable via configuration file:**
+
+Create or edit `jupyter-config/labconfig/page_config.json`:
+
+```json
+{
+  "disabledExtensions": {
+    "@jupyter/nbexchange:history": true,
+    "@jupyter/nbexchange:bulk-autograde": true
+  }
+}
+```
+
+This configuration disables only the Exchange History extension while keeping Bulk Autograde functional.
+
+**Available extension IDs:**
+
+- `@jupyter/nbexchange:history` - Exchange History extension
+- `@jupyter/nbexchange:bulk-autograde` - Bulk Autograde extension
+- `@jupyter/nbexchange:feature-status` - Feature status service (required by both extensions above)
+- `@jupyter/nbexchange:menu` - Nbgrader menu integration
+
+> **Note:** The `@jupyter/nbexchange:feature-status` plugin provides the shared service that both History and Bulk Autograde depend on. It should not be disabled unless you want to disable both features.
+
 ## Requirements
 
-- JupyterLab >= 4.0.0
+- JupyterLab >= 4.5.0
 - NbGrader
 
 ## Installation

@@ -1,9 +1,16 @@
 import { HistoryWidget } from './index';
 import { JupyterFrontEnd } from '@jupyterlab/application';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 import { HistoryList } from './history';
 jest.mock('../handler', () => ({ requestAPI: jest.fn() }));
+
+jest.mock('@jupyterlab/apputils', () => ({
+  Notification: {
+    emit: jest.fn()
+  }
+}));
 
 /* Tests still to write */
 // show_error gets widget with missing 'alert-danger' class
@@ -148,60 +155,64 @@ describe('HistoryWidget', () => {
 
   // test load-list gets network error
   it('handles network error when loading history list', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockRejectedValue(new Error('Network Error'));
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(errorSpy).toHaveBeenCalled();
 
-    expect(error_box.innerHTML).toContain('Error on GET /history');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error on GET /history'),
+      'error',
+      { autoClose: false }
+    );
     errorSpy.mockRestore();
+    notificationSpy.mockRestore();
   });
 
   // test load-list with non-json response
   it('handles non-JSON response when loading history list', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockResolvedValue('Non-JSON Response');
 
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed with string:</p>\n<pre>Non-JSON Response</pre>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'HistoryList.load_list() failed with string:\nNon-JSON Response',
+      'error',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   // test load-list with error in response
   it('handles error in response when loading history list', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'false',
       value: 'Some error occurred'
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
-    const error_box = widget.node.querySelector(
-      '#baautograde-alert-danger'
-    ) as HTMLElement;
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>Some error occurred</pre>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'HistoryList.load_list() failed with success not true:\nSome error occurred',
+      'error',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   // test load-list with valid data
@@ -236,6 +247,7 @@ describe('HistoryWidget', () => {
   });
 
   it('loads history list identifies valid data with no assignments', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     const mockData = [
       {
         role: { Instructor: 1 },
@@ -253,18 +265,21 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const error_box = widget.node.querySelector('.alert-info') as HTMLElement;
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'There is no history to show you',
+      'info',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   it('loads history list identifies valid data with no assignments for student', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     const mockData = [{}];
     // mock get_current course to return course code
     (requestAPI as jest.Mock).mockResolvedValue({
@@ -272,15 +287,17 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
-    const error_box = widget.node.querySelector('.alert-info') as HTMLElement;
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(error_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'There is no history to show you',
+      'info',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   // test marks the current course correctly
@@ -411,6 +428,7 @@ describe('HistoryWidget', () => {
   });
 
   it('sets on show_error correctly', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: null
@@ -420,18 +438,19 @@ describe('HistoryWidget', () => {
     const app = {} as JupyterFrontEnd;
     const widget = new HistoryWidget(app);
     const historyList = new HistoryList(widget, 'actions-panel-group');
-
-    const element = widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    expect(element.innerHTML).toBe('');
 
     historyList.show_error('<p>Test error message</p>');
 
-    expect(element.innerHTML).toBe('<p>Test error message</p>');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      '<p>Test error message</p>',
+      'error',
+      { autoClose: false }
+    );
+    notificationSpy.mockRestore();
   });
 
   it('sets on show_info correctly', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: null
@@ -442,16 +461,17 @@ describe('HistoryWidget', () => {
     const widget = new HistoryWidget(app);
     const historyList = new HistoryList(widget, 'actions-panel-group');
 
-    const element = widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    expect(element.innerHTML).toBe('');
-
     historyList.show_info('<p>Test info message</p>');
-    expect(element.innerHTML).toBe('<p>Test info message</p>');
+    expect(notificationSpy).toHaveBeenCalledWith(
+      '<p>Test info message</p>',
+      'info',
+      { autoClose: false }
+    );
+    notificationSpy.mockRestore();
   });
 
   it('runs clear_list correctly', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: null
@@ -462,12 +482,6 @@ describe('HistoryWidget', () => {
     const widget = new HistoryWidget(app);
     const historyList = new HistoryList(widget, 'actions-panel-group');
 
-    const info = widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    const danger = widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
     const results_panel = widget.node.querySelector(
       '#actions-panel-group'
     ) as HTMLElement;
@@ -478,38 +492,37 @@ describe('HistoryWidget', () => {
     historyList.show_info('<p>Test info message</p>');
     historyList.show_error('<p>Test error message</p>');
 
-    expect(info.innerHTML).toBe('<p>Test info message</p>');
-    expect(danger.innerHTML).toBe('<p>Test error message</p>');
-
     historyList.clear_list();
 
-    expect(info.innerHTML).toBe('');
-    expect(danger.innerHTML).toBe('');
     expect(results_panel.innerHTML).toBe('');
+    notificationSpy.mockRestore();
   });
 
   // test load-list with invalid data
   it('handles success but null value', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     // mock get_current course to return course code
     (requestAPI as jest.Mock).mockResolvedValue({
       success: 'true',
       value: null
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    const info_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
-    expect(info_box.innerHTML).toContain(
-      '<p>There is no history available from the Exchange service</p>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'There is no history available from the Exchange service',
+      'info',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 
   // test load-list with invalid data
   it('handles success and present but bad  value', async () => {
+    const notificationSpy = jest.spyOn(Notification, 'emit');
     const mockData = [
       {
         role: 'Instructor',
@@ -527,15 +540,16 @@ describe('HistoryWidget', () => {
       value: mockData
     });
     const app = {} as JupyterFrontEnd;
-    const widget = new HistoryWidget(app);
+    new HistoryWidget(app);
 
     // wait for the asynchronous load_list invoked by the widget
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    const info_box = widget.node.querySelector('.alert-info') as HTMLElement;
-
-    expect(info_box.innerHTML).toContain(
-      '<p>There is no history to show you</p>'
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'There is no history to show you',
+      'info',
+      { autoClose: false }
     );
+    notificationSpy.mockRestore();
   });
 });

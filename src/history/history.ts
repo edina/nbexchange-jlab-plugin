@@ -1,6 +1,6 @@
 import { Widget } from '@lumino/widgets';
 
-// disabled, 'cos I can't test them: import { Notification } from '@jupyterlab/apputils';
+import { Notification } from '@jupyterlab/apputils';
 
 import { requestAPI } from '../handler';
 
@@ -126,22 +126,18 @@ export class HistoryList {
 
   private load_list_success(data: ICourseData[]): void {
     if (data === null) {
-      this.show_info(
-        '<p>There is no history available from the Exchange service</p>'
-      );
+      this.show_info('There is no history available from the Exchange service');
       return;
     }
     if (typeof data !== 'object') {
       this.show_error(
-        '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>' +
-          String(data) +
-          '</pre>'
+        'HistoryList.load_list() failed with success not true:\n' + String(data)
       );
       return;
     }
     if (data.length === 0) {
       this.show_info(
-        '<p>There is zero history available from the Exchange service'
+        'There is zero history available from the Exchange service'
       );
       return;
     }
@@ -149,12 +145,12 @@ export class HistoryList {
       for (const key in data) {
         const this_course = data[key];
         if (!('assignments' in this_course)) {
-          this.show_info('<p>There is no history to show you</p>');
+          this.show_info('There is no history to show you');
           return;
         }
         const assignments: IAssignmentData[] = this_course['assignments'];
         if (assignments.length === 0) {
-          this.show_info('<p>There is no history to show you</p>');
+          this.show_info('There is no history to show you');
           return;
         }
       }
@@ -294,7 +290,7 @@ export class HistoryList {
     } catch (reason) {
       console.error('load_list caught error:', reason);
       const msg: string = `Error on GET /history.\n${reason}`;
-      this.show_error('<p>' + msg + '</p>');
+      this.show_error(msg);
       return;
     } finally {
       this.set_loading(false);
@@ -304,47 +300,21 @@ export class HistoryList {
       this.load_list_success(<any[]>data.value);
     } else {
       if (typeof data === 'string') {
-        this.show_error(
-          '<p>HistoryList.load_list() failed with string:</p>\n<pre>' +
-            data +
-            '</pre>'
-        );
+        this.show_error('HistoryList.load_list() failed with string:\n' + data);
         return;
       }
       this.show_error(
-        '<p>HistoryList.load_list() failed with success not true:</p>\n<pre>' +
-          data.value +
-          '</pre>'
+        'HistoryList.load_list() failed with success not true:\n' + data.value
       );
     }
   }
 
   public show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
+    Notification.emit(message, 'error', { autoClose: false });
   }
 
   public show_info(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-info'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.log('show_info element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // Notification.emit(message, 'info', { autoClose: false });
+    Notification.emit(message, 'info', { autoClose: false });
   }
 }
 
@@ -485,7 +455,7 @@ class Action {
       } catch (reason) {
         console.error('Action do_download caught error:', reason);
         const msg: string = 'Error on GET hisDownload.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
+        this.show_error(msg);
       }
       if (data) {
         alert_area.innerHTML = data.value;
@@ -520,7 +490,7 @@ class Action {
       } catch (reason) {
         console.error('Action do_collect caught error:', reason);
         const msg: string = 'Error on GET hisCollect.\n' + reason;
-        this.show_error('<p>' + msg + '</p>');
+        this.show_error(msg);
       }
 
       if (data) {
@@ -644,16 +614,6 @@ class Action {
   }
 
   private show_error(message: string): void {
-    const element = this.widget.node.getElementsByClassName(
-      'alert-danger'
-    )[0] as HTMLElement;
-    if (element) {
-      element.innerHTML = message;
-      element.style.display = 'block';
-    } else {
-      console.error('show_error element not found');
-      // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
-    }
-    // disabled, 'cos I can't test them: Notification.emit(message, 'error', { autoClose: false });
+    Notification.emit(message, 'error', { autoClose: false });
   }
 }

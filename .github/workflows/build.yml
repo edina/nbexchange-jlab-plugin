@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       # Installs go through jlpm (JupyterLab's bundled yarn), so skip setup-node's
       # packageManager-based cache: it shells out to the runner's Yarn 1 and fails.
@@ -29,6 +29,10 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
+
+      # Enable corepack to use the Yarn version specified in package.json (yarn@4.18.0)
+      - name: Enable corepack
+        run: corepack enable
 
       - name: Lint python
         run: |
@@ -40,6 +44,7 @@ jobs:
       - name: Lint typescript
         run: |
           pip install "jupyterlab>=4.0.0,<5"
+          corepack enable
           jlpm install
           jlpm lint:check
 
@@ -48,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v5
 
@@ -62,6 +67,10 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
+
+      # Enable corepack to use the Yarn version specified in package.json (yarn@4.18.0)
+      - name: Enable corepack
+        run: corepack enable
 
       # setuptools < 81 ships its own pkg_resources, which clashes with the
       # standard-pkg-resources test dependency (needed by pytest-tornado) and
@@ -78,4 +87,6 @@ jobs:
 
       - name: Run typescript tests
         if: matrix.python-version == '3.13'
-        run: jlpm jest
+        run: |
+          corepack enable
+          jlpm jest
